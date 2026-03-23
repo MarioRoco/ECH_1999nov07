@@ -39,12 +39,12 @@ import pandas as pd
 from scipy.ndimage import gaussian_filter1d
 
 
-from auxiliar_files.data_path import path_data_soho 
-from auxiliar_files.SOHO_aux_functions import *
-from auxiliar_files.calibration_parameters import *
-from auxiliar_files.spectroheliogram_functions import *
-from auxiliar_files.solar_rotation_variables import *
-from auxiliar_files.aux_functions import *
+from utils.data_path import path_data_soho 
+from utils.SOHO_aux_functions import *
+from utils.calibration_parameters import *
+from utils.spectroheliogram_functions import *
+from utils.solar_rotation_variables import *
+from utils.aux_functions import *
 from NeVIII_rest_wavelength import * #NeVIII_theoretical_wavelength_dic, NeVIII_theoretical_wavelength_color_dic 
 
 from wcal_parameters import * #slit_bottom_px, slit_top_px

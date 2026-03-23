@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from scipy.interpolate import interp1d
-from auxiliar_functions.aux_functions import crop_range
+from utils.aux_functions import crop_range
 import matplotlib.lines as mlines
 
 #########################################################################
