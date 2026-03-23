@@ -49,14 +49,14 @@ import astropy.units as u
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from auxiliar_functions.data_path import path_data_soho 
-from auxiliar_functions.SOHO_aux_functions import *
-from auxiliar_functions.calibration_parameters__output import *
-from auxiliar_functions.spectroheliogram_functions import *
-from auxiliar_functions.solar_rotation_variables import *
-from auxiliar_functions.aux_functions import *
-from auxiliar_functions.general_variables import *
-from auxiliar_functions.NeVIII_rest_wavelength import *
+from utils.data_path import path_data_soho 
+from utils.SOHO_aux_functions import *
+from utils.calibration_parameters__output import *
+from utils.spectroheliogram_functions import *
+from utils.solar_rotation_variables import *
+from utils.aux_functions import *
+from utils.general_variables import *
+from utils.NeVIII_rest_wavelength import *
 from scale_hrts import *
 
 ######################################################
@@ -64,7 +64,7 @@ from scale_hrts import *
 ######################################################
 
 # Load the intensity map and uncertainties
-intensitymap_loaded_dic = np.load('../auxiliar_functions/intensity_map_'+line_label+'_interpolated.npz')
+intensitymap_loaded_dic = np.load('../data/data_modified/intensity_map_'+line_label+'_interpolated.npz')
 intensity_map = intensitymap_loaded_dic['intensity_map'] #2D-array
 intensity_map_unc = intensitymap_loaded_dic['intensity_map_unc'] #2D-array
 intensity_map_croplat = intensitymap_loaded_dic['intensity_map_croplat'] #2D-array
@@ -154,7 +154,7 @@ for range_percentage_i in range_percentage_list:
     
     
     # Import SUMER data interpolated (wavelength calibrated)
-    data_interpolated_loaded = np.load('../auxiliar_functions/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
+    data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
     # Average spectra of the pixels selected
     lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from_pixels_selected_from_interpolated_data(wavelength_range_=wavelength_range_to_average, data_interpolated_loaded_=data_interpolated_loaded, rows_cols_of_spectroheliogram_croplat=rowscols_inside_range_i)
 

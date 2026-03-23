@@ -35,21 +35,21 @@ import astropy.units as u
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from auxiliar_functions.data_path import path_data_soho 
-from auxiliar_functions.SOHO_aux_functions import *
-from auxiliar_functions.calibration_parameters__output import *
-from auxiliar_functions.spectroheliogram_functions import *
-from auxiliar_functions.solar_rotation_variables import *
-from auxiliar_functions.aux_functions import *
-from auxiliar_functions.general_variables import *
-from auxiliar_functions.NeVIII_rest_wavelength import *
+from utils.data_path import path_data_soho 
+from utils.SOHO_aux_functions import *
+from utils.calibration_parameters__output import *
+from utils.spectroheliogram_functions import *
+from autils.solar_rotation_variables import *
+from utils.aux_functions import *
+from utils.general_variables import *
+from utils.NeVIII_rest_wavelength import *
 
 ######################################################
 ######################################################
 ######################################################
 
 # Load the intensity map and uncertainties
-intensitymap_loaded_dic = np.load('../auxiliar_functions/intensity_map_'+line_label+'_interpolated.npz')
+intensitymap_loaded_dic = np.load('../data/data_modified/intensity_map_'+line_label+'_interpolated.npz')
 intensity_map = intensitymap_loaded_dic['intensity_map'] #2D-array
 intensity_map_unc = intensitymap_loaded_dic['intensity_map_unc'] #2D-array
 intensity_map_croplat = intensitymap_loaded_dic['intensity_map_croplat'] #2D-array
@@ -68,7 +68,7 @@ print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212
 ######################################################
 
 # Import SUMER data interpolated (wavelength calibrated)
-data_interpolated_loaded = np.load('../auxiliar_functions/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
+data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
 spectral_image_interpolated_list = data_interpolated_loaded['spectral_image_interpolated_list']
 spectral_image_unc_interpolated_list = data_interpolated_loaded['spectral_image_unc_interpolated_list']
 lam_sumer = data_interpolated_loaded['reference_wavelength']          # scalar (0‑d array; use a_loaded.item() for Python float)

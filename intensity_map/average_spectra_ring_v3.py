@@ -65,14 +65,14 @@ from scipy.ndimage import gaussian_filter1d
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from auxiliar_functions.data_path import path_data_soho 
-from auxiliar_functions.SOHO_aux_functions import *
-from auxiliar_functions.calibration_parameters__output import *
-from auxiliar_functions.spectroheliogram_functions import *
-from auxiliar_functions.solar_rotation_variables import *
-from auxiliar_functions.aux_functions import *
-from auxiliar_functions.general_variables import *
-from auxiliar_functions.NeVIII_rest_wavelength import *
+from utils.data_path import path_data_soho 
+from utils.SOHO_aux_functions import *
+from utils.calibration_parameters__output import *
+from utils.spectroheliogram_functions import *
+from utils.solar_rotation_variables import *
+from utils.aux_functions import *
+from utils.general_variables import *
+from utils.NeVIII_rest_wavelength import *
 
 ######################################################
 # Rest wavelength
@@ -95,7 +95,7 @@ intensity_map_unc_croplat = intensity_map_unc[slit_top_px:slit_bottom_px+1,:]
 
 ######################################################
 # Import SUMER data interpolated (wavelength calibrated)
-data_interpolated_loaded = np.load('../auxiliar_functions/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
+data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
 spectral_image_interpolated_list = data_interpolated_loaded['spectral_image_interpolated_list']
 spectral_image_unc_interpolated_list = data_interpolated_loaded['spectral_image_unc_interpolated_list']
 lam_sumer = data_interpolated_loaded['reference_wavelength']          # scalar (0‑d array; use a_loaded.item() for Python float)
@@ -132,7 +132,7 @@ header_eit = fits.getheader(filepath_eit)
 ######################################################
 # Import coordinates
 
-from auxiliar_functions.solar_rotation_variables import *
+from utils.solar_rotation_variables import *
 closest_index = closest_index_EIT_SUMER_dic[filename_eit]
 closest_time_sumer = closest_time_SUMER_to_EIT_dic[filename_eit]
 time_eit = time_EIT_dic[filename_eit]

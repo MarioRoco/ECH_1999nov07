@@ -57,14 +57,14 @@ import astropy.units as u
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from auxiliar_functions.data_path import path_data_soho 
-from auxiliar_functions.SOHO_aux_functions import *
-from auxiliar_functions.calibration_parameters__output import *
-from auxiliar_functions.spectroheliogram_functions import *
-from auxiliar_functions.solar_rotation_variables import *
-from auxiliar_functions.aux_functions import *
-from auxiliar_functions.general_variables import *
-from auxiliar_functions.NeVIII_rest_wavelength import *
+from utils.data_path import path_data_soho 
+from utils.SOHO_aux_functions import *
+from utils.calibration_parameters__output import *
+from utils.spectroheliogram_functions import *
+from utils.solar_rotation_variables import *
+from utils.aux_functions import *
+from utils.general_variables import *
+from utils.NeVIII_rest_wavelength import *
 from scale_hrts import *
 
 ############################################################################################################
@@ -73,7 +73,7 @@ from scale_hrts import *
 # Average profiles of the intensity bin
 
 # Load the intensity map and uncertainties
-intensitymap_loaded_dic = np.load('../auxiliar_functions/intensity_map_'+line_label+'_interpolated.npz')
+intensitymap_loaded_dic = np.load('../data/data_modified/intensity_map_'+line_label+'_interpolated.npz')
 intensity_map = intensitymap_loaded_dic['intensity_map'] #2D-array
 intensity_map_unc = intensitymap_loaded_dic['intensity_map_unc'] #2D-array
 intensity_map_croplat = intensitymap_loaded_dic['intensity_map_croplat'] #2D-array
@@ -118,7 +118,7 @@ header_eit = fits.getheader(filepath_eit)
 
 ######################################################
 
-from auxiliar_functions.solar_rotation_variables import *
+from utils.solar_rotation_variables import *
 closest_index = closest_index_EIT_SUMER_dic[filename_eit]
 closest_time_sumer = closest_time_SUMER_to_EIT_dic[filename_eit]
 time_eit = time_EIT_dic[filename_eit]
@@ -197,7 +197,7 @@ print('Number of pixels in SUMER:', len(rowscols_croplat_sumer_from_eit))
 ######################################################
 
 # Import SUMER data interpolated (wavelength calibrated)
-data_interpolated_loaded = np.load('../auxiliar_functions/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
+data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
 # Average spectra of the pixels selected
 lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from_pixels_selected_from_interpolated_data(wavelength_range_=wavelength_range_to_average, data_interpolated_loaded_=data_interpolated_loaded, rows_cols_of_spectroheliogram_croplat=rowscols_croplat_sumer_from_eit)
 
@@ -423,7 +423,7 @@ plt.show(block=False)
 if save_average_profile_map == 'yes':
     range_numbers_to_string = '__'.join(f"{x:.2f}".replace('.', '_').rstrip('0') if f"{x:.2f}"[-1] != '0' else f"{x:.1f}".replace('.', '_') for x in range_percentage) 
     filename_profile = 'average_profile__' + range_numbers_to_string + '__' + threshold_value_type + '_of_EIT_' + str(eit_wavelength)
-    foldepath_profile = '../auxiliar_functions/'
+    foldepath_profile = '../data/data_modified/'
     np.savez(foldepath_profile+filename_profile, lam_sumer_cropNeVIII=lam_sumer_cropNeVIII, rad_sumer_cropNeVIII=rad_sumer_cropNeVIII, erad_sumer_cropNeVIII=erad_sumer_cropNeVIII, rad_sumer_cropNeVIII_corrected_qra=rad_sumer_cropNeVIII_corrected_qra, erad_sumer_cropNeVIII_corrected_qra=erad_sumer_cropNeVIII_corrected_qra, lam_hrtsa_cropNeVIII=lam_hrtsa_cropNeVIII, rad_hrtsa_conv_scaled_cropNeVIII=rad_hrtsa_conv_scaled_cropNeVIII, erad_hrtsa_conv_scaled_cropNeVIII=erad_hrtsa_conv_scaled_cropNeVIII, rad_sumer_cropNeVIII_corrected_qrb=rad_sumer_cropNeVIII_corrected_qrb, erad_sumer_cropNeVIII_corrected_qrb=erad_sumer_cropNeVIII_corrected_qrb, lam_hrtsb_cropNeVIII=lam_hrtsb_cropNeVIII, rad_hrtsb_conv_scaled_cropNeVIII=rad_hrtsb_conv_scaled_cropNeVIII, erad_hrtsb_conv_scaled_cropNeVIII=erad_hrtsb_conv_scaled_cropNeVIII, rad_sumer_cropNeVIII_corrected_qrl=rad_sumer_cropNeVIII_corrected_qrl, erad_sumer_cropNeVIII_corrected_qrl=erad_sumer_cropNeVIII_corrected_qrl, lam_hrtsl_cropNeVIII=lam_hrtsl_cropNeVIII, rad_hrtsl_conv_scaled_cropNeVIII=rad_hrtsl_conv_scaled_cropNeVIII, erad_hrtsl_conv_scaled_cropNeVIII=erad_hrtsl_conv_scaled_cropNeVIII)
 
 
@@ -461,7 +461,7 @@ erad_hrtsl_conv_scaled_cropNeVIII = profiles_loaded_dic['erad_hrtsl_conv_scaled_
 # EIT contours
 
 # Load the intensity map and uncertainties
-intensitymap_loaded_dic = np.load('../auxiliar_functions/dopplermap_BRmap.npz')
+intensitymap_loaded_dic = np.load('../data/data_modified/dopplermap_BRmap.npz')
 ddopplershift_map_binned_HRTSsub_lessmedian = intensitymap_loaded_dic['ddopplershift_map_binned_HRTSsub_lessmedian']
 BR_asymmetry_map_gaussian_binned_corrected_normalized = intensitymap_loaded_dic['BR_map']
 

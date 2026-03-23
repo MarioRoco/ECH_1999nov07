@@ -33,15 +33,15 @@ import matplotlib.lines as mlines
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from auxiliar_functions.data_path import path_data_soho 
-from auxiliar_functions.SOHO_aux_functions import *
-from auxiliar_functions.calibration_parameters__output import *
-from auxiliar_functions.spectroheliogram_functions import *
-from auxiliar_functions.solar_rotation_variables import *
-from auxiliar_functions.aux_functions import *
-from auxiliar_functions.general_variables import *
-from auxiliar_functions.NeVIII_rest_wavelength import *
-from auxiliar_functions.auxfuncs_binning_and_dopplermap import *
+from utils.data_path import path_data_soho 
+from utils.SOHO_aux_functions import *
+from utils.calibration_parameters__output import *
+from utils.spectroheliogram_functions import *
+from utils.solar_rotation_variables import *
+from utils.aux_functions import *
+from utils.general_variables import *
+from utils.NeVIII_rest_wavelength import *
+from utils.auxfuncs_binning_and_dopplermap import *
 from scale_hrts import *
 
 
@@ -76,7 +76,7 @@ y_HPlat_crop = s_image_pixels_to_helioprojective_latitude(s_px_img=np.arange(sli
 
 #####################################
 # Import SUMER data interpolated (wavelength calibrated)
-data_interpolated_loaded = np.load('../auxiliar_functions/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
+data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
 spectral_image_interpolated_list = data_interpolated_loaded['spectral_image_interpolated_list']
 spectral_image_unc_interpolated_list = data_interpolated_loaded['spectral_image_unc_interpolated_list']
 spectral_image_interpolated_croplat_list = data_interpolated_loaded['spectral_image_interpolated_croplat_list']

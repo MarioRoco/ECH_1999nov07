@@ -95,7 +95,7 @@ from scipy.ndimage import gaussian_filter1d
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from auxiliar_functions.aux_functions import *
+from utils.aux_functions import *
 ######################################################
 ######################################################
 ######################################################
@@ -104,7 +104,7 @@ from auxiliar_functions.aux_functions import *
 ######################################################
 # SUMER
 
-foldername_sumer_spectrum = '../auxiliar_functions/'
+foldername_sumer_spectrum = '../data/data_modified/'
 profiles_loaded_dic = np.load(foldername_sumer_spectrum + filename_sumer_spectrum)
 lam_sumer = profiles_loaded_dic['lam_sumer_av'] #Angstrom
 rad_sumer = profiles_loaded_dic['rad_sumer_av'] #[W/sr/m^2/Angstroem]

@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from auxiliar_functions.aux_functions import *
-from auxiliar_functions.NeVIII_rest_wavelength import *
+from utils.aux_functions import *
+from utils.NeVIII_rest_wavelength import *
 
 ######################################################
 ########################### wavelength array
