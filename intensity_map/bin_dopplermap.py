@@ -8,7 +8,7 @@ line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', 'cold_line'
 
 wavelength_range_analysis = [1540.1, 1541.5] #Angstroem
 
-save_intensity_map = 'no'
+save_dopplermap = 'yes'
 
 show_spectral_image_binned = 'yes'
 show_wavelength_range = 'yes'
@@ -16,9 +16,8 @@ show_intensitymap_binned = 'yes'
 
 show_spectral_image_binned = 'no'
 show_spectral_ranges = 'no'
-show_intensity_map_binned = 'yes'
 show_scaling_factor_maps = 'no'
-show_dopplermaps = 'yes'
+show_dopplermaps = 'no'
 show_dopplermaps_lessmedian = 'yes'
 show_chi2red_of_dopplermaps = 'no'
 
@@ -168,9 +167,6 @@ dopplershift_map_binned_HRTSsub_qra_lessmedian = subtract_median_rows(arr_2D=dop
 dopplershift_map_binned_HRTSsub_qrb_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qrb)
 dopplershift_map_binned_HRTSsub_qrl_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qrl)
 
-############################################################
-# 
-lower_bound, upper_bound = get_bounds(intensitymap_croplat=intensitymap_croplat, range_percentage=range_percentage, threshold_value_type=threshold_value_type)
 
 ############################################################
 #  Extent in pixels 
@@ -195,8 +191,6 @@ if show_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
@@ -207,8 +201,6 @@ if show_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
 
@@ -220,8 +212,6 @@ if show_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
 
@@ -233,8 +223,6 @@ if show_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
     
 
@@ -249,8 +237,6 @@ if show_dopplermaps_lessmedian == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
@@ -261,8 +247,6 @@ if show_dopplermaps_lessmedian == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
 
@@ -274,8 +258,6 @@ if show_dopplermaps_lessmedian == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
 
@@ -287,8 +269,6 @@ if show_dopplermaps_lessmedian == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
 
@@ -303,8 +283,6 @@ if show_chi2red_of_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
     
     
@@ -316,8 +294,6 @@ if show_chi2red_of_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
@@ -328,8 +304,6 @@ if show_chi2red_of_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
@@ -340,11 +314,35 @@ if show_chi2red_of_dopplermaps == 'yes':
     ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
     fig.supylabel('Latitude dimension (pixels)', fontsize=17)
     plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-    contour_lower = ax.contour(intensitymap_croplat[::-1], levels=[lower_bound], colors='red', linewidths=2, extent=extent_sumer_binned_px_contours)
-    contour_upper = ax.contour(intensitymap_croplat[::-1], levels=[upper_bound], colors='blue', linewidths=2, extent=extent_sumer_binned_px_contours)
     plt.show(block=False)
 
 
+############################################################
+# Save Dopplershift map
+
+if save_dopplermap == 'yes':
+    filename_profile = 'dopplershift_map_'+line_label+f'_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz'
+    foldepath_profile = '../outputs/'
+    np.savez(foldepath_profile+filename_profile, dopplershift_map_binned=dopplershift_map_binned, dopplershift_map_binned_HRTSsub_qra=dopplershift_map_binned_HRTSsub_qra, dopplershift_map_binned_HRTSsub_qrb=dopplershift_map_binned_HRTSsub_qrb, dopplershift_map_binned_HRTSsub_qrl=dopplershift_map_binned_HRTSsub_qrl, subtract_median_rows=subtract_median_rows)
+    
+    
+dopplershift_map_binned_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned)
+dopplershift_map_binned_HRTSsub_qra_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qra)
+dopplershift_map_binned_HRTSsub_qrb_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qrb)
+dopplershift_map_binned_HRTSsub_qrl_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qrl)
+
+
+
+"""
+In order to load the intensity map in another file (or this one), do the next:
+
+dopplershift_map_loaded_dic = np.load('dopplershift_map_'+line_label+f'_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz')
+dopplershift_map_binned = dopplershift_map_loaded_dic['dopplershift_map_binned'] #2D-array
+dopplershift_map_binned_HRTSsub_qra = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qra'] #2D-array
+dopplershift_map_binned_HRTSsub_qrb = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qrb'] #2D-array
+dopplershift_map_binned_HRTSsub_qrl = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qrl'] #2D-array
+subtract_median_rows = dopplershift_map_loaded_dic['subtract_median_rows'] #Function that subtract the median of each row of a 2D-array
+"""
 
 ############################################################
 

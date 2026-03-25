@@ -4,7 +4,7 @@
 bin_lat = 4
 bin_lon = 1
 
-save_intensity_map = 'no'
+save_intensity_map = 'yes'
 
 show_spectral_image_binned = 'yes'
 show_wavelength_range = 'yes'
@@ -37,7 +37,7 @@ import matplotlib.lines as mlines
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
-from utils.data_path import path_data_soho 
+#from utils.data_path import path_data_soho 
 from utils.SOHO_aux_functions import *
 from utils.calibration_parameters__output import *
 from utils.spectroheliogram_functions import *
@@ -211,7 +211,7 @@ intensitymap_loaded_dic = np.load('intensity_map_'+line_label+f'_interpolated_bi
 intensity_map_croplat_binned = intensitymap_loaded_dic['intensity_map_croplat_binned'] #[W/sr/m^2] 2D-array
 intensity_map_unc_croplat_binned = intensitymap_loaded_dic['intensity_map_unc_croplat_binned'] #[W/sr/m^2] 2D-array
 """
-""
+
 ############################################################
 
 
