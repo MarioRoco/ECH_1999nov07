@@ -1,4 +1,10 @@
 
+"""
+## Ranges of wavelength
+wavelength_range_scalefactor_left = [1537.7, 1539.5] #Angstrom
+wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
+"""
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,13 +46,13 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
     # HRTS
 
     if hrts_qr=='a':
-	    from hrts_spectra.data__qqr_a_xdr import lambda__qqr_a_xdr, radiance__qqr_a_xdr, unc_radiance__qqr_a_xdr
+	    from data.hrts.data__qqr_a_xdr import lambda__qqr_a_xdr, radiance__qqr_a_xdr, unc_radiance__qqr_a_xdr
 	    lam_hrts, rad_hrts = 10.*lambda__qqr_a_xdr, 0.1*radiance__qqr_a_xdr #multiply by 10. and 0.1 to convert nm to Angstrom
     elif hrts_qr=='b':
-	    from hrts_spectra.data__qqr_b_xdr import lambda__qqr_b_xdr, radiance__qqr_b_xdr, unc_radiance__qqr_b_xdr
+	    from data.hrts.data__qqr_b_xdr import lambda__qqr_b_xdr, radiance__qqr_b_xdr, unc_radiance__qqr_b_xdr
 	    lam_hrts, rad_hrts = 10.*lambda__qqr_b_xdr, 0.1*radiance__qqr_b_xdr
     elif hrts_qr=='l':
-	    from hrts_spectra.data__qqr_l_xdr import lambda__qqr_l_xdr, radiance__qqr_l_xdr, unc_radiance__qqr_l_xdr
+	    from data.hrts.data__qqr_l_xdr import lambda__qqr_l_xdr, radiance__qqr_l_xdr, unc_radiance__qqr_l_xdr
 	    lam_hrts, rad_hrts = 10.*lambda__qqr_l_xdr, 0.1*radiance__qqr_l_xdr
 
     erad_hrts = np.zeros(len(rad_hrts)) #TODO: we don't know the uncertainties of HRTS

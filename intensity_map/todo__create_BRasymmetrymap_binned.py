@@ -37,6 +37,8 @@ fwhm_to_convolve = 1.95*0.04215 #Angstrom
 BR_distance_centroid = 50. #[km/s] Distance of the center of the range from the centroid of the fitted gaussian
 BR_width = 50. #[km/s]
 
+filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits'
+
 
 #####################################
 # Bin data
