@@ -1263,6 +1263,123 @@ def get_factor_SUMER_HRTS(lam_sumer, spectralimage_interp_list_, unc_spectralima
     return [scaling_factor_map, chi2red_map]
 
 
+def get_factor_SUMER_HRTS__previous_HRTS_preparation(lam_sumer_, spectralimage_interp_list_, unc_spectralimage_interp_list_, lam_hrts_, rad_hrts_, rad_hrts_conv_SUMERgrid_cropscale_, fwhm_conv, wavelength_range_left, wavelength_range_right, indices_left_sumer, indices_right_sumer, show__row_col='no', y_scale='linear', show_legend='yes'):
+
+    idx_left_sumer_0, idx_left_sumer_1 = indices_left_sumer
+    idx_right_sumer_0, idx_right_sumer_1 = indices_right_sumer
+    
+    N_img = len(spectralimage_interp_list_)
+    N_rows = spectralimage_interp_list_[0].shape[0]
+
+    scaling_factor_NT, chi2red_NT = [],[]
+    for img_ in tqdm(range(N_img)):
+        scaling_factor_1sp_allrows, chi2red_1sp_allrows = [], []
+        for row_ in range(N_rows):
+            
+            # 6) Take the data of the current spectral image and row (of SUMER)
+            rad_sumer = spectralimage_interp_list_[img_][row_, :]
+            erad_sumer = unc_spectralimage_interp_list_[img_][row_, :]
+
+            # 7) Crop SUMER in the wavelength range
+            ## Left of Ne VIII
+            rad_sumer_cropleft = rad_sumer[idx_left_sumer_0:idx_left_sumer_1+1]
+            erad_sumer_cropleft = erad_sumer[idx_left_sumer_0:idx_left_sumer_1+1]
+            ## Right of Ne VIII
+            rad_sumer_cropright = rad_sumer[idx_right_sumer_0:idx_right_sumer_1+1]
+            erad_sumer_cropright = erad_sumer[idx_right_sumer_0:idx_right_sumer_1+1]
+            ## Concatenate left and right
+            rad_sumer_cropscale = np.concatenate([rad_sumer_cropleft,  rad_sumer_cropright])
+            erad_sumer_cropscale = np.concatenate([erad_sumer_cropleft, erad_sumer_cropright])
+            rad_sumer_cropscale = np.ma.filled(rad_sumer_cropscale, np.nan) # Convert masked values to NaNs
+            erad_sumer_cropscale = np.ma.filled(erad_sumer_cropscale, np.nan)
+            
+            # 8) Fit straight line to the radiance of HRTS vs SUMER (y = m*x + 0 (intercept = 0))
+            y_hrts = rad_hrts_conv_SUMERgrid_cropscale_
+            y_sumer = rad_sumer_cropscale
+            yerr_sumer = erad_sumer_cropscale
+            weights = 1 / yerr_sumer**2
+            mask = (np.isfinite(y_hrts) & np.isfinite(y_sumer) & np.isfinite(yerr_sumer)) #ignore the NaNs before computing the weighted slope
+            weights = weights[mask]
+            y_hrts = y_hrts[mask]
+            y_sumer = y_sumer[mask]
+            yerr_sumer = yerr_sumer[mask]
+            scaling_factor_ = np.sum(weights * y_hrts * y_sumer) / np.sum(weights * y_hrts**2) #this is the slope and it is the scaling factor
+
+            # 9) Compute chi^2
+            chi2 = np.sum(((y_sumer - scaling_factor_ * y_hrts)**2) / (yerr_sumer**2))
+            dof = len(y_sumer) - 1 # Degrees of freedom (N - number_of_parameters = N - 1)
+            chi2red_ = chi2 / dof #reduced chi^2
+            
+            
+            ####################################
+            # 10) Show profile
+            if show__row_col!='no' and show__row_col[0]==row_ and show__row_col[1]==img_:
+                color_sumer = 'red'
+                color_hrts = 'blue'
+                
+                # Generate fitted line for plotting
+                xfit = np.linspace(min(rad_hrts_conv_SUMERgrid_cropscale_), max(rad_hrts_conv_SUMERgrid_cropscale_), 1000)
+                yfit = scaling_factor_ * xfit
+
+                # Show profiles and region cropped
+                fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
+                ax.errorbar(x=lam_sumer_, y=rad_sumer, yerr=erad_sumer, color=color_sumer, linewidth=0.8, marker='.', markersize=5, label='SUMER original')
+                ax.errorbar(x=lam_hrts_, y=rad_hrts_, color=color_hrts, linewidth=0.8, label=f'HRTS original')
+                
+                # Crop SUMER in the wavelength range
+                lam_sumer_cropleft = lam_sumer_[idx_left_sumer_0:idx_left_sumer_1+1] # Left of Ne VIII
+                lam_sumer_cropright = lam_sumer_[idx_right_sumer_0:idx_right_sumer_1+1] # Right of Ne VIII
+                lam_sumer_cropscale = np.concatenate([lam_sumer_cropleft,  lam_sumer_cropright]) # Concatenate left and right
+                ax.errorbar(x=lam_sumer_cropscale, y=scaling_factor_*rad_hrts_conv_SUMERgrid_cropscale_, color=color_hrts, linewidth=0.8, marker='.', markersize=5, label=f'HRTS scaled, convolved, in SUMER grid')
+                
+                ax.set_yscale(y_scale)
+                ax.axvspan(wavelength_range_left[0], wavelength_range_left[1], color='orange', alpha=0.15, label='Region to analyze')
+                ax.axvspan(wavelength_range_right[0], wavelength_range_right[1], color='orange', alpha=0.15)
+                ax.set_title(f'SUMER and HRTS spectra. Wavelength range used to calculate the scaling factor. Indices: Spectral image {img_}, latitude {row_}', fontsize=18) 
+                ax.set_xlabel('Wavelength direction (\u212B)', color='black', fontsize=16)
+                ax.set_ylabel(r'Radiance [W/sr/m$^2$/''\u212B]', color='black', fontsize=16)
+                if show_legend=='yes': ax.legend(fontsize=10)
+                plt.show(block=False)
+                
+                # ) Show radiances of SUMER and HRTS
+                fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
+                ax.errorbar(x=y_hrts, y=y_sumer, yerr=yerr_sumer, color='black', linewidth=0, elinewidth=1., marker='.', markersize=10, label='Data')
+                ax.plot(xfit, yfit, color='green', label=f'Linear fit. Slope (scaling factor): {np.round(scaling_factor_,4)}')
+                ax.set_title(f'Radiances of SUMER vs HRTS, and fitting.', fontsize=18) 
+                ax.set_xlabel(r'Radiance HRTS [W/sr/m$^2$/''\u212B]', color=color_hrts, fontsize=16)
+                ax.set_ylabel(r'Radiance SUMER [W/sr/m$^2$/''\u212B]', color=color_sumer, fontsize=16)
+                # Change tick label colors
+                ax.tick_params(axis='x', colors=color_hrts)
+                ax.tick_params(axis='y', colors=color_sumer)
+                # ---- Make axes square with same limits ----
+                min_val = min([np.nanmin(y_sumer), np.nanmin(y_hrts)])
+                max_val = max([np.nanmax(y_sumer), np.nanmax(y_hrts)])
+                delta_extremes = 0.05 * (max_val - min_val)
+                ax.set_xlim(min_val-delta_extremes, max_val+delta_extremes)
+                ax.set_ylim(min_val-delta_extremes, max_val+delta_extremes)
+                print('###############')
+                print(min_val)
+                print(max_val)
+                print(min_val-delta_extremes, max_val+delta_extremes)
+                ax.set_aspect('equal', adjustable='box')
+                if show_legend=='yes': ax.legend(fontsize=10)
+                plt.show(block=False)
+            
+            ####################################
+            
+            # 10) Save scaling factor and reduced chi^2 each in a list
+            scaling_factor_1sp_allrows.append(scaling_factor_)
+            chi2red_1sp_allrows.append(chi2red_)
+
+        # 11) Save the above lists (which represent the different spectral images) in lists to crate the 2D-array
+        scaling_factor_NT.append(scaling_factor_1sp_allrows)
+        chi2red_NT.append(chi2red_1sp_allrows)
+
+    # 12) Convert to array and transpose
+    scaling_factor_map = np.array(scaling_factor_NT).T 
+    chi2red_map = np.array(chi2red_NT).T 
+
+    return [scaling_factor_map, chi2red_map]
 
 
 ##################################################

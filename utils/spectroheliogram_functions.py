@@ -959,3 +959,62 @@ def average_profiles_from_pixels_selected_from_interpolated_data(wavelength_rang
 #########################################################################
 # 
 
+
+def create_spectroheliogram_from_interpolation(spectralimage_interpolated_list, spectralimage_unc_interpolated_list, w_px_range, w_px_range_bckg, slope_list, slope_unc_list):
+    c1, c2 = w_px_range
+    n = c2 - c1 + 1
+    cb1, cb2 = w_px_range_bckg
+    k = cb2 - cb1 + 1
+    
+    spectroheliogram_line_NT, unc_spectroheliogram_line_NT  = [],[]
+    for img_ in range(len(spectralimage_interpolated_list)):
+        spectral_image_ = spectralimage_interpolated_list[img_]
+        spectral_image_unc_ = spectralimage_unc_interpolated_list[img_]
+        
+        integrated_intensity_line_1col, unc_integrated_intensity_line_1col = [],[]
+        for row_ in range(len(slope_list)): 
+
+            # pixel scale
+            w = slope_list[row_] 
+            w_unc = slope_unc_list[row_] #uncertainty
+
+            # Spectral radiance of the line
+            I_i = spectral_image_[row_, c1:c2+1] #1d-array
+            I_unc_i = spectral_image_unc_[row_, c1:c2+1] #1d-array (uncertainties)
+            
+            # Spectral radiance of the continuum
+            C_j = spectral_image_[row_, cb1:cb2+1] #1d-array
+            C_unc_j = spectral_image_unc_[row_, cb1:cb2+1] #1d-array (uncertainties)
+
+            # Calculate the average of the profile of each row
+            ## Average the continuum
+            C = np.mean(C_j) 
+            C_unc = (1/k) * np.sum(C_unc_j**2)
+            ## Integrate the line
+            I = w * np.sum(I_i - C) #continuum average
+            I_unc_T1 = w_unc * np.sum(I_i - C)
+            I_unc_T2 = np.sum((w*I_unc_i)**2)
+            I_unc_T3 = n*w*C*C_unc
+            I_unc = np.sqrt( I_unc_T1**2 + I_unc_T2**2 + I_unc_T3**2 )
+            
+            # Save in lists
+            integrated_intensity_line_1col.append(I) 
+            unc_integrated_intensity_line_1col.append(I_unc) 
+        
+        # save the above lists (which represent the columns) in lists to crate the 2D-array of the spectroheliogram
+        spectroheliogram_line_NT.append(integrated_intensity_line_1col) 
+        unc_spectroheliogram_line_NT.append(unc_integrated_intensity_line_1col)
+        
+    # Convert to array and transpose
+    spectroheliogram_line = np.array(spectroheliogram_line_NT).T 
+    unc_spectroheliogram_line = np.array(unc_spectroheliogram_line_NT).T
+    
+    return [spectroheliogram_line, unc_spectroheliogram_line]
+
+
+#########################################################################
+#########################################################################
+# 
+
+
+
