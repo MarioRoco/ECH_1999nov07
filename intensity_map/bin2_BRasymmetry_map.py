@@ -6,6 +6,8 @@ bin_lon = 1
 
 save_BRasymmetry_map = 'yes'
 
+lat_img__indices_binned = 'no'
+
 show_spectral_image_binned = 'yes'
 show_wavelength_range = 'yes'
 show_intensitymap_binned = 'yes'
@@ -16,6 +18,29 @@ BR_width = 50. #[km/s]
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line':
 
 filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
+
+#########
+# For the scale factor map
+save_scalefactor_map = 'no'
+
+show_spectral_image_binned = 'yes'
+show_scaling_factor_maps = 'yes'
+show_analysis_scalingfactor__row_col = [0,0] #'no' or list of 2 integers e.g. [23,56]
+
+filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
+
+## Ranges of wavelength
+wavelength_range_scalefactor_left = [1537.7, 1539.5] #Angstrom
+wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
+
+## FWHM of the cold lines in SUMER:
+fwhm_mean_weighted_sumer =  0.17740
+fwhm_std_sumer =  0.02094
+fwhm_unc_weighted_sumer =  0.00131
+fwhm_synthetic_Si = 0.03
+fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
+fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
+fwhm_to_convolve = 1.95 * 0.04215
 
 ############################################################
 
@@ -52,11 +77,49 @@ from utils.auxfuncs_binning_and_dopplermap import *
 from scale_hrts import *
 
 ############################################################
-# Bin data
-exec(open("bin_data_interpolated.py").read())
+# Ranges of wavelength
+if line_label == 'NeVIII':
+    wavelength_range_intensity_map = [1540.45, 1541.2] #Angstroem
+    wavelength_range_intensity_map_bckg = [1539.8, 1540.2] #Angstroem
+    line_center_label = 'Ne VIII - 770.428 \u212B'
+    wavelength_range_analysis = [1540.1, 1541.5] #Angstroem
+elif line_label == 'SiII':
+    wavelength_range_intensity_map = [1533.075, 1533.805] #Angstroem
+    #wavelength_range_intensity_map = [1533.17, 1533.725] #Angstroem
+    wavelength_range_intensity_map_bckg = [1535.10, 1536.60] #Angstroem
+    line_center_label = 'Si II - 1533.43 \u212B'
+elif line_label == 'CIV':
+    wavelength_range_intensity_map = [1547.90, 1548.66] #Angstroem
+    wavelength_range_intensity_map_bckg = [1545.93, 1547.65] #Angstroem
+    line_center_label = 'C IV - 1548.21 \u212B'
+elif line_label == 'cold_line':
+    wavelength_range_intensity_map = [1537.80, 1538.10] #Angstroem
+    wavelength_range_intensity_map_bckg = [1538.30, 1538.39] #Angstroem
+    line_center_label = 'Si I - 1537.94 \u212B'
 
-# Outputs:
+############################################################
+# Bin data
+
+
+data_binned_loaded = np.load(f'../data/data_modified/spectral_image_list_intepolated_binned_lon{bin_lon}_lat{bin_lat}.npz', allow_pickle=True)
+spectral_image_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_interpolated_croplat_binned_list']
+spectral_image_unc_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_unc_interpolated_croplat_binned_list']
+pixelscale_list_croplat_binned = data_binned_loaded['pixelscale_list_croplat_binned']
+pixelscale_unc_list_croplat_binned = data_binned_loaded['pixelscale_unc_list_croplat_binned']
+pixelscale_intercept_list_croplat_binned = data_binned_loaded['pixelscale_intercept_list_croplat_binned']
+pixelscale_intercept_unc_list_croplat_binned = data_binned_loaded['pixelscale_intercept_unc_list_croplat_binned']
+x_HPlon_rotcomp_binned = data_binned_loaded['x_HPlon_rotcomp_binned']
+y_HPlat_crop_binned = data_binned_loaded['y_HPlat_crop_binned']
+lam_sumer = data_binned_loaded['lam_sumer']
+lam_sumer_unc = data_binned_loaded['lam_sumer_unc']
+row_reference = data_binned_loaded['row_reference']
+row_reference_binned = data_binned_loaded['row_reference_binned']
+
+
+# Or if you want to execute the file that bins the data: (but remember to change the inputs in that file)
+#exec(open("bin_data_interpolated.py").read())
 """
+# Outputs:
 spectral_image_interpolated_list
 spectral_image_unc_interpolated_list
 spectral_image_interpolated_croplat_list
@@ -73,6 +136,39 @@ pixelscale_intercept_unc_list_croplat_binned
 x_HPlon_rotcomp_binned
 y_HPlat_crop_binned
 """
+
+############################################################
+# Scaling factor array
+exec(open("bin_scalefactor_map.py").read())
+
+# Outputs:
+"""
+scaling_factor_map_binned_qra, scaling_factor_map_binned_qrb, scaling_factor_map_binned_qrl
+chi2red_map_binned_qra, chi2red_map_binned_qrb, chi2red_map_binned_qrl
+# Radiances
+rad_hrtsa_conv, rad_hrtsb_conv, rad_hrtsl_conv
+interp_func_hrtsa, interp_func_hrtsb, interp_func_hrtsl
+rad_hrtsa_conv_SUMERgrid, rad_hrtsb_conv_SUMERgrid, rad_hrtsl_conv_SUMERgrid
+# Uncertainties of the radiance
+erad_hrtsa_conv, erad_hrtsb_conv, erad_hrtsl_conv
+interp_func_hrtsa_err, interp_func_hrtsb_err, interp_func_hrtsl_err
+erad_hrtsa_conv_SUMERgrid, erad_hrtsb_conv_SUMERgrid, erad_hrtsl_conv_SUMERgrid
+# Left
+idx_left_sumer_0, idx_left_sumer_1
+lam_sumer_cropleft
+rad_hrtsa_conv_SUMERgrid_cropleft, rad_hrtsb_conv_SUMERgrid_cropleft, rad_hrtsl_conv_SUMERgrid_cropleft
+erad_hrtsa_conv_SUMERgrid_cropleft, erad_hrtsb_conv_SUMERgrid_cropleft, erad_hrtsl_conv_SUMERgrid_cropleft
+# Right
+idx_right_sumer_0, idx_right_sumer_1
+lam_sumer_cropright
+rad_hrtsa_conv_SUMERgrid_cropright, rad_hrtsb_conv_SUMERgrid_cropright, rad_hrtsl_conv_SUMERgrid_cropright
+erad_hrtsa_conv_SUMERgrid_cropright, erad_hrtsb_conv_SUMERgrid_cropright, erad_hrtsl_conv_SUMERgrid_cropright
+# Concatenate left and right
+lam_sumer_cropscale
+rad_hrtsa_conv_SUMERgrid_cropscale, rad_hrtsb_conv_SUMERgrid_cropscale, rad_hrtsl_conv_SUMERgrid_cropscale
+erad_hrtsa_conv_SUMERgrid_cropscale, erad_hrtsb_conv_SUMERgrid_cropscale, erad_hrtsl_conv_SUMERgrid_cropscale
+"""
+
 
 ############################################################
 # Rest wavelength used
@@ -535,33 +631,33 @@ def create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer, spectralimage_int
 # Create asymmetry map by subtracting Red-Blue
 
 # HRTS not subtracted
-BRasymmetry_map_gaussian_binned, BRasymmetry_map_gaussian_binned_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='no', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned, BRasymmetry_map_gaussian_binned_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='no', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
 
 
 # HRTS subtracted, QR A
-BRasymmetry_map_gaussian_binned_HRTSsub_qra, BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned_HRTSsub_qra, BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
 
 
 # HRTS subtracted, QR B
-BRasymmetry_map_gaussian_binned_HRTSsub_qrb, BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsb, rad_hrts=rad_hrtsb, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrb, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned_HRTSsub_qrb, BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsb, rad_hrts=rad_hrtsb, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrb, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
 
 # HRTS subtracted, QR L
-BRasymmetry_map_gaussian_binned_HRTSsub_qrl, BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsl, rad_hrts=rad_hrtsl, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrl, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned_HRTSsub_qrl, BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized = create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsl, rad_hrts=rad_hrtsl, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrl, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
 
 ######################################################
 # Create asymmetry map by dividing Red/Blue
 
 # HRTS not subtracted
-BRasymmetry_map_gaussian_binned_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='no', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col='yes', y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='no', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col='yes', y_scale='linear', show_legend='yes')
 
 # HRTS subtracted, QR A
-BRasymmetry_map_gaussian_binned_HRTSsub_qra_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned_HRTSsub_qra_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsa, rad_hrts=rad_hrtsa, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qra, show__row_col=lat_img__indices_binned, y_scale='linear', show_legend='yes')
 
 # HRTS subtracted, QR B
-BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsb, rad_hrts=rad_hrtsb, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrb, show__row_col='yes', y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsb, rad_hrts=rad_hrtsb, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrb, show__row_col='yes', y_scale='linear', show_legend='yes')
 
 # HRTS subtracted, QR L
-BRasymmetry_map_gaussian_binned_HRTSsub_qrl_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_list_binned, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_list_binned, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsl, rad_hrts=rad_hrtsl, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrl, show__row_col='yes', y_scale='linear', show_legend='yes')
+BRasymmetry_map_gaussian_binned_HRTSsub_qrl_division = create_BRasymmetrymap_with_centroid_of_gaussian_division(lam_sumer=lam_sumer, spectralimage_interp_list_=spectral_image_interpolated_croplat_binned_list, unc_spectralimage_interp_list_=spectral_image_unc_interpolated_croplat_binned_list, wavelength_range_preliminary=wavelength_range_analysis, rest_wavelength=lam_0, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, subtract_HRTS='yes', lam_hrts=lam_hrtsl, rad_hrts=rad_hrtsl, fwhm_conv=fwhm_to_convolve, scalefactor_hrts_2Darr=scaling_factor_map_binned_qrl, show__row_col='yes', y_scale='linear', show_legend='yes')
 
 
 ############################################################
@@ -570,25 +666,25 @@ BRasymmetry_map_gaussian_binned_HRTSsub_qrl_division = create_BRasymmetrymap_wit
 
 # Save intensity map and uncertainties as .npy
 if save_BRasymmetry_map == 'yes':
-    data_id = f'_interpolated_binned_lon{bin_lon}_lat{bin_lat}__d{int(BR_distance_centroid)}_w{int(BR_width)}'
-    filename_profile_subtraction = 'BRasymmetry_map_subtraction_'+line_label+data_id+'.npz'
-    filename_profile_division = 'BRasymmetry_map_division_'+line_label+data_id+'.npz'
-    foldepath_profile = '../outputs/'
-    np.savez(foldepath_profile+filename_profile_subtraction, BRasymmetry_map_gaussian_binned_normalized=BRasymmetry_map_gaussian_binned_normalized, BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized=BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized, BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized=BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized, BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized=BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized)
-    np.savez(foldepath_profile+filename_profile_division, BRasymmetry_map_gaussian_binned_division=BRasymmetry_map_gaussian_binned_division, BRasymmetry_map_gaussian_binned_HRTSsub_qra_division=BRasymmetry_map_gaussian_binned_HRTSsub_qra_division, BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division=BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division, BRasymmetry_map_gaussian_binned_HRTSsub_qrl_division=BRasymmetry_map_gaussian_binned_HRTSsub_qrl_division)
+    data_id = f'_binned_lon{bin_lon}_lat{bin_lat}__d{int(BR_distance_centroid)}_w{int(BR_width)}'
+    filename_subtraction = 'BRasymmetry_map_subtraction_'+line_label+data_id+'.npz'
+    filename_division = 'BRasymmetry_map_division_'+line_label+data_id+'.npz'
+    foldepath = '../outputs/'
+    np.savez(foldepath+filename_subtraction, BRasymmetry_map_gaussian_binned_normalized=BRasymmetry_map_gaussian_binned_normalized, BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized=BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized, BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized=BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized, BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized=BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized)
+    np.savez(foldepath+filename_division, BRasymmetry_map_gaussian_binned_division=BRasymmetry_map_gaussian_binned_division, BRasymmetry_map_gaussian_binned_HRTSsub_qra_division=BRasymmetry_map_gaussian_binned_HRTSsub_qra_division, BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division=BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division, BRasymmetry_map_gaussian_binned_HRTSsub_qrl_division=BRasymmetry_map_gaussian_binned_HRTSsub_qrl_division)
 
 
 
 """
 In order to load the intensity map in another file (or this one), do the next:
 
-BRasymmetry_map_subtraction_loaded_dic = np.load()
+BRasymmetry_map_subtraction_loaded_dic = np.load(foldepath+filename_subtraction)
 BRasymmetry_map_gaussian_binned_normalized = BRasymmetry_map_subtraction_loaded_dic['BRasymmetry_map_gaussian_binned_normalized'] # 2D-array
 BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized = BRasymmetry_map_subtraction_loaded_dic['BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized'] # 2D-array
 BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized = BRasymmetry_map_subtraction_loaded_dic['BRasymmetry_map_gaussian_binned_HRTSsub_qrb_normalized'] # 2D-array
 BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized = BRasymmetry_map_subtraction_loaded_dic['BRasymmetry_map_gaussian_binned_HRTSsub_qrl_normalized'] # 2D-array
  
-BRasymmetry_map_division_loaded_dic = np.load()
+BRasymmetry_map_division_loaded_dic = np.load(foldepath+filename_division)
 BRasymmetry_map_gaussian_binned_division = BRasymmetry_map_division_loaded_dic['BRasymmetry_map_gaussian_binned_division'] # 2D-array
 BRasymmetry_map_gaussian_binned_HRTSsub_qra_division = BRasymmetry_map_division_loaded_dic['BRasymmetry_map_gaussian_binned_HRTSsub_qra_division'] # 2D-array
 BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division = BRasymmetry_map_division_loaded_dic['BRasymmetry_map_gaussian_binned_HRTSsub_qrb_division'] # 2D-array

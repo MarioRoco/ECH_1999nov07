@@ -1,5 +1,5 @@
 # INPUTS
-
+"""
 # Binning
 bin_lat = 4
 bin_lon = 1
@@ -24,7 +24,7 @@ fwhm_synthetic_Si = 0.03
 fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
 fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
 fwhm_to_convolve = 1.95 * 0.04215
-
+"""
 
 ############################################################
 
@@ -61,11 +61,27 @@ from utils.auxfuncs_binning_and_dopplermap import *
 from scale_hrts import *
 
 ############################################################
-# Bin data
-exec(open("bin_data_interpolated.py").read())
+# Import binned data
 
-# Outputs:
+## Spectral images binned
+data_binned_loaded = np.load(f'../data/data_modified/spectral_image_list_intepolated_binned_lon{bin_lon}_lat{bin_lat}.npz', allow_pickle=True)
+spectral_image_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_interpolated_croplat_binned_list']
+spectral_image_unc_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_unc_interpolated_croplat_binned_list']
+pixelscale_list_croplat_binned = data_binned_loaded['pixelscale_list_croplat_binned']
+pixelscale_unc_list_croplat_binned = data_binned_loaded['pixelscale_unc_list_croplat_binned']
+pixelscale_intercept_list_croplat_binned = data_binned_loaded['pixelscale_intercept_list_croplat_binned']
+pixelscale_intercept_unc_list_croplat_binned = data_binned_loaded['pixelscale_intercept_unc_list_croplat_binned']
+x_HPlon_rotcomp_binned = data_binned_loaded['x_HPlon_rotcomp_binned']
+y_HPlat_crop_binned = data_binned_loaded['y_HPlat_crop_binned']
+lam_sumer = data_binned_loaded['lam_sumer']
+lam_sumer_unc = data_binned_loaded['lam_sumer_unc']
+row_reference = data_binned_loaded['row_reference']
+row_reference_binned = data_binned_loaded['row_reference_binned']
+
+# Or if you want to execute the file that bins the data: (but remember to change the inputs in that file)
+#exec(open("bin_data_interpolated.py").read())
 """
+# Outputs:
 spectral_image_interpolated_list
 spectral_image_unc_interpolated_list
 spectral_image_interpolated_croplat_list

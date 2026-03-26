@@ -6,9 +6,9 @@ bin_lon = 1
 
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', 'cold_line'
 
-wavelength_range_analysis = [1540.1, 1541.5] #Angstroem
-
 save_dopplermap = 'yes'
+
+lat_img__indices_binned = 'no'
 
 show_spectral_image_binned = 'yes'
 show_wavelength_range = 'yes'
@@ -21,9 +21,32 @@ show_dopplermaps = 'no'
 show_dopplermaps_lessmedian = 'yes'
 show_chi2red_of_dopplermaps = 'no'
 
-line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line':
+line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 
 filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
+
+#########
+# For the scale factor map
+save_scalefactor_map = 'no'
+
+show_spectral_image_binned = 'yes'
+show_scaling_factor_maps = 'yes'
+show_analysis_scalingfactor__row_col = [0,0] #'no' or list of 2 integers e.g. [23,56]
+
+filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
+
+## Ranges of wavelength
+wavelength_range_scalefactor_left = [1537.7, 1539.5] #Angstrom
+wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
+
+## FWHM of the cold lines in SUMER:
+fwhm_mean_weighted_sumer =  0.17740
+fwhm_std_sumer =  0.02094
+fwhm_unc_weighted_sumer =  0.00131
+fwhm_synthetic_Si = 0.03
+fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
+fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
+fwhm_to_convolve = 1.95 * 0.04215
 
 ############################################################
 
@@ -61,10 +84,26 @@ from scale_hrts import *
 
 ############################################################
 # Bin data
-exec(open("bin_data_interpolated.py").read())
 
-# Outputs:
+data_binned_loaded = np.load(f'../data/data_modified/spectral_image_list_intepolated_binned_lon{bin_lon}_lat{bin_lat}.npz', allow_pickle=True)
+spectral_image_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_interpolated_croplat_binned_list']
+spectral_image_unc_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_unc_interpolated_croplat_binned_list']
+pixelscale_list_croplat_binned = data_binned_loaded['pixelscale_list_croplat_binned']
+pixelscale_unc_list_croplat_binned = data_binned_loaded['pixelscale_unc_list_croplat_binned']
+pixelscale_intercept_list_croplat_binned = data_binned_loaded['pixelscale_intercept_list_croplat_binned']
+pixelscale_intercept_unc_list_croplat_binned = data_binned_loaded['pixelscale_intercept_unc_list_croplat_binned']
+x_HPlon_rotcomp_binned = data_binned_loaded['x_HPlon_rotcomp_binned']
+y_HPlat_crop_binned = data_binned_loaded['y_HPlat_crop_binned']
+lam_sumer = data_binned_loaded['lam_sumer']
+lam_sumer_unc = data_binned_loaded['lam_sumer_unc']
+row_reference = data_binned_loaded['row_reference']
+row_reference_binned = data_binned_loaded['row_reference_binned']
+
+
+# Or if you want to execute the file that bins the data: (but remember to change the inputs in that file)
+#exec(open("bin_data_interpolated.py").read())
 """
+# Outputs:
 spectral_image_interpolated_list
 spectral_image_unc_interpolated_list
 spectral_image_interpolated_croplat_list
@@ -115,12 +154,12 @@ erad_hrtsa_conv_SUMERgrid_cropscale, erad_hrtsb_conv_SUMERgrid_cropscale, erad_h
 """
 
 ############################################################
-
-## Ranges of wavelength
+# Ranges of wavelength
 if line_label == 'NeVIII':
     wavelength_range_intensity_map = [1540.45, 1541.2] #Angstroem
     wavelength_range_intensity_map_bckg = [1539.8, 1540.2] #Angstroem
     line_center_label = 'Ne VIII - 770.428 \u212B'
+    wavelength_range_analysis = [1540.1, 1541.5] #Angstroem
 elif line_label == 'SiII':
     wavelength_range_intensity_map = [1533.075, 1533.805] #Angstroem
     #wavelength_range_intensity_map = [1533.17, 1533.725] #Angstroem
@@ -321,7 +360,7 @@ if show_chi2red_of_dopplermaps == 'yes':
 # Save Dopplershift map
 
 if save_dopplermap == 'yes':
-    filename_profile = 'dopplershift_map_'+line_label+f'_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz'
+    filename_profile = 'dopplershift_map_'+line_label+f'_binned_lon{bin_lon}_lat{bin_lat}.npz'
     foldepath_profile = '../outputs/'
     np.savez(foldepath_profile+filename_profile, dopplershift_map_binned=dopplershift_map_binned, dopplershift_map_binned_HRTSsub_qra=dopplershift_map_binned_HRTSsub_qra, dopplershift_map_binned_HRTSsub_qrb=dopplershift_map_binned_HRTSsub_qrb, dopplershift_map_binned_HRTSsub_qrl=dopplershift_map_binned_HRTSsub_qrl, subtract_median_rows=subtract_median_rows)
     
@@ -336,12 +375,11 @@ dopplershift_map_binned_HRTSsub_qrl_lessmedian = subtract_median_rows(arr_2D=dop
 """
 In order to load the intensity map in another file (or this one), do the next:
 
-dopplershift_map_loaded_dic = np.load('dopplershift_map_'+line_label+f'_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz')
+dopplershift_map_loaded_dic = np.load('dopplershift_map_'+line_label+f'_binned_lon{bin_lon}_lat{bin_lat}.npz')
 dopplershift_map_binned = dopplershift_map_loaded_dic['dopplershift_map_binned'] #2D-array
 dopplershift_map_binned_HRTSsub_qra = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qra'] #2D-array
 dopplershift_map_binned_HRTSsub_qrb = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qrb'] #2D-array
 dopplershift_map_binned_HRTSsub_qrl = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qrl'] #2D-array
-subtract_median_rows = dopplershift_map_loaded_dic['subtract_median_rows'] #Function that subtract the median of each row of a 2D-array
 """
 
 ############################################################

@@ -50,10 +50,26 @@ from scale_hrts import *
 
 ############################################################
 # Bin data
-exec(open("bin_data_interpolated.py").read())
 
-# Outputs:
+data_binned_loaded = np.load(f'../data/data_modified/spectral_image_list_intepolated_binned_lon{bin_lon}_lat{bin_lat}.npz', allow_pickle=True)
+spectral_image_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_interpolated_croplat_binned_list']
+spectral_image_unc_interpolated_croplat_binned_list = data_binned_loaded['spectral_image_unc_interpolated_croplat_binned_list']
+pixelscale_list_croplat_binned = data_binned_loaded['pixelscale_list_croplat_binned']
+pixelscale_unc_list_croplat_binned = data_binned_loaded['pixelscale_unc_list_croplat_binned']
+pixelscale_intercept_list_croplat_binned = data_binned_loaded['pixelscale_intercept_list_croplat_binned']
+pixelscale_intercept_unc_list_croplat_binned = data_binned_loaded['pixelscale_intercept_unc_list_croplat_binned']
+x_HPlon_rotcomp_binned = data_binned_loaded['x_HPlon_rotcomp_binned']
+y_HPlat_crop_binned = data_binned_loaded['y_HPlat_crop_binned']
+lam_sumer = data_binned_loaded['lam_sumer']
+lam_sumer_unc = data_binned_loaded['lam_sumer_unc']
+row_reference = data_binned_loaded['row_reference']
+row_reference_binned = data_binned_loaded['row_reference_binned']
+
+
+# Or if you want to execute the file that bins the data: (but remember to change the inputs in that file)
+#exec(open("bin_data_interpolated.py").read())
 """
+# Outputs:
 spectral_image_interpolated_list
 spectral_image_unc_interpolated_list
 spectral_image_interpolated_croplat_list
@@ -106,10 +122,6 @@ w_px_range_bckg, w_cal_range_pixcenter_bckg = w_range_pixel_from_wavelength_cali
 
 ############################################################
 
-# Select one spectral image not binned
-spectral_image_interpolated_croplat = spectral_image_interpolated_croplat_list[0]
-spectral_image_unc_interpolated_croplat = spectral_image_unc_interpolated_croplat_list[0]
-
 # Select one spectral image binned
 spectral_image_interpolated_croplat_binned = spectral_image_interpolated_croplat_binned_list[0]
 spectral_image_unc_interpolated_croplat_binned = spectral_image_unc_interpolated_croplat_binned_list[0]
@@ -121,21 +133,6 @@ px_half = (lam_sumer[1] - lam_sumer[0])/2
 extent = [lam_sumer[0]-px_half, lam_sumer[-1]-px_half, N_rows+0.5, 0-0.5]
 
 if show_wavelength_range == 'yes':
-
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
-    img = ax.imshow(spectral_image_interpolated_croplat, cmap='Greys', aspect='auto', norm=LogNorm(), extent=extent)
-    cax = fig.add_axes([0.91, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
-    cbar = fig.colorbar(img, cax=cax)
-    cbar.set_label(f'Av. intensity [W/sr/m^2/Angstroem]', fontsize=16)
-    ax.set_title(f'SOHO/SUMER, spectral image calibrated, index {0}', fontsize=18) 
-    ax.set_xlabel('Wavelength (\u212B)', color='black', fontsize=16)
-    ax.set_ylabel('Spatial direction (pixels)', color='black', fontsize=16)
-    ax.axvline(x=w_cal_range_pixcenter[0], linestyle='-', color='blue', linewidth=2, label='Left of the range of Ne VIII to integrate')
-    ax.axvline(x=w_cal_range_pixcenter[1], linestyle='-', color='cyan', linewidth=2, label='Right of the range of Ne VIII to integrate')
-    ax.axvline(x=w_cal_range_pixcenter_bckg[0], linestyle='-', color='red', linewidth=2, label='Left of the range of continuum')
-    ax.axvline(x=w_cal_range_pixcenter_bckg[1], linestyle='-', color='orange', linewidth=2, label='Right of the range of continuum')
-    ax.legend(fontsize=10)
-    plt.show(block=False)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
     img = ax.imshow(spectral_image_interpolated_croplat_binned, cmap='Greys', aspect='auto', norm=LogNorm(), extent=extent)
@@ -199,7 +196,7 @@ if show_intensitymap_binned == 'yes':
 
 # Save intensity map and uncertainties as .npy
 if save_intensity_map == 'yes':
-    filename_profile = 'intensity_map_'+line_label+f'_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz'
+    filename_profile = 'intensity_map_'+line_label+f'_binned_lon{bin_lon}_lat{bin_lat}.npz'
     foldepath_profile = '../outputs/'
     np.savez(foldepath_profile+filename_profile, intensity_map_croplat_binned=intensity_map_croplat_binned, intensity_map_unc_croplat_binned=intensity_map_unc_croplat_binned)
 
@@ -207,7 +204,7 @@ if save_intensity_map == 'yes':
 """
 In order to load the intensity map in another file (or this one), do the next:
 
-intensitymap_loaded_dic = np.load('intensity_map_'+line_label+f'_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz')
+intensitymap_loaded_dic = np.load('intensity_map_'+line_label+f'_binned_lon{bin_lon}_lat{bin_lat}.npz')
 intensity_map_croplat_binned = intensitymap_loaded_dic['intensity_map_croplat_binned'] #[W/sr/m^2] 2D-array
 intensity_map_unc_croplat_binned = intensitymap_loaded_dic['intensity_map_unc_croplat_binned'] #[W/sr/m^2] 2D-array
 """
