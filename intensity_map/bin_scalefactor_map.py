@@ -1,14 +1,14 @@
 # INPUTS
-"""
+
 # Binning
 bin_lat = 4
 bin_lon = 1
 
-save_scalefactor_map = 'no'
+save_scalefactor_map = 'yes'
 
 show_spectral_image_binned = 'yes'
 show_scaling_factor_maps = 'yes'
-show_analysis_scalingfactor__row_col = [62,100] #'no' or list of 2 integers e.g. [23,56]
+show_analysis_scalingfactor__row_col = [0,0] #'no' or list of 2 integers e.g. [23,56]
 
 filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
 
@@ -24,7 +24,7 @@ fwhm_synthetic_Si = 0.03
 fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
 fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
 fwhm_to_convolve = 1.95 * 0.04215
-"""
+
 
 ############################################################
 
@@ -286,18 +286,30 @@ if show_scaling_factor_maps=='yes':
 if save_scalefactor_map == 'yes': # Save scale factor maps of the 3 QRs
     filename_profile = f'scalefactor_map_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz'
     foldepath_profile = '../outputs/'
-    np.savez(foldepath_profile+filename_profile, scaling_factor_map_binned_qra=scaling_factor_map_binned_qra, scaling_factor_map_binned_qrb=scaling_factor_map_binned_qrb, scaling_factor_map_binned_qrl=scaling_factor_map_binned_qrl)
+    np.savez(foldepath_profile+filename_profile, scaling_factor_map_binned_qra=scaling_factor_map_binned_qra, scaling_factor_map_binned_qrb=scaling_factor_map_binned_qrb, scaling_factor_map_binned_qrl=scaling_factor_map_binned_qrl, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, fwhm_to_convolve=fwhm_to_convolve, rad_hrtsa_conv=rad_hrtsa_conv, rad_hrtsb_conv=rad_hrtsb_conv, rad_hrtsl_conv=rad_hrtsl_conv, rad_hrtsa_conv_SUMERgrid=rad_hrtsa_conv_SUMERgrid, rad_hrtsb_conv_SUMERgrid=rad_hrtsb_conv_SUMERgrid, rad_hrtsl_conv_SUMERgrid=rad_hrtsl_conv_SUMERgrid, lam_sumer=lam_sumer)
 
 
 """
 In order to load the intensity map in another file (or this one), do the next:
 
 scalefactor_loaded_dic = np.load(f'scalefactor_map_interpolated_binned_lon{bin_lon}_lat{bin_lat}.npz')
+
 scaling_factor_map_binned_qra = scalefactor_loaded_dic['scaling_factor_map_binned_qra'] #[W/sr/m^2] 2D-array
 scaling_factor_map_binned_qrb = scalefactor_loaded_dic['scaling_factor_map_binned_qrb'] #[W/sr/m^2] 2D-array
 scaling_factor_map_binned_qrl = scalefactor_loaded_dic['scaling_factor_map_binned_qrl'] #[W/sr/m^2] 2D-array
+
+wavelength_range_scalefactor_left = scalefactor_loaded_dic['wavelength_range_scalefactor_left'] #Angstrom
+wavelength_range_scalefactor_right = scalefactor_loaded_dic['wavelength_range_scalefactor_right'] #Angstrom
+fwhm_to_convolve = scalefactor_loaded_dic['fwhm_to_convolve'] #Angstrom
+rad_hrtsa_conv = scalefactor_loaded_dic['rad_hrtsa_conv']
+rad_hrtsb_conv = scalefactor_loaded_dic['rad_hrtsb_conv']
+rad_hrtsl_conv = scalefactor_loaded_dic['rad_hrtsl_conv']
+lam_hrts_SUMERgrid = scalefactor_loaded_dic['lam_sumer']
+rad_hrtsa_conv_SUMERgrid = scalefactor_loaded_dic['rad_hrtsa_conv_SUMERgrid']
+rad_hrtsb_conv_SUMERgrid = scalefactor_loaded_dic['rad_hrtsb_conv_SUMERgrid']
+rad_hrtsl_conv_SUMERgrid = scalefactor_loaded_dic['rad_hrtsl_conv_SUMERgrid']
 """
-""
+
 
 ############################################################
 # 

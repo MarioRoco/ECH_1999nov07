@@ -362,15 +362,7 @@ if show_chi2red_of_dopplermaps == 'yes':
 if save_dopplermap == 'yes':
     filename_profile = 'dopplershift_map_'+line_label+f'_binned_lon{bin_lon}_lat{bin_lat}.npz'
     foldepath_profile = '../outputs/'
-    np.savez(foldepath_profile+filename_profile, dopplershift_map_binned=dopplershift_map_binned, dopplershift_map_binned_HRTSsub_qra=dopplershift_map_binned_HRTSsub_qra, dopplershift_map_binned_HRTSsub_qrb=dopplershift_map_binned_HRTSsub_qrb, dopplershift_map_binned_HRTSsub_qrl=dopplershift_map_binned_HRTSsub_qrl, subtract_median_rows=subtract_median_rows)
-    
-    
-dopplershift_map_binned_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned)
-dopplershift_map_binned_HRTSsub_qra_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qra)
-dopplershift_map_binned_HRTSsub_qrb_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qrb)
-dopplershift_map_binned_HRTSsub_qrl_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qrl)
-
-
+    np.savez(foldepath_profile+filename_profile, dopplershift_map_binned=dopplershift_map_binned, dopplershift_map_binned_HRTSsub_qra=dopplershift_map_binned_HRTSsub_qra, dopplershift_map_binned_HRTSsub_qrb=dopplershift_map_binned_HRTSsub_qrb, dopplershift_map_binned_HRTSsub_qrl=dopplershift_map_binned_HRTSsub_qrl, subtract_median_rows=subtract_median_rows, rest_wavelength_label=rest_wavelength_label, rest_wavelength=lam_0, rest_wavelength_unc=lam_unc_0, rest_velocity_unc=v_unc_0)
 
 """
 In order to load the intensity map in another file (or this one), do the next:
@@ -380,7 +372,13 @@ dopplershift_map_binned = dopplershift_map_loaded_dic['dopplershift_map_binned']
 dopplershift_map_binned_HRTSsub_qra = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qra'] #2D-array
 dopplershift_map_binned_HRTSsub_qrb = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qrb'] #2D-array
 dopplershift_map_binned_HRTSsub_qrl = dopplershift_map_loaded_dic['dopplershift_map_binned_HRTSsub_qrl'] #2D-array
+rest_wavelength_label = dopplershift_map_loaded_dic['rest_wavelength_label']
+rest_wavelength = dopplershift_map_loaded_dic['rest_wavelength']
+rest_wavelength_unc = dopplershift_map_loaded_dic['rest_wavelength_unc']
+rest_velocity_unc = dopplershift_map_loaded_dic['rest_velocity_unc']
+# dopplershift_map_binned_HRTSsub_qra_lessmedian = subtract_median_rows(arr_2D=dopplershift_map_binned_HRTSsub_qra)
 """
+
 
 ############################################################
 
