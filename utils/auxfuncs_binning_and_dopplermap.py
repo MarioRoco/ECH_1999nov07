@@ -2447,13 +2447,11 @@ def create_BRasymmetrymap_with_centroid_of_gaussian(lam_sumer, spectralimage_int
                 BR_asymmetry_1sp_allrows.append(np.nan)
                 BR_asymmetry_normalized_1sp_allrows.append(np.nan)
             else:
-                BR_asymmetry_i_j, BR_asymmetry_normalized_i_j = BR_asymmetry_one_spectrum_with_centroid_of_gaussian(x_data=v_data, y_data=y_data, y_unc_data=y_unc_data, BR_centroid=BR_centroid_i_j, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width)
+                if show__row_col!='no' and show__row_col[0]==row_ and show__row_col[1]==img_: show_profile_ij='yes'
+                else: show_profile_ij='no'
+                BR_asymmetry_i_j, BR_asymmetry_normalized_i_j = BR_asymmetry_one_spectrum_with_centroid_of_gaussian(x_data=v_data, y_data=y_data, y_unc_data=y_unc_data, BR_centroid=BR_centroid_i_j, BR_distance_centroid=BR_distance_centroid, BR_width=BR_width, show_profile=show_profile_ij)
                 BR_asymmetry_1sp_allrows.append(BR_asymmetry_i_j)
                 BR_asymmetry_normalized_1sp_allrows.append(BR_asymmetry_normalized_i_j)
-            
-            
-            if show__row_col!='no' and show__row_col[0]==row_ and show__row_col[1]==img_: show_profile_ij='yes'
-            else: show_profile_ij='no'
 
             
         # save the above lists (which represent the different spectral images) in lists to crate the 2D-array
