@@ -3,6 +3,10 @@ line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 fwhm_conv = 1.95*0.04215 #Angstrom
 N_pixels_bin = 8000
 
+intensity_CH_boundary = 132.58588 #132.58588 is the 4% of the maximum intensity of EIT array
+percentage_CH_boundary = 4.
+
+
 # Wavelength ranges to crop spectra
 wavelength_range_to_average = [1531.1147, 1551.7688]
 wavelength_range_to_analyze_NeVIII = [1540.2, 1541.4]
@@ -54,7 +58,7 @@ from scale_hrts import *
 ######################################################
 
 # Load the intensity map and uncertainties
-intensitymap_loaded_dic = np.load('../data/data_modified/intensity_map_'+line_label+'_interpolated.npz')
+intensitymap_loaded_dic = np.load('../outputs/intensity_map_'+line_label+'_interpolated.npz')
 intensity_map = intensitymap_loaded_dic['intensity_map'] #2D-array
 intensity_map_unc = intensitymap_loaded_dic['intensity_map_unc'] #2D-array
 intensity_map_croplat = intensitymap_loaded_dic['intensity_map_croplat'] #2D-array
@@ -87,6 +91,15 @@ def pixels_higher_intensity_than_a_value(arr_2d, bound_, N_pixels):
     coords_sorted = coords_[idx_sorted]      # coordinates ordered by brightness
     rowscols_inside_range__ = coords_sorted[:N_pixels] # Take first N_pixels (brightest N_pixels pixels)
     return rowscols_inside_range__
+
+
+# Import SUMER data interpolated (wavelength calibrated)
+data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
+
+# wavelength from the interpolated data
+lam_sumer_full = data_interpolated_loaded['reference_wavelength'] 
+elam_sumer_full = data_interpolated_loaded['unc_reference_wavelength'] 
+row_reference = int(data_interpolated_loaded['row_reference'])  
 
 
 # Extent in pixels 
@@ -122,6 +135,8 @@ rad_peak_corrected_qrl_list = []
 bound_mean_list, bound_unc_list = [],[]
 
 bound_i = np.min(intensity_map_croplat)-0.01
+y_intensity_correction_qra, y_intensity_correction_qrb, y_intensity_correction_qrl = [],[],[]
+yerr_intensity_correction_qra, yerr_intensity_correction_qrb, yerr_intensity_correction_qrl = [],[],[]
 while bound_i<np.max(intensity_map_croplat):
     lower_bound_i = bound_i
     print(bound_i, ',', np.max(intensity_map_croplat))
@@ -162,9 +177,80 @@ while bound_i<np.max(intensity_map_croplat):
     hrts_qr='l'
     fshl = fun_scale_hrts(hrts_qr=hrts_qr, lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)    
     rad_sumer_cropNeVIII_corrected_qrl, erad_sumer_cropNeVIII_corrected_qrl = fshl['rad_sumer_cropNeVIII_corrected'], fshl['erad_sumer_cropNeVIII_corrected']  
+    
+    ######################################################
+    # 6) Calculate the correction of intensity made by HRTS
+    
+    wavelength_range_intensity_map = [1540.45, 1541.2] #Angstroem
+    wavelength_range_intensity_map_bckg = [1539.8, 1540.2] #Angstroem
+    
+    # pixel scale
+    w = pixelscale_list[row_reference]
+    w_unc = pixelscale_unc_list[row_reference]
+    
+    
+    ## Spectral radiance of the line uncorrected
+    lam_sumer_cropint, idx_int = crop_range(list_to_crop=fsha['lam_sumer_cropNeVIII'], range_values=wavelength_range_intensity_map) #crop in the integration range
+    Iu_i = fsha['rad_sumer_cropNeVIII'][idx_int[0]:idx_int[1]+1] #1d-array
+    Iu_unc_i = fsha['erad_sumer_cropNeVIII'][idx_int[0]:idx_int[1]+1] #1d-array (uncertainties)
+    ## Integrate the line
+    Iu = w * np.sum(Iu_i) #continuum average
+    Iu_unc_T1 = w_unc * np.sum(Iu_i)
+    Iu_unc_T2 = np.sum((w*Iu_unc_i)**2)
+    Iu_unc = np.sqrt( Iu_unc_T1**2 + Iu_unc_T2**2)
+    
+    
+    ## Spectral radiance of the line corrected with HRTS
+    lam_sumer_cropint, idx_int = crop_range(list_to_crop=fsha['lam_sumer_cropNeVIII'], range_values=wavelength_range_intensity_map) #crop in the integration range
+    Ia_i = fsha['rad_sumer_cropNeVIII_corrected'][idx_int[0]:idx_int[1]+1] #1d-array
+    Ia_unc_i = fsha['erad_sumer_cropNeVIII_corrected'][idx_int[0]:idx_int[1]+1] #1d-array (uncertainties)
+    ## Integrate the line
+    Ia = w * np.sum(Ia_i) #continuum average
+    Ia_unc_T1 = w_unc * np.sum(Ia_i)
+    Ia_unc_T2 = np.sum((w*Ia_unc_i)**2)
+    Ia_unc = np.sqrt( Ia_unc_T1**2 + Ia_unc_T2**2)
+    
+    
+    ## Spectral radiance of the line
+    lam_sumer_cropint, idx_int = crop_range(list_to_crop=fshb['lam_sumer_cropNeVIII'], range_values=wavelength_range_intensity_map) #crop in the integration range
+    Ib_i = fshb['rad_sumer_cropNeVIII_corrected'][idx_int[0]:idx_int[1]+1] #1d-array
+    Ib_unc_i = fshb['erad_sumer_cropNeVIII_corrected'][idx_int[0]:idx_int[1]+1] #1d-array (uncertainties)
+    ## Integrate the line
+    Ib = w * np.sum(Ib_i) #continuum average
+    Ib_unc_T1 = w_unc * np.sum(Ib_i)
+    Ib_unc_T2 = np.sum((w*Ib_unc_i)**2)
+    Ib_unc = np.sqrt( Ib_unc_T1**2 + Ib_unc_T2**2)
+    
+    
+    ## Spectral radiance of the line
+    lam_sumer_cropint, idx_int = crop_range(list_to_crop=fshl['lam_sumer_cropNeVIII'], range_values=wavelength_range_intensity_map) #crop in the integration range
+    Il_i = fshl['rad_sumer_cropNeVIII_corrected'][idx_int[0]:idx_int[1]+1] #1d-array
+    Il_unc_i = fshl['erad_sumer_cropNeVIII_corrected'][idx_int[0]:idx_int[1]+1] #1d-array (uncertainties)
+    ## Integrate the line
+    Il = w * np.sum(Il_i) #continuum average
+    Il_unc_T1 = w_unc * np.sum(Il_i)
+    Il_unc_T2 = np.sum((w*Il_unc_i)**2)
+    Il_unc = np.sqrt( Il_unc_T1**2 + Il_unc_T2**2)
+    
+    
+    # Calculate the percentage of intensity removed by the blends
+    ## Percentage
+    percentage_corrected_qra = (1-Ia/Iu)*100.
+    percentage_corrected_qrb = (1-Ib/Iu)*100.
+    percentage_corrected_qrl = (1-Il/Iu)*100.
+    y_intensity_correction_qra.append(percentage_corrected_qra) 
+    y_intensity_correction_qrb.append(percentage_corrected_qrb) 
+    y_intensity_correction_qrl.append(percentage_corrected_qrl) 
+    ## Uncertainty of the percentage
+    unc_percentage_corrected_qra = 100.*np.sqrt((-Ia_unc/Iu)**2 + (Ia*Iu_unc/(Iu**2))**2)
+    unc_percentage_corrected_qrb = 100.*np.sqrt((-Ib_unc/Iu)**2 + (Ib*Iu_unc/(Iu**2))**2)
+    unc_percentage_corrected_qrl = 100.*np.sqrt((-Il_unc/Iu)**2 + (Il*Iu_unc/(Iu**2))**2)
+    yerr_intensity_correction_qra.append(unc_percentage_corrected_qra) 
+    yerr_intensity_correction_qrb.append(unc_percentage_corrected_qrb) 
+    yerr_intensity_correction_qrl.append(unc_percentage_corrected_qrl) 
 
     ######################################################
-    # 6) calculate peak
+    # 7) calculate peak
     
     # uncorrected data
     mpi_uncorrected = find_maximum_by_parabolic_interpolation_adapted(wavelength=lam_sumer_cropNeVIII, radiance=rad_sumer_cropNeVIII_uncorrected, radiance_unc=erad_sumer_cropNeVIII_uncorrected, show_figure='no')
@@ -314,6 +400,59 @@ ax.axhspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_xscale('log')
 ax.legend()
 plt.show(block=False)
+
+
+
+
+#Teriaca's comment for the paper: Percentage of intensity that is taken by HRTS. This is a general discussion about why blends are important bla bla bla. It is a general plot. And then I go to the details (maps and single things). 
+
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), gridspec_kw={'height_ratios': [1, 1.5]}, sharex=True)
+ax[0].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=y_intensity_correction_qra, yerr=yerr_intensity_correction_qra, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
+ax[0].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=y_intensity_correction_qrb, yerr=yerr_intensity_correction_qrb, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+#ax[0].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=y_intensity_correction_qrl, yerr=yerr_intensity_correction_qrl, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
+ax[0].set_ylabel('Intensity correction\n HRTS/SUMER (%)', color='black', fontsize=16)
+ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='red', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
+ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qra_list, yerr=ev_peak_corrected_qra_list, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
+ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+#ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrl_list, yerr=ev_peak_corrected_qrl_list, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
+ax[1].set_title(f'', fontsize=18) 
+ax[1].set_xlabel(r'Spectral radiance peak (W/sr/m$^2$)', color='black', fontsize=16)
+ax[1].set_ylabel('Doppler shift (km/s)', color='black', fontsize=16)
+ax[1].axhline(y=0., color='black', linewidth=1.2, linestyle='--', label=f'Rest wavelength {lam_0}'' S\u212B')#, label=label_i) 
+ax[1].axhspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
+ax[0].axvline(x=intensity_CH_boundary, color='black', linestyle=':', label='CH boundary')
+ax[1].axvline(x=intensity_CH_boundary, color='black', linestyle=':')
+ax[0].legend()
+ax[1].legend()
+#plt.tight_layout()
+plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.02)
+plt.show(block=False)
+
+
+
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), gridspec_kw={'height_ratios': [1, 1.5]}, sharex=True)
+ax[0].errorbar(x=percentage_list, xerr=percentage_unc_list, y=y_intensity_correction_qra, yerr=yerr_intensity_correction_qra, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
+ax[0].errorbar(x=percentage_list, xerr=percentage_unc_list, y=y_intensity_correction_qrb, yerr=yerr_intensity_correction_qrb, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+#ax[0].errorbar(x=percentage_list, xerr=percentage_unc_list, y=y_intensity_correction_qrl, yerr=yerr_intensity_correction_qrl, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
+ax[0].set_ylabel('Intensity correction\n HRTS/SUMER (%)', color='black', fontsize=16)
+ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='red', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
+ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qra_list, yerr=ev_peak_corrected_qra_list, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
+ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+#ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrl_list, yerr=ev_peak_corrected_qrl_list, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
+ax[1].set_title(f'', fontsize=18) 
+ax[1].set_xlabel(r'Percentage of maximum intensity', color='black', fontsize=16)
+ax[1].set_ylabel('Doppler shift (km/s)', color='black', fontsize=16)
+ax[1].axhline(y=0., color='black', linewidth=1.2, linestyle='--', label=f'Rest wavelength {lam_0}'' \u212B')#, label=label_i) 
+ax[1].axhspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
+ax[0].axvline(x=percentage_CH_boundary, color='black', linestyle=':', label='CH boundary')
+ax[1].axvline(x=percentage_CH_boundary, color='black', linestyle=':')
+ax[0].legend()
+ax[1].legend()
+#plt.tight_layout()
+plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.02)
+plt.show(block=False)
+
+
 
 
 """
