@@ -3,7 +3,7 @@ filename_averaged_spectrum = 'average_profile__0_0__4_0__max_of_sumer_NeVIII.npz
 filename_averaged_spectrum = 'average_profile__0_0__3_42__max_of_sumer_195___.npz'
 filename_averaged_spectrum = 'average_profile__0_0__4_0__max_of_sumer_195.npz'
 filename_averaged_spectrum = 'average_profile__0_0__4_0__max_of_EIT_195.npz'
-filename_averaged_spectrum = 'average_profile__0_0__3_42__max_of_EIT_195.npz'
+#filename_averaged_spectrum = 'average_profile__0_0__3_42__max_of_EIT_195.npz'
 
 
 
@@ -114,7 +114,7 @@ from scale_hrts import *
 # Average profiles of the intensity bin
 
 # Load the intensity map and uncertainties
-intensitymap_loaded_dic = np.load('../data/data_modified/intensity_map_'+line_label+'_interpolated.npz')
+intensitymap_loaded_dic = np.load('../outputs/intensity_map_'+line_label+'_interpolated.npz')
 intensity_map = intensitymap_loaded_dic['intensity_map'] #2D-array
 intensity_map_unc = intensitymap_loaded_dic['intensity_map_unc'] #2D-array
 intensity_map_croplat = intensitymap_loaded_dic['intensity_map_croplat'] #2D-array
@@ -163,7 +163,7 @@ lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from
 ############################################################################################################
 # Substract HRTS
 
-profiles_loaded_dic = np.load('../data/data_modified/'+filename_averaged_spectrum)
+profiles_loaded_dic = np.load('../outputs/'+filename_averaged_spectrum)
 lam_sumer_cropNeVIII = profiles_loaded_dic['lam_sumer_cropNeVIII'] #Angstrom
 rad_sumer_cropNeVIII = profiles_loaded_dic['rad_sumer_cropNeVIII']
 erad_sumer_cropNeVIII = profiles_loaded_dic['erad_sumer_cropNeVIII']
