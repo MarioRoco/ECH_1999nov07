@@ -1,18 +1,21 @@
 
-filename_averaged_spectrum = 'average_profile__0_0__4_0__max_of_sumer_NeVIII.npz'
-filename_averaged_spectrum = 'average_profile__0_0__3_42__max_of_sumer_195___.npz'
-filename_averaged_spectrum = 'average_profile__0_0__4_0__max_of_sumer_195.npz'
-filename_averaged_spectrum = 'average_profile__0_0__4_0__max_of_EIT_195.npz'
-#filename_averaged_spectrum = 'average_profile__0_0__3_42__max_of_EIT_195.npz'
-
-
-
 #  Inputs
-line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 
 # Threshold value: label (type) and range of percentageRange percentage of the threshold value
-threshold_value_type = 'max' #'max', 'min', 'mean', 'median'
-range_percentage = [0., 4.]
+## range_percentage: [float1, float2]
+## threshold_value_type: 'max', 'min', 'mean', 'median'
+## instrument: 'eit_195', 'sumer_NeVIII'
+#range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
+#range_percentage, threshold_value_type, instrument_line = [0., 3.42], 'max', 'eit_195'
+#range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'sumer_NeVIII'
+#range_percentage, threshold_value_type, instrument_line = [0., 5.], 'max', 'eit_195'
+#range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
+
+range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
+
+
+line_label_sumer = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
+
 
 fwhm_conv = 1.95*0.04215 #Angstrom
 
@@ -33,12 +36,11 @@ wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
 
 # save average profile as .npy?
 save_average_profile = 'no' 
-
 show_plots_correction = 'no'
 
 ######################################################
 # Initial parameters of the fitting
-
+"""
 bckg_fit_uncorrected = 0.15 #HRST not subtracted
 init_parameters_uncorrected = [bckg_fit_uncorrected, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
            0.2-bckg_fit_uncorrected, -54., 20.,
@@ -74,6 +76,47 @@ elif sun_region=='qqr_l':
                    3.-bckg_fit_corrected, 7., 35.,
                    1.-bckg_fit_corrected, 37., 50.
                    ]
+"""
+
+
+wavelength_range_NeVIII = [1540.32, 1541.43]
+#x_lims_fits = [min(v_sumer_cropNeVIII), max(v_sumer_cropNeVIII)]
+
+bckg_fit_uncorrected = 0.2 #HRST not subtracted
+init_parameters_uncorrected = [bckg_fit_uncorrected, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
+	0.3-bckg_fit_uncorrected, -54., 20.,
+	1.07-bckg_fit_uncorrected, -10, 45.,
+	0.5-bckg_fit_uncorrected, 15., 45.,
+	0.25-bckg_fit_uncorrected, 97., 30.
+	]
+
+if sun_region=='qqr_a':
+    bckg_fit_corrected = -0.3
+    init_parameters_corrected = [bckg_fit_corrected, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
+	0.1-bckg_fit_corrected, -60., 20.,
+	0.5-bckg_fit_corrected, -30., 20.,
+	3.-bckg_fit_corrected, 0.0, 50.,
+	#1.5-bckg_fit_corrected, 25., 30.
+	]
+
+elif sun_region=='qqr_b':
+	bckg_fit_corrected = 0.0
+	init_parameters_corrected = [bckg_fit_corrected, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
+		0.04-bckg_fit_corrected, -78., 30.,
+		#0.3-bckg_fit_corrected, -50., 30.,
+		0.5-bckg_fit_corrected, -30., 40.,
+		0.8-bckg_fit_corrected, 0.0, 50.,
+		#1.5-bckg_fit_corrected, 33., 40.
+		]
+
+elif sun_region=='qqr_l':
+	bckg_fit_corrected = 0.
+	init_parameters_corrected = [bckg_fit_corrected, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
+		0.08-bckg_fit_corrected, -75., 20.,
+		0.3-bckg_fit_corrected, -35., 30.,
+		0.8-bckg_fit_corrected, 7., 50.,
+		0.022-bckg_fit_corrected, 77., 30.
+		]
 
 
 ######################################################
@@ -114,7 +157,7 @@ from scale_hrts import *
 # Average profiles of the intensity bin
 
 # Load the intensity map and uncertainties
-intensitymap_loaded_dic = np.load('../outputs/intensity_map_'+line_label+'_interpolated.npz')
+intensitymap_loaded_dic = np.load('../outputs/intensity_map_'+line_label_sumer+'_interpolated.npz')
 intensity_map = intensitymap_loaded_dic['intensity_map'] #2D-array
 intensity_map_unc = intensitymap_loaded_dic['intensity_map_unc'] #2D-array
 intensity_map_croplat = intensitymap_loaded_dic['intensity_map_croplat'] #2D-array
@@ -162,6 +205,10 @@ lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from
 ############################################################################################################
 ############################################################################################################
 # Substract HRTS
+
+range_numbers_to_string = '__'.join(f"{x:.2f}".replace('.', '_').rstrip('0') if f"{x:.2f}"[-1] != '0' else f"{x:.1f}".replace('.', '_') for x in range_percentage) 
+filename_averaged_spectrum = 'average_profile__' + range_numbers_to_string + '__' + threshold_value_type + '_of_'+instrument_line+'.npz'
+
 
 profiles_loaded_dic = np.load('../outputs/'+filename_averaged_spectrum)
 lam_sumer_cropNeVIII = profiles_loaded_dic['lam_sumer_cropNeVIII'] #Angstrom

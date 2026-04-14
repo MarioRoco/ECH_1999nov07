@@ -7,7 +7,7 @@ percentage_label = 60
 
 fwhm_conv = 1.95*0.04215 #nm
 
-sun_region = 'qqr_a' #HRTS spectrum
+sun_region = 'qqr_b' #HRTS spectrum
 #wavelength_range_NeVIII = [1539., 1542.5]
 wavelength_range_NeVIII = [1540., 1541.5]
 wavelength_range_NeVIII = [1540.1, 1541.46]
@@ -71,6 +71,7 @@ elif sun_region=='qqr_b':
                    0.8-bckg_fit_corrected, 0.0, 50.,
                    #1.5-bckg_fit_corrected, 33., 40.
                    ]
+
                    
 elif sun_region=='qqr_l':
     bckg_fit_corrected = 0.
@@ -104,7 +105,7 @@ from utils.aux_functions import *
 ######################################################
 # SUMER
 
-foldername_sumer_spectrum = '../data/data_modified/'
+foldername_sumer_spectrum = '../outputs/'
 profiles_loaded_dic = np.load(foldername_sumer_spectrum + filename_sumer_spectrum)
 lam_sumer = profiles_loaded_dic['lam_sumer_av'] #Angstrom
 rad_sumer = profiles_loaded_dic['rad_sumer_av'] #[W/sr/m^2/Angstroem]
@@ -120,16 +121,16 @@ lam_sumer_idx = np.arange(0, len(lam_sumer))
 # HRTS
 
 if sun_region=='qqr_a':
-	from hrts_spectra.data__qqr_a_xdr import lambda__qqr_a_xdr, radiance__qqr_a_xdr, unc_radiance__qqr_a_xdr
+	from data.hrts.data__qqr_a_xdr import lambda__qqr_a_xdr, radiance__qqr_a_xdr, unc_radiance__qqr_a_xdr
 	lam_hrts, rad_hrts = 10.*lambda__qqr_a_xdr, 0.1*radiance__qqr_a_xdr #multiply by 10. and 0.1 to convert nm to Angstrom
 elif sun_region=='qqr_b':
-	from hrts_spectra.data__qqr_b_xdr import lambda__qqr_b_xdr, radiance__qqr_b_xdr, unc_radiance__qqr_b_xdr
+	from data.hrts.data__qqr_b_xdr import lambda__qqr_b_xdr, radiance__qqr_b_xdr, unc_radiance__qqr_b_xdr
 	lam_hrts, rad_hrts = 10.*lambda__qqr_b_xdr, 0.1*radiance__qqr_b_xdr
 elif sun_region=='qqr_l':
-	from hrts_spectra.data__qqr_l_xdr import lambda__qqr_l_xdr, radiance__qqr_l_xdr, unc_radiance__qqr_l_xdr
+	from data.hrts.data__qqr_l_xdr import lambda__qqr_l_xdr, radiance__qqr_l_xdr, unc_radiance__qqr_l_xdr
 	lam_hrts, rad_hrts = 10.*lambda__qqr_l_xdr, 0.1*radiance__qqr_l_xdr
 elif sun_region=='qr':
-	from hrts_spectra.data__qr_xdr import lambda__qr_xdr, radiance__qr_xdr, unc_radiance__qr_xdr
+	from data.hrts.data__qr_xdr import lambda__qr_xdr, radiance__qr_xdr, unc_radiance__qr_xdr
 	lam_hrts, rad_hrts = 10.*lambda__qr_xdr, 0.1*radiance__qr_xdr
 else: print("sun_region should be 'qqr_a', 'qqr_b', 'qqr_l', or 'qr'")
 

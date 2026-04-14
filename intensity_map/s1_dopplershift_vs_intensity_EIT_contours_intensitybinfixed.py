@@ -11,8 +11,8 @@ range_percentage_list = [[0.,5.], [5.,10.], [10.,20.], [20.,30.], [30.,40.], [40
 
 range_percentage_list = [[0.,2.5], [2.5,3.], [3.,3.5], [3.5,4.], [4.,4.5], [4.5,6.], [6.,10.], [10.,20.], [20.,30.], [30.,40.], [40.,50.], [50.,70.], [70.,100.]]
 
-intensity_CH_boundary = 132.58588 #132.58588 is the 4% of the maximum intensity of EIT array
-percentage_CH_boundary = 4.
+#percentage_CH_boundary, intensity_CH_boundary = 4., 132.58588 #132.58588 is the 4% of the maximum intensity of EIT array
+percentage_CH_boundary, intensity_CH_boundary = 3.42, 113.38871
 
 
 eit_wavelength = 195 #171, 195, 284, or 304 [Angstrom]
@@ -409,10 +409,10 @@ for range_percentage_i in range_percentage_list:
         ax[1].text(1.02, 0.5, f'SUMER-{line_center_label}', fontsize=22,transform=ax[1].transAxes, va='center', ha='left', rotation=90)
         plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
         # EIT subplot (top) - contours from EIT data
-        contour_lower_eit = ax[0].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_px_contours)
+        contour_lower_eit = ax[0].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='black', linewidths=2, extent=extent_eit_px_contours)
         contour_upper_eit = ax[0].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='blue', linewidths=2, extent=extent_eit_px_contours)
         # EIT subplot (bottom) - contours from EIT data
-        contour_lower_eit = ax[1].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_sumer_px_contours)
+        contour_lower_eit = ax[1].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='black', linewidths=2, extent=extent_sumer_px_contours)
         contour_upper_eit = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='blue', linewidths=2, extent=extent_sumer_px_contours)
         # Plot scatter AFTER contours with zorder to ensure visibility
         ax[0].scatter(x_col_list_eit_plot, y_row_list_eit_plot, color='cyan', marker='s', s=1, zorder=10)
@@ -473,9 +473,9 @@ for range_percentage_i in range_percentage_list:
 
 
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
-ax.errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='red', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
+ax.errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='black', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
 ax.errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qra_list, yerr=ev_peak_corrected_qra_list, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
-ax.errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+ax.errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='red', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
 ax.errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrl_list, yerr=ev_peak_corrected_qrl_list, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
 ax.set_title(f'', fontsize=18) 
 ax.set_xlabel(r'Spectral radiance peak (W/sr/m$^2$)', color='black', fontsize=16)
@@ -488,9 +488,9 @@ plt.show(block=False)
 
 
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
-ax.errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='red', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
+ax.errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='black', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
 ax.errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qra_list, yerr=ev_peak_corrected_qra_list, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
-ax.errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+ax.errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='red', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
 ax.errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrl_list, yerr=ev_peak_corrected_qrl_list, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
 ax.set_title(f'', fontsize=18) 
 ax.set_xlabel(r'Percentage of the most intense pixel', color='black', fontsize=16)
@@ -507,12 +507,12 @@ plt.show(block=False)
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), gridspec_kw={'height_ratios': [1, 1.5]}, sharex=True)
 ax[0].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=y_intensity_correction_qra, yerr=yerr_intensity_correction_qra, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
-ax[0].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=y_intensity_correction_qrb, yerr=yerr_intensity_correction_qrb, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+ax[0].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=y_intensity_correction_qrb, yerr=yerr_intensity_correction_qrb, color='red', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
 #ax[0].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=y_intensity_correction_qrl, yerr=yerr_intensity_correction_qrl, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
 ax[0].set_ylabel('Intensity correction\n HRTS/SUMER (%)', color='black', fontsize=16)
-ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='red', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
+ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='black', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
 ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qra_list, yerr=ev_peak_corrected_qra_list, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
-ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='red', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
 #ax[1].errorbar(x=bound_mean_list, xerr=bound_unc_list, y=v_peak_corrected_qrl_list, yerr=ev_peak_corrected_qrl_list, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
 ax[1].set_title(f'', fontsize=18) 
 ax[1].set_xlabel(r'Spectral radiance peak (W/sr/m$^2$)', color='black', fontsize=16)
@@ -531,12 +531,12 @@ plt.show(block=False)
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), gridspec_kw={'height_ratios': [1, 1.5]}, sharex=True)
 ax[0].errorbar(x=percentage_list, xerr=percentage_unc_list, y=y_intensity_correction_qra, yerr=yerr_intensity_correction_qra, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
-ax[0].errorbar(x=percentage_list, xerr=percentage_unc_list, y=y_intensity_correction_qrb, yerr=yerr_intensity_correction_qrb, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+ax[0].errorbar(x=percentage_list, xerr=percentage_unc_list, y=y_intensity_correction_qrb, yerr=yerr_intensity_correction_qrb, color='red', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
 #ax[0].errorbar(x=percentage_list, xerr=percentage_unc_list, y=y_intensity_correction_qrl, yerr=yerr_intensity_correction_qrl, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
 ax[0].set_ylabel('Intensity correction\n HRTS/SUMER (%)', color='black', fontsize=16)
-ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='red', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
+ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_uncorrected_list, yerr=ev_peak_uncorrected_list, color='black', linewidth=0., elinewidth=1.0, marker='^', label='SUMER uncorrected')
 ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qra_list, yerr=ev_peak_corrected_qra_list, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
-ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='green', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
+ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrb_list, yerr=ev_peak_corrected_qrb_list, color='red', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-B')
 #ax[1].errorbar(x=percentage_list, xerr=percentage_unc_list, y=v_peak_corrected_qrl_list, yerr=ev_peak_corrected_qrl_list, color='cyan', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-L')
 ax[1].set_title(f'', fontsize=18) 
 ax[1].set_xlabel(r'Percentage of maximum intensity', color='black', fontsize=16)
