@@ -177,6 +177,8 @@ def vkms_doppler_unc(lamb, lamb_unc, lamb_0, lamb_0_unc):
     """
     c = 299792.4580 #[km/s] speed of light
     return c/lamb_0 * np.sqrt( lamb_unc**2 + (lamb/lamb_0 * lamb_0_unc)**2 )
+    
+
 
 def lamb_doppler(lamb_0, v_kms):
     """

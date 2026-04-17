@@ -20,6 +20,60 @@ NeVIII_theoretical_wavelength_color_dic['Peter_and_Judge_1999'] = 'magenta'
 NeVIII_theoretical_wavelength_color_dic['Kelly_database'] = 'brown'
 
 
+
+
+    
+"""   
+In next lines I was trying to guess what is the most correct way to calculate the uncertainty of the rest wavelength in km/s
+
+In [2]: vkms_doppler_unc(lamb=1540.856, lamb_unc=0.014, lamb_0=1540.856, lamb_0_
+   ...: unc=0.014)
+Out[2]: np.float64(3.852136630555179)
+
+In [3]: vkms_doppler_unc(lamb=1540.856/2., lamb_unc=0.014/2., lamb_0=1540.856/2.
+   ...: , lamb_0_unc=0.014/2.)
+Out[3]: np.float64(3.852136630555179)
+
+In [4]: vkms_doppler_unc(lamb=1540.856+0.014, lamb_unc=0., lamb_0=1540.856, lamb
+   ...: _0_unc=0.014)
+Out[4]: np.float64(2.723896682238359)
+
+In [5]: vkms_doppler_unc(lamb=1540.856+0.014, lamb_unc=0.014, lamb_0=1540.856, l
+   ...: amb_0_unc=0.014)
+Out[5]: np.float64(3.852154130579622)
+
+In [6]: 299792.4580*0.014/1540.856
+Out[6]: 2.723871933522665
+"""
+
+
+def vkms_doppler(lamb, lamb_0):
+    """
+    Wavelength (delta) to doppler velocity. 
+    """
+    c = 299792.4580 #[km/s] speed of light
+    return c*(lamb-lamb_0)/lamb_0
+
+def vkms_doppler_unc(lamb, lamb_unc, lamb_0, lamb_0_unc):
+    """
+    Wavelength (delta) to doppler velocity. 
+    """
+    c = 299792.4580 #[km/s] speed of light
+    return c/lamb_0 * np.sqrt( lamb_unc**2 + (lamb/lamb_0 * lamb_0_unc)**2 )
+
+rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
+lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
+lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
+
+# Probably one of the next options is the most correct way to convert the uncertainty on the rest wavelength in wavelength units to Doppler shift velocity
+#v_unc_0 = vkms_doppler_unc(lamb=lam_0+lam_unc_0, lamb_unc=0.0, lamb_0=lam_0, lamb_0_unc=lam_unc_0) 
+v_unc_0 = vkms_doppler(lamb=lam_0+lam_unc_0, lamb_0=lam_0)
+
+
+
+
+
+
 """
 Dammasch et al. 1999 (https://articles.adsabs.harvard.edu/cgi-bin/nph-iarticle_query?1999ESASP.446..263D&defaultprint=YES&filetype=.pdf) say "It is fundamental to determine the rest wavelength of these lines(Ne VIII, Mg X, Fe XII), which -for reasons of the high ionization stage of the ions- are hard to measure in the laboratory with high accuracy." Also they say "The Ne VIII line formed at 630 000 K has shown strong outflow velocities of the Ne 7+  ion in coronal holes, but only a small blue shift in quiet Sun regions."
 
