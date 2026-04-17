@@ -1,6 +1,5 @@
 #  Inputs
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
-fwhm_conv = 1.95*0.04215 #Angstrom
 N_pixels_bin = 1000
 N_pixels_bin = 400
 
@@ -14,10 +13,6 @@ percentage_CH_boundary = 4.
 # Wavelength ranges to crop spectra
 wavelength_range_to_average = [1531.1147, 1551.7688]
 wavelength_range_to_analyze_NeVIII = [1540.2, 1541.4]
-
-## Ranges of wavelength
-wavelength_range_scalefactor_left = [1537.7, 1539.5] #nm
-wavelength_range_scalefactor_right = [1542., 1544.] #nm
 
 show_plots_correction = 'no'
 show_plots = 'yes'
@@ -71,16 +66,10 @@ line_center_label = intensitymap_loaded_dic['line_center_label']
 vmin_sumer, vmax_sumer = intensitymap_loaded_dic['vmin_vmax'] 
 
 ######################################################
-
-# Rest wavelength used
-rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
-lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212B')
-
-# uncertainty of the rest wavelength in km/s
-v_unc_0 = vkms_doppler_unc(lamb=lam_0, lamb_unc=lam_unc_0, lamb_0=lam_0, lamb_0_unc=lam_unc_0) 
-
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 ######################################################
 # Import EIT data
 
@@ -250,15 +239,15 @@ while bound_i<np.max(data_eit_crop_corrected):
     
     
     hrts_qr='a'
-    fsha = fun_scale_hrts(hrts_qr=hrts_qr, lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+    fsha = fun_scale_hrts(hrts_qr=hrts_qr, lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
     lam_sumer_cropNeVIII, rad_sumer_cropNeVIII, erad_sumer_cropNeVIII, rad_sumer_cropNeVIII_corrected_qra, erad_sumer_cropNeVIII_corrected_qra = fsha['lam_sumer_cropNeVIII'], fsha['rad_sumer_cropNeVIII'], fsha['erad_sumer_cropNeVIII'], fsha['rad_sumer_cropNeVIII_corrected'], fsha['erad_sumer_cropNeVIII_corrected']
     
     hrts_qr='b'
-    fshb = fun_scale_hrts(hrts_qr=hrts_qr, lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+    fshb = fun_scale_hrts(hrts_qr=hrts_qr, lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
     rad_sumer_cropNeVIII_corrected_qrb, erad_sumer_cropNeVIII_corrected_qrb = fshb['rad_sumer_cropNeVIII_corrected'], fshb['erad_sumer_cropNeVIII_corrected']
     
     hrts_qr='l'
-    fshl = fun_scale_hrts(hrts_qr=hrts_qr, lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)    
+    fshl = fun_scale_hrts(hrts_qr=hrts_qr, lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)    
     rad_sumer_cropNeVIII_corrected_qrl, erad_sumer_cropNeVIII_corrected_qrl = fshl['rad_sumer_cropNeVIII_corrected'], fshl['erad_sumer_cropNeVIII_corrected']  
     
     

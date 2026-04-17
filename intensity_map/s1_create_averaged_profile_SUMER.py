@@ -6,9 +6,6 @@ line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 threshold_value_type = 'max' #'max', 'min', 'mean', 'median'
 range_percentage = [0., 4.]
 
-
-fwhm_conv = 1.95*0.04215 #Angstrom
-
 color_sumer = 'blue'
 color_hrts = 'green'
 color_sumer_uncorrected = 'red'
@@ -18,9 +15,6 @@ color_sumer_corrected = 'blue'
 wavelength_range_to_average = [1531.1147, 1551.7688]
 wavelength_range_to_analyze_NeVIII = [1540.2, 1541.4]
 
-## Ranges of wavelength
-wavelength_range_scalefactor_left = [1537.7, 1539.5] #Angstrom
-wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
 
 # save average profile as .npy?
 save_average_profile = 'yes' 
@@ -76,16 +70,10 @@ line_center_label = intensitymap_loaded_dic['line_center_label']
 vmin_sumer, vmax_sumer = intensitymap_loaded_dic['vmin_vmax'] 
 
 ######################################################
-
-# Rest wavelength used
-rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
-lamb_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lamb_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lamb_0, r'$\pm$', lamb_unc_0, '\u212B')
-
-# uncertainty of the rest wavelength in km/s
-v_unc_0 = vkms_doppler_unc(lamb=lamb_0, lamb_unc=lamb_unc_0, lamb_0=lamb_0, lamb_0_unc=lamb_unc_0) 
-
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 
 ######################################################
 

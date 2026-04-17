@@ -5,8 +5,6 @@ filename_sumer_spectrum = 'average_profile__0_0__55_0__mean_of_eit_195.npz'
 filename_sumer_spectrum = 'average_profile__0_0__60_0__mean_of_eit_195.npz'
 percentage_label = 60
 
-fwhm_conv = 1.95*0.04215 #nm
-
 sun_region = 'qqr_b' #HRTS spectrum
 #wavelength_range_NeVIII = [1539., 1542.5]
 wavelength_range_NeVIII = [1540., 1541.5]
@@ -15,23 +13,12 @@ wavelength_range_NeVIII = [1540.32, 1541.43]
 n_gaussian_to_analyze_corrected = 1 
 n_gaussian_to_analyze = 1
 
-## Rest wavelength used
-lamb_0 = 1540.856
-#lamb_0 = 1540.85
-lamb_unc_0 = 0.014 #Angstrom
 
 axes_size = 20
 color_sumer = 'blue'
 color_hrts = 'green'
 color_sumer_uncorrected = 'red'
 color_sumer_corrected = 'blue'
-
-## Ranges of wavelength
-wavelength_range_scalefactor_left = [1537.7, 1539.5] #nm
-wavelength_range_scalefactor_right = [1542., 1544.] #nm
-
-#wavelength_range_scalefactor_left = [1537.7, 1540.4] #nm
-#wavelength_range_scalefactor_right = [1541.22, 1544.] #nm
 
 ######################################################
 # 
@@ -97,6 +84,7 @@ import sys
 import os
 sys.path.append(os.path.abspath('..'))
 from utils.aux_functions import *
+from utils.NeVIII_rest_wavelength import *
 ######################################################
 ######################################################
 ######################################################
@@ -140,11 +128,10 @@ erad_hrts = np.zeros(len(rad_hrts)) #TODO: we don't know the uncertainties of HR
 
 
 ######################################################
-######################################################
-######################################################
-# uncertainty of the rest wavelength in km/s
-
-v_unc_0 = vkms_doppler_unc(lamb=lamb_0, lamb_unc=lamb_unc_0, lamb_0=lamb_0, lamb_0_unc=lamb_unc_0) 
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
     
 ######################################################
 ######################################################
@@ -381,16 +368,16 @@ y_unc_corrected = erad_sumer_cropNeVIII_corrected
 
 # Plot: Comparison SUMER corrected and uncorrected
 fig, ax = plt.subplots(figsize=(12, 5))
-#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {percentage_label}% of the average, not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected, yerr=erad_sumer_cropNeVIII_corrected, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER lowest percentage_label%, corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_hrts_cropNeVIII, lamb_0=lamb_0), y=rad_hrts_conv_scaled_cropNeVIII, yerr=erad_hrts_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR A') #Real spectrum (SUMER)
+#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {percentage_label}% of the average, not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected, yerr=erad_sumer_cropNeVIII_corrected, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER lowest percentage_label%, corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_hrts_cropNeVIII, lamb_0=lam_0), y=rad_hrts_conv_scaled_cropNeVIII, yerr=erad_hrts_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR A') #Real spectrum (SUMER)
 ax.axvline(x=0, color='brown', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='brown', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS', fontsize=18)
 ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
-ax.set_xlim([vkms_doppler(lamb=min(lam_hrts_cropNeVIII), lamb_0=lamb_0), vkms_doppler(lamb=max(lam_hrts_cropNeVIII), lamb_0=lamb_0)])
+ax.set_xlim([vkms_doppler(lamb=min(lam_hrts_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrts_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12)
 ax.set_yscale('linear')
 plt.show(block=False)
@@ -417,25 +404,25 @@ y_unc_uncorrected = erad_sumer_cropNeVIII
 
 
 # Perform the fit
-popt, pcov = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0), y_uncorrected, p0=init_parameters_uncorrected, sigma=y_unc_uncorrected, absolute_sigma=True) #popt are the optimized parameters. pcov is the covariance matrix of the parameters. 
+popt, pcov = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), y_uncorrected, p0=init_parameters_uncorrected, sigma=y_unc_uncorrected, absolute_sigma=True) #popt are the optimized parameters. pcov is the covariance matrix of the parameters. 
 perr = np.sqrt(np.diag(pcov)) #You can extract the standard deviation (1-sigma uncertainty) of the fitted parameters
 
 
 # fitted curve
-x_fit_uncorrected = np.linspace(min(vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0)), max(vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0)), 300)
+x_fit_uncorrected = np.linspace(min(vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0)), max(vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0)), 300)
 y_fit_uncorrected = multigaussian_function_for_curvefit(x_fit_uncorrected, *popt)
 
 
 # Residuals
-y_residuals = y_uncorrected - multigaussian_function_for_curvefit(vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0), *popt)
-y_unc_fit_length_uncorrected = multi_gaussian_function_uncertainties(B=popt, B_unc=perr, x=vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0), x_unc=np.zeros(len(vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0))))
+y_residuals = y_uncorrected - multigaussian_function_for_curvefit(vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), *popt)
+y_unc_fit_length_uncorrected = multi_gaussian_function_uncertainties(B=popt, B_unc=perr, x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), x_unc=np.zeros(len(vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0))))
 y_unc_residuals = np.sqrt(y_unc_uncorrected**2 + y_unc_fit_length_uncorrected**2)
 
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0) ,y=y_uncorrected, yerr=y_unc_uncorrected, color=color_sumer_uncorrected, marker='o', linewidth=0, elinewidth=1., label='SUMER uncorrected')
+ax[0].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0) ,y=y_uncorrected, yerr=y_unc_uncorrected, color=color_sumer_uncorrected, marker='o', linewidth=0, elinewidth=1., label='SUMER uncorrected')
 ax[0].plot(x_fit_uncorrected, y_fit_uncorrected, color='orange', linestyle='-', label='Fit', zorder=1) 
-#ax[0].plot(vkms_doppler(lamb=x_fit_uncorrected_singlegauss, lamb_0=lamb_0), y_fit_uncorrected_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
+#ax[0].plot(vkms_doppler(lamb=x_fit_uncorrected_singlegauss, lamb_0=lam_0), y_fit_uncorrected_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 
 bckg_fit = popt[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
@@ -463,7 +450,7 @@ ax[0].set_title(f'Averaged spectrum and three-Gaussian fit ', fontsize=23)
 ax[0].set_ylabel('Spectral radiance 'r'(W m$^{-2}$ sr$^{-1}$''\u212B'r'$^{-1}$)', fontsize=axes_size)
 ax[0].legend(fontsize=12)
 ax[0].set_yscale('linear')
-ax[1].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lamb_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
+ax[1].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
 ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axes_size)#'Wavelength (nm)'
 ax[1].set_ylabel('Residuals', fontsize=axes_size)
 plt.tight_layout()
@@ -480,25 +467,25 @@ y_unc_corrected = erad_sumer_cropNeVIII_corrected
 
 
 # Perform the fit
-popt, pcov = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_corrected, lamb_0=lamb_0), y_corrected, p0=init_parameters_corrected, sigma=y_unc_corrected, absolute_sigma=True) #popt are the optimized parameters. pcov is the covariance matrix of the parameters. 
+popt, pcov = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_corrected, lamb_0=lam_0), y_corrected, p0=init_parameters_corrected, sigma=y_unc_corrected, absolute_sigma=True) #popt are the optimized parameters. pcov is the covariance matrix of the parameters. 
 perr = np.sqrt(np.diag(pcov)) #You can extract the standard deviation (1-sigma uncertainty) of the fitted parameters
 
 
 # fitted curve
-x_fit_corrected = np.linspace(min(vkms_doppler(lamb=x_corrected, lamb_0=lamb_0)), max(vkms_doppler(lamb=x_corrected, lamb_0=lamb_0)), 300)
+x_fit_corrected = np.linspace(min(vkms_doppler(lamb=x_corrected, lamb_0=lam_0)), max(vkms_doppler(lamb=x_corrected, lamb_0=lam_0)), 300)
 y_fit_corrected = multigaussian_function_for_curvefit(x_fit_corrected, *popt)
 
 
 # Residuals
-y_residuals = y_corrected - multigaussian_function_for_curvefit(vkms_doppler(lamb=x_corrected, lamb_0=lamb_0), *popt)
-y_unc_fit_length_corrected = multi_gaussian_function_uncertainties(B=popt, B_unc=perr, x=vkms_doppler(lamb=x_corrected, lamb_0=lamb_0), x_unc=np.zeros(len(vkms_doppler(lamb=x_corrected, lamb_0=lamb_0))))
+y_residuals = y_corrected - multigaussian_function_for_curvefit(vkms_doppler(lamb=x_corrected, lamb_0=lam_0), *popt)
+y_unc_fit_length_corrected = multi_gaussian_function_uncertainties(B=popt, B_unc=perr, x=vkms_doppler(lamb=x_corrected, lamb_0=lam_0), x_unc=np.zeros(len(vkms_doppler(lamb=x_corrected, lamb_0=lam_0))))
 y_unc_residuals = np.sqrt(y_unc_corrected**2 + y_unc_fit_length_corrected**2)
 
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_corrected, lamb_0=lamb_0) ,y=y_corrected, yerr=y_unc_corrected, color=color_sumer_corrected, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected')
+ax[0].errorbar(x=vkms_doppler(lamb=x_corrected, lamb_0=lam_0) ,y=y_corrected, yerr=y_unc_corrected, color=color_sumer_corrected, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected')
 ax[0].plot(x_fit_corrected, y_fit_corrected, color='blue', linestyle='-', label='Fit', zorder=1) 
-#ax[0].plot(vkms_doppler(lamb=x_fit_corrected_singlegauss, lamb_0=lamb_0), y_fit_corrected_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
+#ax[0].plot(vkms_doppler(lamb=x_fit_corrected_singlegauss, lamb_0=lam_0), y_fit_corrected_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 
 bckg_fit = popt[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
@@ -525,7 +512,7 @@ ax[0].set_title(f'Averaged profile corrected with spectrum of HRTS QS-{letter_qr
 ax[0].set_ylabel('Spectral radiance 'r'(W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axes_size)
 ax[0].legend(fontsize=12)
 ax[0].set_yscale('linear')
-ax[1].errorbar(x=vkms_doppler(lamb=x_corrected, lamb_0=lamb_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
+ax[1].errorbar(x=vkms_doppler(lamb=x_corrected, lamb_0=lam_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
 ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axes_size)#'Wavelength (nm)'
 ax[1].set_ylabel('Residuals', fontsize=axes_size)
 plt.tight_layout()

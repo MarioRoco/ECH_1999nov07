@@ -12,19 +12,6 @@ show_analysis_scalingfactor__row_col = [0,0] #'no' or list of 2 integers e.g. [2
 
 filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
 
-## Ranges of wavelength
-wavelength_range_scalefactor_left = [1537.7, 1539.5] #Angstrom
-wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
-
-## FWHM of the cold lines in SUMER:
-fwhm_mean_weighted_sumer =  0.17740
-fwhm_std_sumer =  0.02094
-fwhm_unc_weighted_sumer =  0.00131
-fwhm_synthetic_Si = 0.03
-fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
-fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
-fwhm_to_convolve = 1.95 * 0.04215
-
 
 ############################################################
 

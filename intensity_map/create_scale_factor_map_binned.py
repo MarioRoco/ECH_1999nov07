@@ -21,14 +21,6 @@ wavelength_range_scalefactor = [1542., 1544.] #Angstroem
 lat_img__indices_binned = 46, 156
 lat_img__indices = bin_lat*lat_img__indices_binned[0], bin_lon*lat_img__indices_binned[1]
 
-## FWHM of the cold lines in SUMER:
-fwhm_mean_weighted_sumer =  0.17740
-fwhm_std_sumer =  0.02094
-fwhm_unc_weighted_sumer =  0.00131
-fwhm_synthetic_Si = 0.03
-fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
-fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
-fwhm_to_convolve = 1.95*0.043
 
 #####################################
 # Bin data

@@ -19,20 +19,11 @@ threshold_value_type = 'max' #'max', 'min', 'mean', 'median'
 range_percentage = [0., 4.]
 
 wavelength_range_analysis = [1540.1, 1541.5] #Angstroem
-wavelength_range_scalefactor = [1542., 1544.] #Angstroem
 
 # Pixel address
 lat_img__indices_binned = 46, 156
 lat_img__indices = bin_lat*lat_img__indices_binned[0], bin_lon*lat_img__indices_binned[1]
 
-## FWHM of the cold lines in SUMER:
-fwhm_mean_weighted_sumer =  0.17740
-fwhm_std_sumer =  0.02094
-fwhm_unc_weighted_sumer =  0.00131
-fwhm_synthetic_Si = 0.03
-fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
-fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
-fwhm_to_convolve = 1.95*0.043
 
 
 #####################################
@@ -92,16 +83,10 @@ exec(open("create_scale_factor_map_binned.py").read())
 #chi2redSF_map_binned_qrl
 
 ######################################################
-
-# Rest wavelength used
-rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
-lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212B')
-
-# uncertainty of the rest wavelength in km/s
-v_unc_0 = vkms_doppler_unc(lamb=lam_0, lamb_unc=lam_unc_0, lamb_0=lam_0, lamb_0_unc=lam_unc_0) 
-
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 
 #####################################
 # 1) Calculate Dopplermap, 2) Plot Dopplermap (fitting a single Gaussian) 3) Plot map of chi^2_red

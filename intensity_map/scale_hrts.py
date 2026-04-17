@@ -1,11 +1,4 @@
 
-"""
-## Ranges of wavelength
-wavelength_range_scalefactor_left = [1537.7, 1539.5] #Angstrom
-wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
-"""
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm

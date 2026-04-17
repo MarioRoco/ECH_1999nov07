@@ -88,25 +88,10 @@ y_HPlat_crop_binned
 """
 
 ############################################################
-
-## Ranges of wavelength
-if line_label == 'NeVIII':
-    wavelength_range_intensity_map = [1540.45, 1541.2] #Angstroem
-    wavelength_range_intensity_map_bckg = [1539.8, 1540.2] #Angstroem
-    line_center_label = 'Ne VIII - 770.428 \u212B'
-elif line_label == 'SiII':
-    wavelength_range_intensity_map = [1533.075, 1533.805] #Angstroem
-    #wavelength_range_intensity_map = [1533.17, 1533.725] #Angstroem
-    wavelength_range_intensity_map_bckg = [1535.10, 1536.60] #Angstroem
-    line_center_label = 'Si II - 1533.43 \u212B'
-elif line_label == 'CIV':
-    wavelength_range_intensity_map = [1547.90, 1548.66] #Angstroem
-    wavelength_range_intensity_map_bckg = [1545.93, 1547.65] #Angstroem
-    line_center_label = 'C IV - 1548.21 \u212B'
-elif line_label == 'cold_line':
-    wavelength_range_intensity_map = [1537.80, 1538.10] #Angstroem
-    wavelength_range_intensity_map_bckg = [1538.30, 1538.39] #Angstroem
-    line_center_label = 'Si I - 1537.94 \u212B'
+# Ranges of wavelength for the different lines
+wavelength_range_intensity_map = wavelength_range_intensity_map_dic[line_label] #Angstroem
+wavelength_range_intensity_map_bckg = wavelength_range_intensity_map_bckg_dic[line_label] #Angstroem
+line_center_label = line_center_label_dic[line_label]
     
 ############################################################
 

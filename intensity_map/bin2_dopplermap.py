@@ -21,7 +21,6 @@ show_dopplermaps = 'no'
 show_dopplermaps_lessmedian = 'yes'
 show_chi2red_of_dopplermaps = 'no'
 
-line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 
 filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
 
@@ -35,18 +34,6 @@ show_analysis_scalingfactor__row_col = [0,0] #'no' or list of 2 integers e.g. [2
 
 filename_eit = 'SOHO_EIT_195_19991107T042103_L1.fits' #for the binning of the coordinates (where solar rotation has been corrected)
 
-## Ranges of wavelength
-wavelength_range_scalefactor_left = [1537.7, 1539.5] #Angstrom
-wavelength_range_scalefactor_right = [1542., 1544.] #Angstrom
-
-## FWHM of the cold lines in SUMER:
-fwhm_mean_weighted_sumer =  0.17740
-fwhm_std_sumer =  0.02094
-fwhm_unc_weighted_sumer =  0.00131
-fwhm_synthetic_Si = 0.03
-fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
-fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
-fwhm_to_convolve = 1.95 * 0.04215
 
 ############################################################
 
@@ -154,37 +141,17 @@ erad_hrtsa_conv_SUMERgrid_cropscale, erad_hrtsb_conv_SUMERgrid_cropscale, erad_h
 """
 
 ############################################################
-# Ranges of wavelength
-if line_label == 'NeVIII':
-    wavelength_range_intensity_map = [1540.45, 1541.2] #Angstroem
-    wavelength_range_intensity_map_bckg = [1539.8, 1540.2] #Angstroem
-    line_center_label = 'Ne VIII - 770.428 \u212B'
-    wavelength_range_analysis = [1540.1, 1541.5] #Angstroem
-elif line_label == 'SiII':
-    wavelength_range_intensity_map = [1533.075, 1533.805] #Angstroem
-    #wavelength_range_intensity_map = [1533.17, 1533.725] #Angstroem
-    wavelength_range_intensity_map_bckg = [1535.10, 1536.60] #Angstroem
-    line_center_label = 'Si II - 1533.43 \u212B'
-elif line_label == 'CIV':
-    wavelength_range_intensity_map = [1547.90, 1548.66] #Angstroem
-    wavelength_range_intensity_map_bckg = [1545.93, 1547.65] #Angstroem
-    line_center_label = 'C IV - 1548.21 \u212B'
-elif line_label == 'cold_line':
-    wavelength_range_intensity_map = [1537.80, 1538.10] #Angstroem
-    wavelength_range_intensity_map_bckg = [1538.30, 1538.39] #Angstroem
-    line_center_label = 'Si I - 1537.94 \u212B'
+# Ranges of wavelength for the different lines
+wavelength_range_intensity_map = wavelength_range_intensity_map_dic[line_label] #Angstroem
+wavelength_range_intensity_map_bckg = wavelength_range_intensity_map_bckg_dic[line_label] #Angstroem
+line_center_label = line_center_label_dic[line_label]
 
 
-############################################################
-
-# Rest wavelength used
-rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
-lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212B')
-
-# uncertainty of the rest wavelength in km/s
-v_unc_0 = vkms_doppler_unc(lamb=lam_0, lamb_unc=lam_unc_0, lamb_0=lam_0, lamb_0_unc=lam_unc_0) 
+######################################################
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 
 ############################################################
 # 1) Calculate Dopplermap, 2) Plot Dopplermap (fitting a single Gaussian) 3) Plot map of chi^2_red

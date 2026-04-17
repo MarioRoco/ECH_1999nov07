@@ -58,12 +58,10 @@ line_center_label = intensitymap_loaded_dic['line_center_label']
 vmin_sumer, vmax_sumer = intensitymap_loaded_dic['vmin_vmax'] 
 
 ######################################################
-
-# Rest wavelength used
-rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
-lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 
 ######################################################
 
@@ -155,14 +153,6 @@ ax.axvline(lam_0, color='green', linewidth=1., label=f'Rest wavelength ({lam_0})
 ax.axvspan(lam_0-lam_unc_0, lam_0+lam_unc_0, color='green', alpha=0.2)
 ax.legend()
 plt.show(block=False)
-
-
-
-
-
-
-
-
 
 
 

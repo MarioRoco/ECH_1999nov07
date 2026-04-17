@@ -1352,20 +1352,15 @@ if hrts_qr == 'qqr_l':
     ######################################################
 
 
-
-
-
 ######################################################
 ######################################################
 ######################################################
 
-## Rest wavelength used
-rest_wavelength_label = rest_wavelength_label_list[0] #'Peter_and_Judge_1999', 'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Kelly_database'
-lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212B')
-v_unc_0 = vkms_doppler_unc(lamb=lam_0, lamb_unc=lam_unc_0, lamb_0=lam_0, lamb_0_unc=lam_unc_0) # uncertainty of the rest wavelength in km/s
-
+######################################################
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 ######################################################
 ######################################################
 ######################################################

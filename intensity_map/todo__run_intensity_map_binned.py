@@ -23,18 +23,6 @@ wavelength_range_scalefactor = [1542., 1544.] #Angstroem
 type_hrts = 'A' #'A', 'B', or 'L'
 
 
-
-## FWHM of the cold lines in SUMER:
-fwhm_mean_weighted_sumer =  0.17740
-fwhm_std_sumer =  0.02094
-fwhm_unc_weighted_sumer =  0.00131
-fwhm_synthetic_Si = 0.03
-fwhm_sumer_to_convolve = fwhm_mean_weighted_sumer - fwhm_synthetic_Si
-fwhm_to_convolve = fwhm_sumer_to_convolve #Usser can addapt this value
-fwhm_to_convolve = 1.95*0.043
-print('fwhm_to_convolve =', fwhm_to_convolve, '\u212B')
-
-
 #####################################
 # Create intensity maps of Si II and Ne VIII
 
@@ -57,15 +45,11 @@ intensitymap_croplat_NeVIII = np.copy(intensitymap_croplat)
 intensitymap_croplat_binned_NeVIII = np.copy(intensitymap_croplat_binned)
 
 
-#####################################
-# Rest wavelength used
-rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
-lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212B')
-
-# uncertainty of the rest wavelength in km/s
-v_unc_0 = vkms_doppler_unc(lamb=lam_0, lamb_unc=lam_unc_0, lamb_0=lam_0, lamb_0_unc=lam_unc_0) 
+######################################################
+# Rest wavelength
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 
 #####################################
 

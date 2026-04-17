@@ -24,16 +24,10 @@ save_average_profile_map = 'no'
 
 sun_region = 'qqr_a' #HRTS spectrum
 
-fwhm_conv = 1.95*0.04215 #nm
-
 color_sumer = 'blue'
 color_hrts = 'green'
 color_sumer_uncorrected = 'red'
 color_sumer_corrected = 'blue'
-
-## Ranges of wavelength
-wavelength_range_scalefactor_left = [1537.7, 1539.5] #nm
-wavelength_range_scalefactor_right = [1542., 1544.] #nm
 
 
 ######################################################
@@ -76,10 +70,9 @@ from utils.NeVIII_rest_wavelength import *
 
 ######################################################
 # Rest wavelength
-rest_wavelength_label = 'Peter_and_Judge_1999' #'SUMER_atlas', 'Peter_1998', 'Dammasch_1999', 'Peter_and_Judge_1999', 'Kelly_database'
-lam_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][0] #Angstrom
-lam_unc_0 = 2.*NeVIII_theoretical_wavelength_dic[rest_wavelength_label][1] #Angstrom
-print('Rest wavelength Ne VIII (2nd order):', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('rest_wavelength_label =', rest_wavelength_label)
+print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
+print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 
 ######################################################
 # Load the intensity map and uncertainties
@@ -448,13 +441,6 @@ lam_hrts
 rad_hrts
 erad_hrts = np.zeros(len(rad_hrts)) #TODO: we don't know the uncertainties of HRTS
 
-
-
-######################################################
-# 
-
-# uncertainty of the rest wavelength in km/s
-v_unc_0 = vkms_doppler_unc(lamb=lam_0, lamb_unc=lam_unc_0, lamb_0=lam_0, lamb_0_unc=lam_unc_0) 
 
 ######################################################
 # 
