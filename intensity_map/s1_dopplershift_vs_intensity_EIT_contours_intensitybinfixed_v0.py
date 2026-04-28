@@ -16,7 +16,7 @@ range_percentage_list = [[0.,2.5], [2.5,3.], [3.,3.5], [3.5,4.], [4.,4.5], [4.5,
 
 range_percentage_list = [[0., 4.], [4., 8.], [8., 12.], [12., 16.], [16., 20.],[20., 24.], [24., 28.], [28., 32.], [32., 36.], [36., 40.],[40., 44.], [44., 48.], [48., 52.], [52., 56.], [56., 60.],[60., 64.], [64., 68.], [68., 72.], [72., 76.], [76., 80.],[80., 84.], [84., 88.], [88., 92.], [92., 96.], [96., 100.]]
 
-range_percentage_list = 'log'
+#range_percentage_list = 'log'
 
 
 
@@ -524,7 +524,7 @@ plt.show(block=False)
 
 
 
-x_shift_errorbars_intensity = 0.015 * (bound_mean_list[-1]-bound_mean_list[0]) * np.ones(len(bound_mean_list))
+x_shift_errorbars_intensity = 0.0 * (bound_mean_list[-1]-bound_mean_list[0]) * np.ones(len(bound_mean_list))
 
 
 #Teriaca's comment for the paper: Percentage of intensity that is taken by HRTS. This is a general discussion about why blends are important bla bla bla. It is a general plot. And then I go to the details (maps and single things). 
@@ -553,7 +553,7 @@ plt.show(block=False)
 
 
 
-x_shift_errorbars_percentage = 0.2 * np.ones(len(percentage_list))
+x_shift_errorbars_percentage = 0. * np.ones(len(percentage_list))
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), gridspec_kw={'height_ratios': [1, 1.5]}, sharex=True)
 ax[0].errorbar(x=percentage_list-x_shift_errorbars_percentage, xerr=percentage_unc_list, y=y_intensity_correction_qra, yerr=yerr_intensity_correction_qra, color='blue', linewidth=0., elinewidth=1.0, marker='.', label='SUMER corrected, QR-A')
@@ -582,7 +582,7 @@ plt.show(block=False)
 
 x_shift_errorbars_percentage_log = []
 for rg0, rg1 in range_percentage_list:
-	x_shift_errorbars_percentage_log.append(0.03*(rg1-rg0))
+	x_shift_errorbars_percentage_log.append(0.0*(rg1-rg0))
 x_shift_errorbars_percentage_log = np.array(x_shift_errorbars_percentage_log)
 
 

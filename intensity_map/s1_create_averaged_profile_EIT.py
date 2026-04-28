@@ -31,9 +31,18 @@ wavelength_range_to_average = [1531.1147, 1551.7688]
 wavelength_range_to_analyze_NeVIII = [1540.2, 1541.4]
 
 # save average profile as .npy?
-save_average_profile = 'yes' 
+save_average_profile = 'no' 
 
-show_plots_correction = 'no'
+show_plots_correction = 'yes'
+show_slit = 'yes'
+
+# Full Sun
+show_sumer_FOV = 'yes'
+show_contours_fullsun = 'yes'
+show_slit_fullsun = 'yes'
+vmin_eit_fullsun, vmax_eit_fullsun = 5.5e1, 5e3 
+contour_intensity_eit_fullsun = 135. #110.
+#contour_intensity_eit_fullsun = 'upper_bound'
 
 
 
@@ -147,6 +156,81 @@ dx_px = 0
 dy_px = -6
 data_eit_crop_corrected = data_eit[y_px_crop_top+dy_px : y_px_crop_bottom+dy_px, x_px_crop_left+dx_px : x_px_crop_right+dx_px]
 
+# Slit position
+HPlon_slit_rotcomp_corrected = HPlon_rotcomp[closest_index + dx_px]
+HPlat_slit_croplat_corrected = 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+closest_index = closest_index_EIT_SUMER_dic[filename_eit]
+closest_time_sumer = closest_time_SUMER_to_EIT_dic[filename_eit]
+time_eit = time_EIT_dic[filename_eit]
+hour_eit = hour_EIT_dic[filename_eit]
+HPlon_rotcomp = HPlon_rotcomp_dic[filename_eit]
+HPlon
+HPlat
+HPlat_croplat = HPlat[slit_top_px:slit_bottom_px+1]
+
+
+##############################################################
+# Physical units of x and y axis of the spectroheliogram
+
+# Get HP longitude for all the raster
+x_HPlon = HPlon #Solar rotation not compensated
+x_HPlon_rotcomp = HPlon_rotcomp_dic[filename_eit] #solar rotation compensated (depends on the EIT file chosen)
+
+
+# Closest SUMER spectrum (index) in time to EIT image
+I = closest_index = closest_index_EIT_SUMER_dic[filename_eit]
+
+# Times of EIT and SUMER: format the date in a more readable way
+label_date_eit = time_EIT_dic[filename_eit].strftime("%d/%b/%Y %H:%M:%S")
+
+##############################################################
+
+# Extent to convert the axes to helioprojective units (arcseconds)
+extent_eit_fullsun_HP = helioprojective_extent_EIT(header_eit=header_eit)
+
+# Projected position and dimension of the slit over the EIT image (at the time of the EIT image)
+x_slit = [HPlon_rotcomp[closest_index], HPlon_rotcomp[closest_index]]
+y_slit = [HPlat_croplat[0], HPlat_croplat[-1]]
+
+# Projected FOV of the raster over the EIT image with solar rotation compensated and not compensated
+x_FOV_rotcomp, y_FOV_rotcomp = create_rectangle(x_left=HPlon_rotcomp[0], x_right=HPlon_rotcomp[-1], y_low=HPlat_croplat[0], y_high=HPlat_croplat[-1], N=100)
+#x_FOV_NOrotcomp, y_FOV_NOrotcomp = create_rectangle(x_left=HPlon[0], x_right=HPlon[-1], y_low=HPlat_croplat[0], y_high=HPlat_croplat[-1], N=100)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ######################################################
 # Extents
 
@@ -204,7 +288,7 @@ lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from
 # Substract HRTS
 
 #subtract HRTS QR-A
-fsh_qra = fun_scale_hrts(hrts_qr='a', lamb_0=lamb_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+fsh_qra = fun_scale_hrts(hrts_qr='a', lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
 lam_sumer_cropNeVIII = fsh_qra['lam_sumer_cropNeVIII']
 rad_sumer_cropNeVIII = fsh_qra['rad_sumer_cropNeVIII']
 erad_sumer_cropNeVIII = fsh_qra['erad_sumer_cropNeVIII']
@@ -224,7 +308,7 @@ rad_hrtsa_conv_scaled_cropNeVIII = fsh_qra['rad_hrts_conv_scaled_cropNeVIII']
 erad_hrtsa_conv_scaled_cropNeVIII = fsh_qra['erad_hrts_conv_scaled_cropNeVIII']
 
 #subtract HRTS QR-B
-fsh_qrb = fun_scale_hrts(hrts_qr='b', lamb_0=lamb_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+fsh_qrb = fun_scale_hrts(hrts_qr='b', lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
 rad_sumer_cropNeVIII_corrected_qrb = fsh_qrb['rad_sumer_cropNeVIII_corrected']
 erad_sumer_cropNeVIII_corrected_qrb = fsh_qrb['erad_sumer_cropNeVIII_corrected']
 lam_hrtsb = fsh_qrb['lam_hrts']
@@ -241,7 +325,7 @@ rad_hrtsb_conv_scaled_cropNeVIII = fsh_qrb['rad_hrts_conv_scaled_cropNeVIII']
 erad_hrtsb_conv_scaled_cropNeVIII = fsh_qrb['erad_hrts_conv_scaled_cropNeVIII']
 
 #subtract HRTS QR-L
-fsh_qrl = fun_scale_hrts(hrts_qr='l', lamb_0=lamb_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+fsh_qrl = fun_scale_hrts(hrts_qr='l', lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
 rad_sumer_cropNeVIII_corrected_qrl = fsh_qrl['rad_sumer_cropNeVIII_corrected']
 erad_sumer_cropNeVIII_corrected_qrl = fsh_qrl['erad_sumer_cropNeVIII_corrected']
 lam_hrtsl = fsh_qrl['lam_hrts']
@@ -262,7 +346,6 @@ erad_hrtsl_conv_scaled_cropNeVIII = fsh_qrl['erad_hrts_conv_scaled_cropNeVIII']
 # Show image of the intensity map with the contours and the pixels inside the contours
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9,8))
-label_size = 18
 ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
 ax[1].pcolormesh(HPlon_rotcomp, HPlat_croplat, intensity_map_croplat, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer))
 ax[1].axis('equal') # Ensures equal scaling of axis x and y
@@ -285,7 +368,6 @@ plt.show(block=False)
 
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(15,14))
-label_size = 18
 ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', aspect='auto', extent=extent_eit_px_image)
 ax[1].imshow(intensity_map_croplat, norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer), cmap='Greys_r', aspect='auto', extent=extent_sumer_px_image)
 ax[1].set_aspect('auto')
@@ -308,16 +390,16 @@ plt.show(block=False)
 
 
 
-fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12,10))
-label_size = 18
+### PAPER image:
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
 ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
 ax[1].pcolormesh(HPlon_rotcomp, HPlat_croplat, intensity_map_croplat, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer))
 ax[1].axis('equal') # Ensures equal scaling of axis x and y
-ax[1].set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=17)
-ax[0].set_title('Contours of the CH in EIT overlaid in the Ne VIII intensity map', fontsize=20)
-fig.supylabel('Helioprojective latitude (arcsec)', fontsize=17)
-ax[0].text(1.02, 0.5, f'EIT-{header_eit["WAVELNTH"]}', fontsize=22,transform=ax[0].transAxes, va='center', ha='left', rotation=90)
-ax[1].text(1.02, 0.5, f'SUMER-{line_center_label}', fontsize=22,transform=ax[1].transAxes, va='center', ha='left', rotation=90)
+ax[1].set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax[0].set_title('Contours of the CH in EIT overlaid in the Ne VIII intensity map', fontsize=18)
+fig.supylabel('Helioprojective latitude (arcsec)', fontsize=16)
+ax[0].text(1.02, 0.5, f'EIT-{header_eit["WAVELNTH"]}', fontsize=20,transform=ax[0].transAxes, va='center', ha='left', rotation=90)
+ax[1].text(1.02, 0.5, f'SUMER-{line_center_label}', fontsize=20,transform=ax[1].transAxes, va='center', ha='left', rotation=90)
 plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspace=0)
 #ax[0].grid(color='white')
 #ax[1].grid(color='white')
@@ -330,10 +412,11 @@ legend_elements = [
     mlines.Line2D([],[],color='yellow', label=f'{range_percentage[1]} %')]
 contour_lower = ax[1].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_upper = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='yellow', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+if show_slit=='yes':
+    ax[0].axvline(x=HPlon_slit_rotcomp_corrected, linewidth=1.5, color='red', label='slit position')
 ax[0].set_aspect('auto')
 ax[1].set_aspect('auto')
 plt.show(block=False)
-
 
 
 
@@ -343,8 +426,8 @@ ax.errorbar(x=lam_sumer_av, y=rad_sumer_av, yerr=erad_sumer_av, color='blue', li
 ax.set_title(f'SOHO/SUMER, profile averaged', fontsize=18) 
 ax.set_xlabel('Wavelength (\u212B)', color='black', fontsize=16)
 ax.set_ylabel(f'Av. spectral radiance [W/sr/m^2/Angstroem]', color='black', fontsize=16)
-ax.axvline(lamb_0, color='green', linewidth=1., label=f'Rest wavelength ({lamb_0})'' \u212B')
-ax.axvspan(lamb_0-lamb_unc_0, lamb_0+lamb_unc_0, color='green', alpha=0.2)
+ax.axvline(lam_0, color='green', linewidth=1., label=f'Rest wavelength ({lam_0})'' \u212B')
+ax.axvspan(lam_0-lam_unc_0, lam_0+lam_unc_0, color='green', alpha=0.2)
 ax.legend()
 plt.show(block=False)
 
@@ -355,25 +438,25 @@ ax.errorbar(x=lam_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_crop
 ax.set_title(f'SOHO/SUMER, profile averaged', fontsize=18) 
 ax.set_xlabel('Wavelength (\u212B)', color='black', fontsize=16)
 ax.set_ylabel(f'Av. spectral radiance [W/sr/m^2/Angstroem]', color='black', fontsize=16)
-ax.axvline(lamb_0, color='green', linewidth=1., label=f'Rest wavelength ({lamb_0})'' \u212B')
-ax.axvspan(lamb_0-lamb_unc_0, lamb_0+lamb_unc_0, color='green', alpha=0.2)
+ax.axvline(lam_0, color='green', linewidth=1., label=f'Rest wavelength ({lam_0})'' \u212B')
+ax.axvspan(lam_0-lam_unc_0, lam_0+lam_unc_0, color='green', alpha=0.2)
 ax.legend()
 plt.show(block=False)
 
 
 # Plot: Comparison SUMER corrected and uncorrected
 fig, ax = plt.subplots(figsize=(12, 5))
-#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
-#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_hrtsa_cropNeVIII, lamb_0=lamb_0), y=rad_hrtsa_conv_scaled_cropNeVIII, yerr=erad_hrtsa_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QS A') #Real spectrum (SUMER)
+#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
+#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_hrtsa_cropNeVIII, lamb_0=lam_0), y=rad_hrtsa_conv_scaled_cropNeVIII, yerr=erad_hrtsa_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QS A') #Real spectrum (SUMER)
 ax.axvline(x=0, color='black', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS QS-A', fontsize=18)
 ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
-ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsa_cropNeVIII), lamb_0=lamb_0), vkms_doppler(lamb=max(lam_hrtsa_cropNeVIII), lamb_0=lamb_0)])
+ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsa_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrtsa_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12)
 ax.set_yscale('linear')
 plt.show(block=False)
@@ -381,17 +464,17 @@ plt.show(block=False)
 
 # Plot: Comparison SUMER corrected and uncorrected
 fig, ax = plt.subplots(figsize=(12, 5))
-#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
-#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_hrtsb_cropNeVIII, lamb_0=lamb_0), y=rad_hrtsb_conv_scaled_cropNeVIII, yerr=erad_hrtsb_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QS B') #Real spectrum (SUMER)
+#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
+#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_hrtsb_cropNeVIII, lamb_0=lam_0), y=rad_hrtsb_conv_scaled_cropNeVIII, yerr=erad_hrtsb_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QS B') #Real spectrum (SUMER)
 ax.axvline(x=0, color='black', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS QS-B', fontsize=18)
 ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
-ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsb_cropNeVIII), lamb_0=lamb_0), vkms_doppler(lamb=max(lam_hrtsb_cropNeVIII), lamb_0=lamb_0)])
+ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsb_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrtsb_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12)
 ax.set_yscale('linear')
 plt.show(block=False)
@@ -399,16 +482,16 @@ plt.show(block=False)
 
 # Plot: Comparison SUMER corrected and uncorrected
 fig, ax = plt.subplots(figsize=(12, 5))
-#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected_qrl, yerr=erad_sumer_cropNeVIII_corrected_qrl, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER {range_percentage} of the maximum%, corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_hrtsl_cropNeVIII, lamb_0=lamb_0), y=rad_hrtsl_conv_scaled_cropNeVIII, yerr=erad_hrtsl_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QS L') #Real spectrum (SUMER)
+#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qrl, yerr=erad_sumer_cropNeVIII_corrected_qrl, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER {range_percentage} of the maximum%, corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_hrtsl_cropNeVIII, lamb_0=lam_0), y=rad_hrtsl_conv_scaled_cropNeVIII, yerr=erad_hrtsl_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QS L') #Real spectrum (SUMER)
 ax.axvline(x=0, color='black', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS QS-L', fontsize=18)
 ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
-ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsl_cropNeVIII), lamb_0=lamb_0), vkms_doppler(lamb=max(lam_hrtsl_cropNeVIII), lamb_0=lamb_0)])
+ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsl_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrtsl_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12)
 ax.set_yscale('linear')
 plt.show(block=False)
@@ -504,6 +587,149 @@ legend_elements = [
     mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
 ax.set_aspect('auto')
 plt.show(block=False)
+
+
+
+##############################################################
+##############################################################
+##############################################################
+# Plot full Sun (EIT) with the FOV of the raster and the slit position during the image
+
+if contour_intensity_eit_fullsun == 'upper_bound': contour_intensity_eit_fullsun = upper_bound_eit
+
+##############################################################
+# Physical units of x and y axis of the spectroheliogram
+
+# Get HP latitude for the entire y axis (360 pixels), and for the cropped one
+y_HPlat_fullLat = HPlat
+y_HPlat_crop = HPlat[slit_top_px:slit_bottom_px+1]
+
+# Closest SUMER spectrum (index) in time to EIT image
+I = closest_index = closest_index_EIT_SUMER_dic[filename_eit]
+
+# Times of EIT and SUMER: format the date in a more readable way
+label_date_eit = time_EIT_dic[filename_eit].strftime("%d/%b/%Y %H:%M:%S")
+
+##############################################################
+
+# Extent to convert the axes to helioprojective units (arcseconds)
+extent_eit_fullsun_HP = helioprojective_extent_EIT(header_eit=header_eit)
+
+# Projected position and dimension of the slit over the EIT image (at the time of the EIT image)
+x_slit = [HPlon_rotcomp[closest_index], HPlon_rotcomp[closest_index]]
+y_slit = [y_HPlat_crop[0], y_HPlat_crop[-1]]
+
+# Projected FOV of the raster over the EIT image with solar rotation compensated and not compensated
+x_FOV_rotcomp, y_FOV_rotcomp = create_rectangle(x_left=HPlon_rotcomp[0], x_right=HPlon_rotcomp[-1], y_low=y_HPlat_crop[0], y_high=y_HPlat_crop[-1], N=100)
+x_FOV_NOrotcomp, y_FOV_NOrotcomp = create_rectangle(x_left=HPlon[0], x_right=HPlon[-1], y_low=y_HPlat_crop[0], y_high=y_HPlat_crop[-1], N=100)
+
+
+
+
+
+########## Full Sun 1: Show all contours INSIDE the solar disk
+### PAPER image
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(11, 11))
+img = ax.imshow(data_eit, cmap='Greys_r', norm=LogNorm(vmin=vmin_eit_fullsun, vmax=vmax_eit_fullsun), extent=extent_eit_fullsun_HP) # Plot the main solar image 
+cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+cbar = fig.colorbar(img, ax=ax, cax=cax, pad=0.01)
+cbar.set_label(f'Intensity (DN/s)', fontsize=16)
+ax.set_title(f'SOHO/EIT - {header_eit["WAVELNTH"]} \u212B, {label_date_eit}', fontsize=20)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+if show_contours_fullsun=='yes':
+    from skimage import measure
+    contours = measure.find_contours(data_eit[::-1], level=contour_intensity_eit_fullsun) # Find contours at a given level
+    solar_center = (0,0)  # Helioprojective (x, y) center of the Sun
+    solar_radius = header_eit['RSUN_OBS'] #[arcsec] apparent photospheric solar radius   
+    largest_contour = None
+    max_points = 0
+    for contour in contours:
+        # Convert image coordinates to helioprojective coordinates
+        x_contour = np.interp(contour[:, 1], [0, data_eit.shape[1]], [extent_eit_fullsun_HP[0], extent_eit_fullsun_HP[1]])
+        y_contour = np.interp(contour[:, 0], [0, data_eit.shape[0]], [extent_eit_fullsun_HP[2], extent_eit_fullsun_HP[3]])
+
+        # Filter out contour points outside the solar disk
+        distances = np.sqrt((x_contour - solar_center[0])**2 + (y_contour - solar_center[1])**2)
+        inside_mask = distances < solar_radius
+        
+        # Only plot if contour has at least some points inside solar disk
+        if np.any(inside_mask):
+            x_inside = x_contour[inside_mask]
+            y_inside = y_contour[inside_mask]
+            ax.plot(x_inside, y_inside, color='yellow', linewidth=1.5)
+
+    ax.plot([],[], color='yellow', linewidth=1.5, label=f'Contours {contour_intensity_eit_fullsun} DN/s')
+if show_slit=='yes':
+    ax.axvline(x=HPlon_slit_rotcomp_corrected, linewidth=1.5, color='red', label='slit position')
+ax.set_xlim([-1100,1100])
+ax.set_ylim([-1100,1100])
+ax.set_aspect('equal', adjustable='box')
+if show_sumer_FOV=='yes':
+    #ax.plot(x_FOV_rotcomp, y_FOV_rotcomp, linestyle='-', linewidth=1.1, color='cyan', label='Raster FOV, SR compensated')
+    ax.plot(x_FOV_rotcomp, y_FOV_rotcomp, linestyle='-', linewidth=1.5, color='cyan', label='Raster FOV')
+#ax.axis('equal')
+ax.legend(fontsize=12)
+plt.show(block=False)
+
+
+
+########## Full Sun 2: Plot only contours inside the solar disk, and also not small patches
+# Isolate only the contours of the largest connected region and exclude small patches. We can filter the contours based on their area (or number of points). 
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(11, 11))
+img = ax.imshow(data_eit, cmap='Greys_r', norm=LogNorm(vmin=vmin_eit_fullsun, vmax=vmax_eit_fullsun), extent=extent_eit_fullsun_HP) # Plot the main solar image 
+cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+cbar = fig.colorbar(img, ax=ax, cax=cax, pad=0.01)
+cbar.set_label(f'Intensity (DN/s)', fontsize=16)
+ax.set_title(f'SOHO/EIT - {header_eit["WAVELNTH"]} \u212B, {label_date_eit}', fontsize=20)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+
+# Plot slit and FOVs
+#ax.plot(x_slit, y_slit, linestyle='-', color='red', linewidth=1.5, label='Slit position during EIT image\n'f'{label_date_sumer}')
+if show_sumer_FOV=='yes':
+    #ax.plot(x_FOV_rotcomp, y_FOV_rotcomp, linestyle='-', linewidth=1.1, color='cyan', label='Raster FOV, SR compensated')
+    ax.plot(x_FOV_rotcomp, y_FOV_rotcomp, linestyle='-', linewidth=1.5, color='cyan', label='Raster FOV')
+
+if show_contours_fullsun=='yes':
+    from skimage import measure
+    contours = measure.find_contours(data_eit[::-1], level=contour_intensity_eit_fullsun) # Find contours at a given level
+    solar_center = (0,0)  # Helioprojective (x, y) center of the Sun
+    solar_radius = header_eit['RSUN_OBS'] #[arcsec] apparent photospheric solar radius   
+    largest_contour = None
+    max_points = 0
+    for contour in contours:
+        # Convert image coordinates to helioprojective coordinates
+        x_contour = np.interp(contour[:, 1], [0, data_eit.shape[1]], [extent_eit_fullsun_HP[0], extent_eit_fullsun_HP[1]])
+        y_contour = np.interp(contour[:, 0], [0, data_eit.shape[0]], [extent_eit_fullsun_HP[2], extent_eit_fullsun_HP[3]])
+
+        # Filter out contour points outside the solar disk
+        distances = np.sqrt((x_contour - solar_center[0])**2 + (y_contour - solar_center[1])**2)
+        inside_mask = distances < solar_radius
+        x_inside = x_contour[inside_mask]
+        y_inside = y_contour[inside_mask]
+
+        # Keep only the largest contour (or contours above a size threshold)
+        if len(x_inside) > max_points:
+            largest_contour = (x_inside, y_inside)
+            max_points = len(x_inside)
+
+    # Plot the largest contour only
+    if largest_contour is not None:
+        ax.plot(largest_contour[0], largest_contour[1], color='yellow', linewidth=1.5)
+
+    ax.plot([],[], color='yellow', linewidth=1.5, label=f'Contours {contour_intensity_eit_fullsun} DN/s')
+ax.set_xlim([-1100,1100])
+ax.set_ylim([-1100,1100])
+ax.set_aspect('equal', adjustable='box')
+#ax.axis('equal')
+ax.legend(fontsize=12)
+plt.show(block=False)
+
+
+
+##############################################################
+# 
 
 
 
