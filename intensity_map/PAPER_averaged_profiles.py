@@ -18,7 +18,7 @@ line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 color_sumer_uncorrected = 'black'
 color_hrts_qra = 'blue'
 color_hrts_qrb = 'red'
-color_hrts_qrl = 'green'
+color_hrts_qrl = 'purple'
 
 # Parameters of the individual gaussians fits
 components_linestyle = '-'
@@ -182,14 +182,26 @@ ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII_corrected_qrb, yerr=era
 ax.axvline(x=0, color='black', linestyle=':', linewidth=1.5, label='Rest wavelength: 770.428 \u212B')
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'SUMER spectrum of the CH uncorrected and corrected with HRTS', fontsize=title_size)
-ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ nm$^{-1}$)', fontsize=axislabel_size)
-ax.legend(fontsize=legend_size)
-ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size) #'Wavelength (nm)'
+ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
+
+#ax.legend(fontsize=legend_size)
+# legend in desired order:
+handles, labels = ax.get_legend_handles_labels()
+order = [
+    labels.index('SUMER uncorrected'),
+    labels.index('HRTS QS-A'),
+    labels.index('HRTS QS-B'),
+    labels.index('SUMER corrected, QS-A'),
+    labels.index('SUMER corrected, QS-B'),
+    labels.index('Rest wavelength: 770.428 Å'),
+]
+ax.legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
+
+ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size) 
 ax.set_xlim(x_lims)
 plt.tight_layout()
 plt.show(block=False)
 
-#TODO: why is the radiance in nm??
 
 ############################################################################################################
 ############################################################################################################
@@ -326,15 +338,26 @@ for n_gauss in range(N_gaussians):
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
 
 
-ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 \u212B')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum uncorrected, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
-ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ nm$^{-1}$)', fontsize=axislabel_size)
-ax[0].legend(fontsize=legend_size)
+ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
+
+#ax[0].legend(fontsize=legend_size)
+# legend in desired order:
+handles, labels = ax[0].get_legend_handles_labels()
+order = [
+    labels.index('SUMER uncorrected'),
+    labels.index('Fit'),
+    labels.index('Individual gaussians'),
+    labels.index('Rest wavelength: 770.428 Å'),
+]
+ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
+
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
-ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)#'Wavelength (nm)'
+ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax[1].set_ylabel('Residuals', fontsize=axislabel_size)
 ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
@@ -391,15 +414,26 @@ for n_gauss in range(N_gaussians):
     ax[0].plot(x_fit_corrected_qra_singlegauss, y_fit_corrected_qra_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
 
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-A, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
-ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ nm$^{-1}$)', fontsize=axislabel_size)
-ax[0].legend(fontsize=legend_size)
+ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
+
+#ax[0].legend(fontsize=legend_size)
+# legend in desired order:
+handles, labels = ax[0].get_legend_handles_labels()
+order = [
+    labels.index('SUMER corrected QS-A'),
+    labels.index('Fit'),
+    labels.index('Individual gaussians'),
+    labels.index('Rest wavelength: 770.428 Å'),
+]
+ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
+
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0), y=y_residuals_qra, yerr=y_unc_residuals_qra, color='black', marker='.')
-ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)#'Wavelength (nm)'
+ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax[1].set_ylabel('Residuals', fontsize=axislabel_size)
 ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
@@ -455,15 +489,26 @@ for n_gauss in range(N_gaussians):
     ax[0].plot(x_fit_corrected_qrb_singlegauss, y_fit_corrected_qrb_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
 
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-B, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
-ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ nm$^{-1}$)', fontsize=axislabel_size)
-ax[0].legend(fontsize=legend_size)
+ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
+
+#ax[0].legend(fontsize=legend_size)
+# legend in desired order:
+handles, labels = ax[0].get_legend_handles_labels()
+order = [
+    labels.index('SUMER corrected QS-B'),
+    labels.index('Fit'),
+    labels.index('Individual gaussians'),
+    labels.index('Rest wavelength: 770.428 Å'),
+]
+ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
+
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0), y=y_residuals_qrb, yerr=y_unc_residuals_qrb, color='black', marker='.')
-ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)#'Wavelength (nm)'
+ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax[1].set_ylabel('Residuals', fontsize=axislabel_size)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
@@ -497,7 +542,7 @@ y_unc_residuals_qrl = np.sqrt(y_unc_corrected_qrl**2 + y_unc_fit_length_correcte
 
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
 ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrl, lamb_0=lam_0) ,y=y_corrected_qrl, yerr=y_unc_corrected_qrl, color=color_hrts_qrl, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-L')
-ax[0].plot(x_fit_corrected_qrl, y_fit_corrected_qrl, color='green', linestyle='-', label='Fit', zorder=1) 
+ax[0].plot(x_fit_corrected_qrl, y_fit_corrected_qrl, color=color_hrts_qrl, linestyle='-', label='Fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qrl_singlegauss, lamb_0=lam_0), y_fit_corrected_qrl_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 
 bckg_fit = popt_qrl[0]
@@ -518,15 +563,26 @@ for n_gauss in range(N_gaussians):
     ax[0].plot(x_fit_corrected_qrl_singlegauss, y_fit_corrected_qrl_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
 
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-L, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
-ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ nm$^{-1}$)', fontsize=axislabel_size)
-ax[0].legend(fontsize=legend_size)
+ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
+
+#ax[0].legend(fontsize=legend_size)
+# legend in desired order:
+handles, labels = ax[0].get_legend_handles_labels()
+order = [
+    labels.index('SUMER corrected QS-L'),
+    labels.index('Fit'),
+    labels.index('Individual gaussians'),
+    labels.index('Rest wavelength: 770.428 Å'),
+]
+ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
+
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_corrected_qrl, lamb_0=lam_0), y=y_residuals_qrl, yerr=y_unc_residuals_qrl, color='black', marker='.')
-ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)#'Wavelength (nm)'
+ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax[1].set_ylabel('Residuals', fontsize=axislabel_size)
 ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)

@@ -241,7 +241,7 @@ ax.errorbar(x=lam_sumer_cropscale, y=rad_hrts_conv_SUMERgrid_cropscale, yerr=era
 ax.set_title('Comparison SUMER and HRTS with wavelength ranges used\n for the calculation of the scaling factor', fontsize=18)
 ax.axvspan(wavelength_range_scalefactor_left[0], wavelength_range_scalefactor_left[1], color='grey', alpha=0.15, label='Wavelength ranges')
 ax.axvspan(wavelength_range_scalefactor_right[0], wavelength_range_scalefactor_right[1], color='grey', alpha=0.15)
-ax.set_xlabel(r'1$^{\rm st}$ order wavelength (''\u212B)', fontsize=15)#'Wavelength (nm)'
+ax.set_xlabel(r'1$^{\rm st}$ order wavelength (''\u212B)', fontsize=15)
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
 ax.legend(fontsize=12)
 ax.set_yscale('log')
@@ -347,7 +347,7 @@ ax.errorbar(x=lam_hrts, y=rad_hrts_conv_scaled, yerr=erad_hrts_conv_scaled, colo
 ax.errorbar(x=lam_sumer_cropNeVIII, y=rad_hrts_conv_scaled_SUMERgrid_cropNeVIII, yerr=erad_hrts_conv_scaled_SUMERgrid_cropNeVIII, color=color_hrts, linewidth=0, elinewidth=1., marker='.', markersize=3, label='HRTS convolved, range of analysis (Ne VIII)') 
 ax.set_title(f'HRTS scaled', fontsize=18)
 ax.axvspan(wavelength_range_NeVIII[0], wavelength_range_NeVIII[1], color='grey', alpha=0.15, label='Wavelength range around Ne VIII')
-ax.set_xlabel(r'1$^{\rm st}$ order wavelength (nm)', fontsize=15)#'Wavelength (nm)'
+ax.set_xlabel(r'1$^{\rm st}$ order wavelength (nm)', fontsize=15)
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
 ax.legend(fontsize=12)
 ax.set_yscale('log')
@@ -375,7 +375,7 @@ ax.errorbar(x=vkms_doppler(lamb=lam_hrts_cropNeVIII, lamb_0=lam_0), y=rad_hrts_c
 ax.axvline(x=0, color='brown', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='brown', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS', fontsize=18)
-ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
+ax.set_xlabel('Doppler shift (km/s)', fontsize=15)
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
 ax.set_xlim([vkms_doppler(lamb=min(lam_hrts_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrts_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12)
@@ -451,7 +451,7 @@ ax[0].set_ylabel('Spectral radiance 'r'(W m$^{-2}$ sr$^{-1}$''\u212B'r'$^{-1}$)'
 ax[0].legend(fontsize=12)
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
-ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axes_size)#'Wavelength (nm)'
+ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axes_size)
 ax[1].set_ylabel('Residuals', fontsize=axes_size)
 plt.tight_layout()
 plt.show(block=False)
@@ -513,7 +513,7 @@ ax[0].set_ylabel('Spectral radiance 'r'(W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)
 ax[0].legend(fontsize=12)
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_corrected, lamb_0=lam_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
-ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axes_size)#'Wavelength (nm)'
+ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axes_size)
 ax[1].set_ylabel('Residuals', fontsize=axes_size)
 plt.tight_layout()
 plt.show(block=False)
