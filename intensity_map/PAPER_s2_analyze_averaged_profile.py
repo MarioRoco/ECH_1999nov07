@@ -3,27 +3,16 @@
 ## range_percentage: [float1, float2]
 ## threshold_value_type: 'max', 'min', 'mean', 'median'
 ## instrument: 'eit_195', 'sumer_NeVIII'
-#range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
 #range_percentage, threshold_value_type, instrument_line = [0., 3.42], 'max', 'eit_195'
 #range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'sumer_NeVIII'
 #range_percentage, threshold_value_type, instrument_line = [0., 5.], 'max', 'eit_195'
 #range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
-
-range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
-
+#range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
+range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
 
 #  Inputs
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 
-# Threshold value: label (type) and range of percentageRange percentage of the threshold value
-#range_percentage, threshold_value_type = [0., 4.], 'max' #'max', 'min', 'mean', 'median'
-range_percentage, threshold_value_type = [0., 60.], 'mean'
-
-
-color_sumer_uncorrected = 'black'
-color_hrts_qra = 'blue'
-color_hrts_qrb = 'red'
-color_hrts_qrl = 'green'
 
 # Parameters of the individual gaussians fits
 components_linestyle = '-'
@@ -71,7 +60,8 @@ from utils.solar_rotation_variables import *
 from utils.aux_functions import *
 from utils.general_variables import *
 from utils.NeVIII_rest_wavelength import *
-from scale_hrts import *
+from PAPER_scale_hrts import *
+from PAPER_fig_params import * 
 
 ############################################################################################################
 ############################################################################################################

@@ -24,17 +24,12 @@ from utils.solar_rotation_variables import *
 from utils.aux_functions import *
 from utils.general_variables import *
 from utils.NeVIII_rest_wavelength import *
+from PAPER_fig_params import *
 
 
 
-def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv, wavelength_range_to_average, wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left, wavelength_range_scalefactor_right, show_plot='yes', title_fit='auto', title_ranges='auto', x_lims_ranges='auto', y_lims_ranges='auto'):
-
-    color_sumer = 'blue'
-    color_hrts = 'green'
-    color_sumer_uncorrected = 'red'
-    color_sumer_corrected = 'blue'
-
-
+def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv, wavelength_range_to_average, wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left, wavelength_range_scalefactor_right, show_plot='yes', title_fit_radiances='auto', title_scaled_HRTSspectrum='auto', title_ranges='auto', x_lims_ranges='auto', y_lims_ranges='auto'): 
+    
     ######################################################
     # HRTS
 
@@ -42,14 +37,23 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
 	    from data.hrts.data__qqr_a_xdr import lambda__qqr_a_xdr, radiance__qqr_a_xdr, unc_radiance__qqr_a_xdr
 	    lam_hrts, rad_hrts = 10.*lambda__qqr_a_xdr, 0.1*radiance__qqr_a_xdr #multiply by 10. and 0.1 to convert nm to Angstrom
 	    qr_label = 'QS A'
+	    color_hrts = color_hrts_qra # from PAPER_fig_params.py
+	    color_hrts_scaled = color_hrts_qra_scaled
+	    color_sumer_corrected = color_sumer_corrected_qra
     elif hrts_qr=='b':
 	    from data.hrts.data__qqr_b_xdr import lambda__qqr_b_xdr, radiance__qqr_b_xdr, unc_radiance__qqr_b_xdr
 	    lam_hrts, rad_hrts = 10.*lambda__qqr_b_xdr, 0.1*radiance__qqr_b_xdr
 	    qr_label = 'QS B'
+	    color_hrts = color_hrts_qrb # from PAPER_fig_params.py
+	    color_hrts_scaled = color_hrts_qrb_scaled
+	    color_sumer_corrected = color_sumer_corrected_qrb
     elif hrts_qr=='l':
 	    from data.hrts.data__qqr_l_xdr import lambda__qqr_l_xdr, radiance__qqr_l_xdr, unc_radiance__qqr_l_xdr
 	    lam_hrts, rad_hrts = 10.*lambda__qqr_l_xdr, 0.1*radiance__qqr_l_xdr
 	    qr_label = 'QS L'
+	    color_hrts = color_hrts_qrl # from PAPER_fig_params.py
+	    color_hrts_scaled = color_hrts_qrl_scaled
+	    color_sumer_corrected = color_sumer_corrected_qrl
 
     erad_hrts = np.zeros(len(rad_hrts)) #TODO: we don't know the uncertainties of HRTS
 
@@ -154,7 +158,8 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
     erad_hrts_conv_SUMERgrid_cropscale  = np.concatenate([erad_hrts_conv_SUMERgrid_cropleft, erad_hrts_conv_SUMERgrid_cropright])
 
 
-    # Plot HRTS scaled
+    # POSTER: Plot wavelength ranges for the calculation of the scaling factor
+    """
     if show_plot=='yes':
         fig, ax = plt.subplots(figsize=(12, 5))
         ax.errorbar(x=lam_sumer, y=rad_sumer, yerr=erad_sumer, color=color_sumer_uncorrected, linewidth=1.5, label='SUMER uncorrected')
@@ -173,6 +178,7 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
         if x_lims_ranges!='auto': ax.set_xlim(x_lims_ranges)
         if y_lims_ranges!='auto': ax.set_ylim(y_lims_ranges)
         plt.show(block=False)
+    """
 
     ################
     # 3.2) Calculate the factor with a linear fit (and zero intercept). Fit straight line to the radiance of HRTS vs SUMER (y = m*x + 0 (intercept = 0))
@@ -213,8 +219,8 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
         ax.errorbar(x=y_hrts, y=y_sumer, yerr=yerr_sumer, color='black', linewidth=0, elinewidth=1., marker='.', markersize=5, label='Data')
         ax.plot(xfit_sf, yfit_sf, color='brown', label=f'Linear fit. Slope (scaling factor): {np.round(scaling_factor_,4)}')
-        if title_fit=='auto': title_fit = f'Spectral radiances of SUMER vs HRTS ({qr_label}), and fitting'
-        ax.set_title(title_fit, fontsize=18) 
+        if title_fit_radiances=='auto': title_fit_radiances = f'Spectral radiances of SUMER vs HRTS ({qr_label}), and fitting'
+        ax.set_title(title_fit_radiances, fontsize=18) 
         ax.set_xlabel(r'Spectral radiance HRTS (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', color=color_hrts, fontsize=16)
         ax.set_ylabel(r'Spectral radiance SUMER (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', color=color_sumer_uncorrected, fontsize=16)
         # Change tick label colors
@@ -270,21 +276,46 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
     erad_hrts_conv_scaled_cropNeVIII = erad_hrts_conv_scaled[idx_NeVIII_hrts_0:idx_NeVIII_hrts_1+1]
 
 
-    # Plot
+    # POSTER: Plot HRTS scaled
+    """
     if show_plot=='yes':
         fig, ax = plt.subplots(figsize=(12, 5))
-        ax.errorbar(x=lam_sumer, y=rad_sumer, yerr=erad_sumer, color=color_sumer_uncorrected, linewidth=0.6, label='SUMER uncorrected')
+        ax.errorbar(x=lam_sumer, y=rad_sumer, yerr=erad_sumer, color=color_sumer_uncorrected, linewidth=1.5, label='SUMER uncorrected')
         #ax.errorbar(x=lam_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linewidth=0, marker='.', markersize=3, label='SUMER regions for analysis (Ne VIII)')
-        ax.errorbar(x=lam_hrts, y=rad_hrts_conv_scaled, yerr=erad_hrts_conv_scaled, color=color_hrts, linewidth=0.6, label=r'HRTS ({qr_label}) convolved and scaled ($\times$'f' {np.round(scaling_factor_,4)})') 
+        ax.errorbar(x=lam_hrts, y=rad_hrts_conv_scaled, yerr=erad_hrts_conv_scaled, color=color_hrts_scaled, linewidth=1.5, label=f'HRTS ({qr_label}) convolved and scaled 'r'($\times$'f' {np.round(scaling_factor_,4)})') 
         #ax.errorbar(x=lam_sumer_cropNeVIII, y=rad_hrts_conv_scaled_SUMERgrid_cropNeVIII, yerr=erad_hrts_conv_scaled_SUMERgrid_cropNeVIII, color=color_hrts, linewidth=0, elinewidth=1., marker='.', markersize=3, label='HRTS convolved, range of analysis (Ne VIII)') 
-        ax.set_title(f'HRTS scaled', fontsize=18)
-        ax.axvspan(wavelength_range_to_analyze_NeVIII[0], wavelength_range_to_analyze_NeVIII[1], color='grey', alpha=0.15, label='Wavelength range around Ne VIII')
+        if title_scaled_HRTSspectrum=='auto': title_scaled_HRTSspectrum=f'HRTS ({qr_label}) spectrum convolved and scaled to SUMER'
+        ax.set_title(title_scaled_HRTSspectrum, fontsize=18)
+        #ax.axvspan(wavelength_range_to_analyze_NeVIII[0], wavelength_range_to_analyze_NeVIII[1], color='grey', alpha=0.15, label='Wavelength range around Ne VIII')
         ax.set_xlabel(r'1$^{\rm st}$ order wavelength (nm)', fontsize=15)#'Wavelength (nm)'
         ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
         if x_lims_ranges!='auto': ax.set_xlim(x_lims_ranges)
         if y_lims_ranges!='auto': ax.set_ylim(y_lims_ranges)
         ax.legend(fontsize=12)
         ax.set_yscale('log')
+        plt.show(block=False)
+    """
+        
+        
+    # POSTER: Plot wavelength ranges for the calculation of the scaling factor, and HRTS scaled
+    if show_plot=='yes':
+        fig, ax = plt.subplots(figsize=(12, 5))
+        ax.errorbar(x=lam_sumer, y=rad_sumer, yerr=erad_sumer, color=color_sumer_uncorrected, linewidth=1.5, label='SUMER uncorrected')
+        #ax.errorbar(x=lam_sumer_cropscale, y=rad_sumer_cropscale, yerr=erad_sumer_cropscale, color=color_sumer_uncorrected, linewidth=0, elinewidth=1., marker='.', markersize=3, label='SUMER regions for scaling factor')
+        ax.errorbar(x=lam_hrts, y=rad_hrts_conv, color=color_hrts, linewidth=1.5, linestyle='--', label='HRTS convolved') 
+        ax.errorbar(x=lam_hrts, y=rad_hrts_conv_scaled, yerr=erad_hrts_conv_scaled, color=color_hrts_scaled, linewidth=1.5, label=f'HRTS ({qr_label}) convolved and scaled 'r'($\times$'f' {np.round(scaling_factor_,4)})') 
+        #ax.errorbar(x=lam_sumer_cropscale, y=rad_hrts_conv_SUMERgrid_cropscale, yerr=erad_hrts_conv_SUMERgrid_cropscale, color=color_hrts, linewidth=0, elinewidth=1., marker='.', markersize=3, label='HRTS convolved, regions for scaling factor') 
+        if title_ranges=='auto': title_ranges=f'SUMER and HRTS ({qr_label}) spectra with wavelength ranges used for the scaling factor'
+        ax.set_title(title_ranges, fontsize=18)
+        ax.axvspan(wavelength_range_scalefactor_left[0], wavelength_range_scalefactor_left[1], color='grey', alpha=0.15)#, label='Wavelength ranges')
+        ax.axvspan(wavelength_range_scalefactor_right[0], wavelength_range_scalefactor_right[1], color='grey', alpha=0.15)
+        #ax.set_xlabel(r'1$^{\rm st}$ order wavelength (''\u212B)', fontsize=15)
+        ax.set_xlabel('Wavelength (\u212B)', fontsize=15)
+        ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
+        ax.legend(fontsize=12)
+        ax.set_yscale('log')
+        if x_lims_ranges!='auto': ax.set_xlim(x_lims_ranges)
+        if y_lims_ranges!='auto': ax.set_ylim(y_lims_ranges)
         plt.show(block=False)
 
 
@@ -306,7 +337,7 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
         #ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
         ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
         ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected, yerr=erad_sumer_cropNeVIII_corrected, color=color_sumer_corrected, linestyle='-', linewidth=2., label=f'SUMER corrected') 
-        ax.errorbar(x=vkms_doppler(lamb=lam_hrts_cropNeVIII, lamb_0=lamb_0), y=rad_hrts_conv_scaled_cropNeVIII, yerr=erad_hrts_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRTS - QR A') #Real spectrum (SUMER)
+        ax.errorbar(x=vkms_doppler(lamb=lam_hrts_cropNeVIII, lamb_0=lamb_0), y=rad_hrts_conv_scaled_cropNeVIII, yerr=erad_hrts_conv_scaled_cropNeVIII, color=color_hrts_scaled, linestyle='--', linewidth=2., label='HRTS - QR A') #Real spectrum (SUMER)
         ax.axvline(x=0, color='brown', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
         #ax.axvspan(-v_unc_0, v_unc_0, color='brown', alpha=0.15)
         ax.set_title(f'Comparison SUMER before and after correction with HRTS', fontsize=18)
