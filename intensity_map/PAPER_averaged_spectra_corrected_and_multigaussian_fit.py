@@ -1,24 +1,24 @@
 
+
+save_paper_images = 'yes'
+folder_name = '../outputs/paper_figures/v2' #name of the folder where you save the images
+save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
+
+
 # Threshold value: label (type) and range of percentageRange percentage of the threshold value
 ## range_percentage: [float1, float2]
 ## threshold_value_type: 'max', 'min', 'mean', 'median'
 ## instrument: 'eit_195', 'sumer_NeVIII'
-#range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
+#range_percentage, threshold_value_type, instrument_line = [0., 3.42], 'max', 'eit_195'
 #range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'sumer_NeVIII'
 #range_percentage, threshold_value_type, instrument_line = [0., 5.], 'max', 'eit_195'
 #range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
-range_percentage, threshold_value_type, instrument_line = [0., 3.42], 'max', 'eit_195'
-#range_percentage, threshold_value_type, instrument_line = [0., 30.], 'max', 'eit_195'
-
-
+#range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
+range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
 
 #  Inputs
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 
-color_sumer_uncorrected = 'black'
-color_hrts_qra = 'blue'
-color_hrts_qrb = 'red'
-color_hrts_qrl = 'purple'
 
 # Parameters of the individual gaussians fits
 components_linestyle = '-'
@@ -30,6 +30,7 @@ fig_size = (12, 6)
 axislabel_size = 13
 title_size = 17
 legend_size = 13
+line_width = 2.
 
 # Wavelength ranges to crop spectra
 wavelength_range_to_average = [1531.1147, 1551.7688]
@@ -66,7 +67,11 @@ from utils.solar_rotation_variables import *
 from utils.aux_functions import *
 from utils.general_variables import *
 from utils.NeVIII_rest_wavelength import *
-from scale_hrts import *
+from PAPER_scale_hrts import *
+from PAPER_fig_params import * 
+
+rest_wavelength_label_figures = f'Rest wavelength ({lam_0/2.}'' \u212B)'
+#rest_wavelength_label_figures = 'Rest wavelength: 770.428 \u212B'
 
 ############################################################################################################
 ############################################################################################################
@@ -87,6 +92,7 @@ vmin_sumer, vmax_sumer = intensitymap_loaded_dic['vmin_vmax']
 print('rest_wavelength_label =', rest_wavelength_label)
 print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
 print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
+
 
 ######################################################
 
@@ -168,40 +174,35 @@ erad_sumer_cropNeVIII_corrected_qrl = profiles_loaded_dic['erad_sumer_cropNeVIII
 # PAPER plot
 
 x_lims = [max(min(v_hrtsa_cropNeVIII), min(v_sumer_cropNeVIII)),      min(max(v_hrtsa_cropNeVIII), max(v_sumer_cropNeVIII))]
-
+"""
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
 ## HRTS scaled and convolved
 ax.errorbar(x=v_hrtsa_cropNeVIII, y=rad_hrtsa_conv_scaled_cropNeVIII, linestyle='--', linewidth=1.2, color=color_hrts_qra, label='HRTS QS-A')
 ax.errorbar(x=v_hrtsb_cropNeVIII, y=rad_hrtsb_conv_scaled_cropNeVIII, linestyle='--', linewidth=1.2, color=color_hrts_qrb, label='HRTS QS-B')
 ## SUMER uncorrected
-ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, linestyle='-', marker='.', markersize=10, linewidth=1.5, color=color_sumer_uncorrected, label='SUMER uncorrected')
+#ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, linestyle='-', marker='.', markersize=10, linewidth=1.5, color=color_sumer_uncorrected, label='SUMER not corrected')
+ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, linestyle='-', linewidth=1.5, color=color_sumer_uncorrected, label='SUMER not corrected')
 ## SUMER corrected
 ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, linestyle='-', linewidth=1.2, color=color_hrts_qra, label='SUMER corrected, QS-A')
 ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, linestyle='-', linewidth=1.2, color=color_hrts_qrb, label='SUMER corrected, QS-B')
 ## 
-ax.axvline(x=0, color='black', linestyle=':', linewidth=1.5, label='Rest wavelength: 770.428 \u212B')
+ax.axvline(x=0, color='black', linestyle=':', linewidth=1.5, label=rest_wavelength_label_figures)
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'SUMER spectrum of the CH uncorrected and corrected with HRTS', fontsize=title_size)
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
-
-#ax.legend(fontsize=legend_size)
 # legend in desired order:
 handles, labels = ax.get_legend_handles_labels()
 order = [
-    labels.index('SUMER uncorrected'),
-    labels.index('HRTS QS-A'),
-    labels.index('HRTS QS-B'),
+    labels.index('SUMER not corrected'),
     labels.index('SUMER corrected, QS-A'),
     labels.index('SUMER corrected, QS-B'),
-    labels.index('Rest wavelength: 770.428 Å'),
-]
+    labels.index(rest_wavelength_label_figures),]
 ax.legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
-
-ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size) 
+ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax.set_xlim(x_lims)
 plt.tight_layout()
 plt.show(block=False)
-
+"""
 
 ############################################################################################################
 ############################################################################################################
@@ -219,36 +220,36 @@ x_lims_fits = [min(v_sumer_cropNeVIII), max(v_sumer_cropNeVIII)]
 
 bckg_fit_uncorrected = 0.2 #HRST not subtracted
 init_parameters_uncorrected = [bckg_fit_uncorrected, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	0.3-bckg_fit_uncorrected, -54., 20.,
-	1.07-bckg_fit_uncorrected, -10, 45.,
-	0.5-bckg_fit_uncorrected, 15., 45.,
-	0.25-bckg_fit_uncorrected, 97., 30.
-	]
+0.3-bckg_fit_uncorrected, -54., 20.,
+1.07-bckg_fit_uncorrected, -10, 45.,
+0.5-bckg_fit_uncorrected, 15., 45.,
+0.25-bckg_fit_uncorrected, 97., 30.
+]
 
 bckg_fit_corrected_qra = -0.3
 init_parameters_corrected_qra = [bckg_fit_corrected_qra, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	0.1-bckg_fit_corrected_qra, -60., 20.,
-	0.5-bckg_fit_corrected_qra, -30., 20.,
-	3.-bckg_fit_corrected_qra, 0.0, 50.,
-	#1.5-bckg_fit_corrected_qra, 25., 30.
-	]
+0.1-bckg_fit_corrected_qra, -60., 20.,
+0.5-bckg_fit_corrected_qra, -30., 20.,
+3.-bckg_fit_corrected_qra, 0.0, 50.,
+#1.5-bckg_fit_corrected_qra, 25., 30.
+]
 
 bckg_fit_corrected_qrb = 0.0
 init_parameters_corrected_qrb = [bckg_fit_corrected_qrb, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	0.04-bckg_fit_corrected_qrb, -78., 30.,
-	#0.3-bckg_fit_corrected_qrb, -50., 30.,
-	0.5-bckg_fit_corrected_qrb, -30., 40.,
-	0.8-bckg_fit_corrected_qrb, 0.0, 50.,
-	#1.5-bckg_fit_corrected_qrb, 33., 40.
-	]
+0.04-bckg_fit_corrected_qrb, -78., 30.,
+#0.3-bckg_fit_corrected_qrb, -50., 30.,
+0.5-bckg_fit_corrected_qrb, -30., 40.,
+0.8-bckg_fit_corrected_qrb, 0.0, 50.,
+#1.5-bckg_fit_corrected_qrb, 33., 40.
+]
 
 bckg_fit_corrected_qrl = 0.
 init_parameters_corrected_qrl = [bckg_fit_corrected_qrl, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	0.08-bckg_fit_corrected_qrl, -75., 20.,
-	0.3-bckg_fit_corrected_qrl, -35., 30.,
-	0.8-bckg_fit_corrected_qrl, 7., 50.,
-	0.022-bckg_fit_corrected_qrl, 77., 30.
-	]
+0.08-bckg_fit_corrected_qrl, -75., 20.,
+0.3-bckg_fit_corrected_qrl, -35., 30.,
+0.8-bckg_fit_corrected_qrl, 7., 50.,
+0.022-bckg_fit_corrected_qrl, 77., 30.
+]
 
 
 
@@ -259,36 +260,77 @@ wavelength_range_NeVIII = [1540.32, 1541.43]
 
 bckg_fit_uncorrected = 0.15 #HRST not subtracted
 init_parameters_uncorrected = [bckg_fit_uncorrected, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	0.2-bckg_fit_uncorrected, -54., 20.,
-	0.5-bckg_fit_uncorrected, -10, 45.,
-	0.4-bckg_fit_uncorrected, 15., 45.,
-	#0.215-bckg_fit_uncorrected, 97., 30.
-	]
+0.2-bckg_fit_uncorrected, -54., 20.,
+0.5-bckg_fit_uncorrected, -10, 45.,
+0.4-bckg_fit_uncorrected, 15., 45.,
+#0.215-bckg_fit_uncorrected, 97., 30.
+]
 
 bckg_fit_corrected_qra = 0.
 init_parameters_corrected_qra = [bckg_fit_corrected_qra, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	0.1-bckg_fit_corrected_qra, -60., 20.,
-	#0.1-bckg_fit_corrected_qra, -50., 20.,
-	0.88-bckg_fit_corrected_qra, -1.0, 50.,
-	#0.15-bckg_fit_corrected_qra, 80., 30.
-	]
+0.1-bckg_fit_corrected_qra, -60., 20.,
+#0.1-bckg_fit_corrected_qra, -50., 20.,
+0.88-bckg_fit_corrected_qra, -1.0, 50.,
+#0.15-bckg_fit_corrected_qra, 80., 30.
+]
 
 bckg_fit_corrected_qrb = -0.3
 init_parameters_corrected_qrb = [bckg_fit_corrected_qrb, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	#0.05-bckg_fit_corrected_qrb, -77., 30.,
-	1.-bckg_fit_corrected_qrb, -40., 30.,
-	3.25-bckg_fit_corrected_qrb, 0.0, 50.,
-	1.5-bckg_fit_corrected_qrb, 33., 40.
-	]
+#0.05-bckg_fit_corrected_qrb, -77., 30.,
+1.-bckg_fit_corrected_qrb, -40., 30.,
+3.25-bckg_fit_corrected_qrb, 0.0, 50.,
+1.5-bckg_fit_corrected_qrb, 33., 40.
+]
            
 bckg_fit_corrected_qrl = -0.3
 init_parameters_corrected_qrl = [bckg_fit_corrected_qrl, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-	0.39-bckg_fit_corrected_qrl, -75., 20.,
-	0.93-bckg_fit_corrected_qrl, -35., 30.,
-	3.-bckg_fit_corrected_qrl, 7., 35.,
-	1.-bckg_fit_corrected_qrl, 37., 50.
-	]
+0.39-bckg_fit_corrected_qrl, -75., 20.,
+0.93-bckg_fit_corrected_qrl, -35., 30.,
+3.-bckg_fit_corrected_qrl, 7., 35.,
+1.-bckg_fit_corrected_qrl, 37., 50.
+]
 """
+
+
+######################################################
+
+### PAPER image: spectra sumer and hrts together
+
+x_lims = [max(min(v_hrtsa_cropNeVIII), min(v_sumer_cropNeVIII)),      min(max(v_hrtsa_cropNeVIII), max(v_sumer_cropNeVIII))]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
+## HRTS scaled and convolved
+ax.errorbar(x=v_hrtsa_cropNeVIII, y=rad_hrtsa_conv_scaled_cropNeVIII, linestyle='--', linewidth=line_width, color=color_hrts_qra, label='HRTS QS-A')
+ax.errorbar(x=v_hrtsb_cropNeVIII, y=rad_hrtsb_conv_scaled_cropNeVIII, linestyle='--', linewidth=line_width, color=color_hrts_qrb, label='HRTS QS-B')
+## SUMER uncorrected
+#ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, linestyle='-', marker='.', markersize=10, linewidth=line_width, color=color_sumer_uncorrected, label='SUMER uncorrected')
+ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, linestyle='-', linewidth=line_width, color=color_sumer_uncorrected, label='SUMER uncorrected')
+## SUMER corrected
+ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, linestyle='-', linewidth=line_width, color=color_hrts_qra, label='SUMER corrected, QS-A')
+ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, linestyle='-', linewidth=line_width, color=color_hrts_qrb, label='SUMER corrected, QS-B')
+## 
+ax.axvline(x=0, color='black', linestyle=':', linewidth=1.5, label=rest_wavelength_label_figures)
+ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
+ax.set_title(f'SUMER spectrum of the CH uncorrected and corrected with HRTS', fontsize=title_size)
+ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
+#ax.legend(fontsize=legend_size)
+# legend in desired order:
+handles, labels = ax.get_legend_handles_labels()
+order = [
+    labels.index('SUMER uncorrected'),
+    labels.index('HRTS QS-A'),
+    labels.index('HRTS QS-B'),
+    labels.index('SUMER corrected, QS-A'),
+    labels.index('SUMER corrected, QS-B'),
+    labels.index(rest_wavelength_label_figures),]
+ax.legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
+ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size) 
+ax.set_xlim(x_lims)
+plt.tight_layout()
+if save_paper_images == 'yes':
+    fig_name = 'spectra_sumer_and_hrts_together'
+    plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
 
 ######################################################
 # Fit uncorrected Ne VIII line
@@ -314,48 +356,43 @@ y_unc_fit_length_uncorrected = multi_gaussian_function_uncertainties(B=popt, B_u
 y_unc_residuals = np.sqrt(y_unc_uncorrected**2 + y_unc_fit_length_uncorrected**2)
 
 
-fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0) ,y=y_uncorrected, yerr=y_unc_uncorrected, color=color_sumer_uncorrected, marker='o', linewidth=0, elinewidth=1., label='SUMER uncorrected')
-ax[0].plot(x_fit_uncorrected, y_fit_uncorrected, color=color_sumer_uncorrected, linestyle='-', label='Fit', zorder=1) 
-#ax[0].plot(vkms_doppler(lamb=x_fit_uncorrected_singlegauss, lamb_0=lam_0), y_fit_uncorrected_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 
+# Multigaussian fit to the uncorrected profile
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+ax[0].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0) ,y=y_uncorrected, yerr=y_unc_uncorrected, color=color_sumer_uncorrected, marker='o', linewidth=0, elinewidth=1., label='SUMER not corrected')
+ax[0].plot(x_fit_uncorrected, y_fit_uncorrected, color=color_sumer_uncorrected, linestyle='-', label='Multigaussian fit', zorder=1) 
+#ax[0].plot(vkms_doppler(lamb=x_fit_uncorrected_singlegauss, lamb_0=lam_0), y_fit_uncorrected_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 bckg_fit = popt[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
 color_singlegauss_list = 5*['grey']
 N_gaussians = (len(popt)-1)//3
 for n_gauss in range(N_gaussians):
-    color_i = color_singlegauss_list[n_gauss]
-    amplitude_fit = popt[3*n_gauss+1]
-    mean_fit = popt[3*n_gauss+2]
-    fwhm_fit = popt[3*n_gauss+3]
-    print('amplitude_fit', amplitude_fit)
-    print('mean_fit', mean_fit)
-    print('fwhm_fit', fwhm_fit)
-    sigma_fit = fwhm_fit / (2 * np.sqrt(2 * np.log(2)))  # Convert FWHM to sigma
-    x_fit_corrected_singlegauss = np.linspace(mean_fit-sigma_fit*3., mean_fit+sigma_fit*3., 200)
-    y_fit_corrected_singlegauss = gaussian_function_with_background(x=x_fit_corrected_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
-    ax[0].plot(x_fit_corrected_singlegauss, y_fit_corrected_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
+	color_i = color_singlegauss_list[n_gauss]
+	amplitude_fit = popt[3*n_gauss+1]
+	mean_fit = popt[3*n_gauss+2]
+	fwhm_fit = popt[3*n_gauss+3]
+	print('amplitude_fit', amplitude_fit)
+	print('mean_fit', mean_fit)
+	print('fwhm_fit', fwhm_fit)
+	sigma_fit = fwhm_fit / (2 * np.sqrt(2 * np.log(2)))  # Convert FWHM to sigma
+	x_fit_corrected_singlegauss = np.linspace(mean_fit-sigma_fit*3., mean_fit+sigma_fit*3., 200)
+	y_fit_corrected_singlegauss = gaussian_function_with_background(x=x_fit_corrected_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
+	ax[0].plot(x_fit_corrected_singlegauss, y_fit_corrected_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-
-
-ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
+ax[0].axvline(x=0, color='black', linestyle='--', label=rest_wavelength_label_figures)
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum uncorrected, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
-
-#ax[0].legend(fontsize=legend_size)
+ax[0].set_yscale('linear')
 # legend in desired order:
 handles, labels = ax[0].get_legend_handles_labels()
 order = [
-    labels.index('SUMER uncorrected'),
-    labels.index('Fit'),
-    labels.index('Individual gaussians'),
-    labels.index('Rest wavelength: 770.428 Å'),
-]
+	labels.index('SUMER not corrected'),
+	labels.index('Multigaussian fit'),
+	labels.index('Individual gaussians'),
+	labels.index(rest_wavelength_label_figures),]
 ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
-
-ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), y=y_residuals, yerr=y_unc_residuals, color='black', marker='.')
 ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax[1].set_ylabel('Residuals', fontsize=axislabel_size)
@@ -363,6 +400,9 @@ ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
+if save_paper_images == 'yes':
+	fig_name = 'spectrum_multigaussian_fit_uncorrected'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
            
@@ -391,11 +431,11 @@ y_unc_fit_length_corrected_qra = multi_gaussian_function_uncertainties(B=popt_qr
 y_unc_residuals_qra = np.sqrt(y_unc_corrected_qra**2 + y_unc_fit_length_corrected_qra**2)
 
 
+### PAPER image: multigaussian fit to the corrected profile (QR-A)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
 ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0) ,y=y_corrected_qra, yerr=y_unc_corrected_qra, color=color_hrts_qra, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-A')
 ax[0].plot(x_fit_corrected_qra, y_fit_corrected_qra, color=color_hrts_qra, linestyle='-', label='Fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qra_singlegauss, lamb_0=lam_0), y_fit_corrected_qra_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
-
 bckg_fit = popt_qra[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
 color_singlegauss_list = 5*['grey']
@@ -413,24 +453,12 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qra_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qra_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qra_singlegauss, y_fit_corrected_qra_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-
-ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-A, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
-
-#ax[0].legend(fontsize=legend_size)
-# legend in desired order:
-handles, labels = ax[0].get_legend_handles_labels()
-order = [
-    labels.index('SUMER corrected QS-A'),
-    labels.index('Fit'),
-    labels.index('Individual gaussians'),
-    labels.index('Rest wavelength: 770.428 Å'),
-]
-ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
-
+ax[0].legend(fontsize=legend_size)
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0), y=y_residuals_qra, yerr=y_unc_residuals_qra, color='black', marker='.')
 ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
@@ -439,6 +467,9 @@ ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
+if save_paper_images == 'yes':
+	fig_name = 'spectrum_multigaussian_fit_corrected_qra'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
 
@@ -466,11 +497,12 @@ y_unc_fit_length_corrected_qrb = multi_gaussian_function_uncertainties(B=popt_qr
 y_unc_residuals_qrb = np.sqrt(y_unc_corrected_qrb**2 + y_unc_fit_length_corrected_qrb**2)
 
 
+
+### PAPER image: multigaussian fit to the corrected profile (QR-B)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
 ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0) ,y=y_corrected_qrb, yerr=y_unc_corrected_qrb, color=color_hrts_qrb, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-B')
 ax[0].plot(x_fit_corrected_qrb, y_fit_corrected_qrb, color=color_hrts_qrb, linestyle='-', label='Fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qrb_singlegauss, lamb_0=lam_0), y_fit_corrected_qrb_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
-
 bckg_fit = popt_qrb[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
 color_singlegauss_list = 5*['grey']
@@ -488,24 +520,12 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qrb_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qrb_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qrb_singlegauss, y_fit_corrected_qrb_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-
-ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-B, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
-
-#ax[0].legend(fontsize=legend_size)
-# legend in desired order:
-handles, labels = ax[0].get_legend_handles_labels()
-order = [
-    labels.index('SUMER corrected QS-B'),
-    labels.index('Fit'),
-    labels.index('Individual gaussians'),
-    labels.index('Rest wavelength: 770.428 Å'),
-]
-ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
-
+ax[0].legend(fontsize=legend_size)
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0), y=y_residuals_qrb, yerr=y_unc_residuals_qrb, color='black', marker='.')
 ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
@@ -514,7 +534,11 @@ ax[1].set_ylabel('Residuals', fontsize=axislabel_size)
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
+if save_paper_images == 'yes':
+	fig_name = 'spectrum_multigaussian_fit_corrected_qrb'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
+
 
 ######################################################
 # Fit corrected Ne VIII line, QS-L
@@ -540,11 +564,12 @@ y_unc_fit_length_corrected_qrl = multi_gaussian_function_uncertainties(B=popt_qr
 y_unc_residuals_qrl = np.sqrt(y_unc_corrected_qrl**2 + y_unc_fit_length_corrected_qrl**2)
 
 
+
+### PAPER image: multigaussian fit to the corrected profile (QR-L)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
 ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrl, lamb_0=lam_0) ,y=y_corrected_qrl, yerr=y_unc_corrected_qrl, color=color_hrts_qrl, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-L')
 ax[0].plot(x_fit_corrected_qrl, y_fit_corrected_qrl, color=color_hrts_qrl, linestyle='-', label='Fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qrl_singlegauss, lamb_0=lam_0), y_fit_corrected_qrl_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
-
 bckg_fit = popt_qrl[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
 color_singlegauss_list = 5*['grey']
@@ -562,24 +587,12 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qrl_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qrl_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qrl_singlegauss, y_fit_corrected_qrl_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-
-ax[0].axvline(x=0, color='black', linestyle='--', label='Rest wavelength: 770.428 Å')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-L, multigaussian fit', fontsize=title_size)
 #ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
-
-#ax[0].legend(fontsize=legend_size)
-# legend in desired order:
-handles, labels = ax[0].get_legend_handles_labels()
-order = [
-    labels.index('SUMER corrected QS-L'),
-    labels.index('Fit'),
-    labels.index('Individual gaussians'),
-    labels.index('Rest wavelength: 770.428 Å'),
-]
-ax[0].legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size)
-
+ax[0].legend(fontsize=legend_size)
 ax[0].set_yscale('linear')
 ax[1].errorbar(x=vkms_doppler(lamb=x_corrected_qrl, lamb_0=lam_0), y=y_residuals_qrl, yerr=y_unc_residuals_qrl, color='black', marker='.')
 ax[1].set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
@@ -588,6 +601,9 @@ ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
+if save_paper_images == 'yes':
+	fig_name = 'spectrum_multigaussian_fit_corrected_qrl'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
 
@@ -597,8 +613,6 @@ plt.show(block=False)
 #xb_uncorrected, yb_uncorrected = find_bisector(x_data=x_uncorrected[3:-7], y_data=y_uncorrected[3:-7], y_unc_data=y_unc_uncorrected[3:-7], y_target_list='auto', N_bisector_dots=50, kind_interp='linear', show_figure='yes')
 
 #xb_corrected, yb_corrected = find_bisector(x_data=x_corrected, y_data=y_corrected, y_unc_data=y_unc_corrected, y_target_list='auto', N_bisector_dots=50, kind_interp='linear', show_figure='yes')
-
-
 
 
 

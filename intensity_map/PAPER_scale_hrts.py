@@ -26,34 +26,36 @@ from utils.general_variables import *
 from utils.NeVIII_rest_wavelength import *
 from PAPER_fig_params import *
 
+rest_wavelength_label_figures = f'Rest wavelength ({lam_0/2.}'' \u212B)'
 
+show_secondary_plots = 'no'
 
-def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv, wavelength_range_to_average, wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left, wavelength_range_scalefactor_right, show_plot='yes', title_fit_radiances='auto', title_scaled_HRTSspectrum='auto', title_ranges='auto', x_lims_ranges='auto', y_lims_ranges='auto'): 
+def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv, wavelength_range_to_average, wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left, wavelength_range_scalefactor_right, show_plot='yes', title_fit_radiances='auto', title_scaled_HRTSspectrum='auto', title_ranges='auto', x_lims_ranges='auto', y_lims_ranges='auto', save_paper_images='no', folder_name='../paper_figures', save_dpi=300): 
     
     ######################################################
     # HRTS
 
     if hrts_qr=='a':
-	    from data.hrts.data__qqr_a_xdr import lambda__qqr_a_xdr, radiance__qqr_a_xdr, unc_radiance__qqr_a_xdr
-	    lam_hrts, rad_hrts = 10.*lambda__qqr_a_xdr, 0.1*radiance__qqr_a_xdr #multiply by 10. and 0.1 to convert nm to Angstrom
-	    qr_label = 'QS A'
-	    color_hrts = color_hrts_qra # from PAPER_fig_params.py
-	    color_hrts_scaled = color_hrts_qra_scaled
-	    color_sumer_corrected = color_sumer_corrected_qra
+        from data.hrts.data__qqr_a_xdr import lambda__qqr_a_xdr, radiance__qqr_a_xdr, unc_radiance__qqr_a_xdr
+        lam_hrts, rad_hrts = 10.*lambda__qqr_a_xdr, 0.1*radiance__qqr_a_xdr #multiply by 10. and 0.1 to convert nm to Angstrom
+        qr_label = 'QS A'
+        color_hrts = color_hrts_qra # from PAPER_fig_params.py
+        color_hrts_scaled = color_hrts_qra_scaled
+        color_sumer_corrected = color_sumer_corrected_qra
     elif hrts_qr=='b':
-	    from data.hrts.data__qqr_b_xdr import lambda__qqr_b_xdr, radiance__qqr_b_xdr, unc_radiance__qqr_b_xdr
-	    lam_hrts, rad_hrts = 10.*lambda__qqr_b_xdr, 0.1*radiance__qqr_b_xdr
-	    qr_label = 'QS B'
-	    color_hrts = color_hrts_qrb # from PAPER_fig_params.py
-	    color_hrts_scaled = color_hrts_qrb_scaled
-	    color_sumer_corrected = color_sumer_corrected_qrb
+        from data.hrts.data__qqr_b_xdr import lambda__qqr_b_xdr, radiance__qqr_b_xdr, unc_radiance__qqr_b_xdr
+        lam_hrts, rad_hrts = 10.*lambda__qqr_b_xdr, 0.1*radiance__qqr_b_xdr
+        qr_label = 'QS B'
+        color_hrts = color_hrts_qrb # from PAPER_fig_params.py
+        color_hrts_scaled = color_hrts_qrb_scaled
+        color_sumer_corrected = color_sumer_corrected_qrb
     elif hrts_qr=='l':
-	    from data.hrts.data__qqr_l_xdr import lambda__qqr_l_xdr, radiance__qqr_l_xdr, unc_radiance__qqr_l_xdr
-	    lam_hrts, rad_hrts = 10.*lambda__qqr_l_xdr, 0.1*radiance__qqr_l_xdr
-	    qr_label = 'QS L'
-	    color_hrts = color_hrts_qrl # from PAPER_fig_params.py
-	    color_hrts_scaled = color_hrts_qrl_scaled
-	    color_sumer_corrected = color_sumer_corrected_qrl
+        from data.hrts.data__qqr_l_xdr import lambda__qqr_l_xdr, radiance__qqr_l_xdr, unc_radiance__qqr_l_xdr
+        lam_hrts, rad_hrts = 10.*lambda__qqr_l_xdr, 0.1*radiance__qqr_l_xdr
+        qr_label = 'QS L'
+        color_hrts = color_hrts_qrl # from PAPER_fig_params.py
+        color_hrts_scaled = color_hrts_qrl_scaled
+        color_sumer_corrected = color_sumer_corrected_qrl
 
     erad_hrts = np.zeros(len(rad_hrts)) #TODO: we don't know the uncertainties of HRTS
 
@@ -214,10 +216,10 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
 
 
 
-    # Show radiances of SUMER and HRTS
+    # PAPER image: radiances of SUMER and HRTS
     if show_plot=='yes':
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
-        ax.errorbar(x=y_hrts, y=y_sumer, yerr=yerr_sumer, color='black', linewidth=0, elinewidth=1., marker='.', markersize=5, label='Data')
+        ax.errorbar(x=y_hrts, y=y_sumer, yerr=yerr_sumer, color=color_hrts, linewidth=0, elinewidth=1., marker='.', markersize=5, label='Data')
         ax.plot(xfit_sf, yfit_sf, color='brown', label=f'Linear fit. Slope (scaling factor): {np.round(scaling_factor_,4)}')
         if title_fit_radiances=='auto': title_fit_radiances = f'Spectral radiances of SUMER vs HRTS ({qr_label}), and fitting'
         ax.set_title(title_fit_radiances, fontsize=18) 
@@ -234,6 +236,9 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
         ax.set_ylim(min_val-delta_extremes, max_val+delta_extremes)
         ax.set_aspect('equal', adjustable='box')
         ax.legend(fontsize=10)
+        if save_paper_images == 'yes':
+            fig_name = 'scaling_factor_fit_qr'+hrts_qr
+            plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
         plt.show(block=False)
 
 
@@ -297,7 +302,7 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
     """
         
         
-    # POSTER: Plot wavelength ranges for the calculation of the scaling factor, and HRTS scaled
+    # PAPER images: Plot wavelength ranges for the calculation of the scaling factor, and HRTS scaled
     if show_plot=='yes':
         fig, ax = plt.subplots(figsize=(12, 5))
         ax.errorbar(x=lam_sumer, y=rad_sumer, yerr=erad_sumer, color=color_sumer_uncorrected, linewidth=1.5, label='SUMER uncorrected')
@@ -316,6 +321,9 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
         ax.set_yscale('log')
         if x_lims_ranges!='auto': ax.set_xlim(x_lims_ranges)
         if y_lims_ranges!='auto': ax.set_ylim(y_lims_ranges)
+        if save_paper_images == 'yes':
+            fig_name = 'scaling_factor_spectral_region_qr'+hrts_qr
+            plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
         plt.show(block=False)
 
 
@@ -332,7 +340,7 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
 
 
     # Plot: Comparison SUMER corrected and uncorrected
-    if show_plot=='yes':
+    if show_secondary_plots == 'yes':
         fig, ax = plt.subplots(figsize=(12, 5))
         #ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
         ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
@@ -377,6 +385,5 @@ erad_hrts_cropNeVIII = fsh['erad_hrts_cropNeVIII']
 rad_hrts_conv_scaled_cropNeVIII = fsh['rad_hrts_conv_scaled_cropNeVIII']
 erad_hrts_conv_scaled_cropNeVIII = fsh['erad_hrts_conv_scaled_cropNeVIII']
 """
-
 
 
