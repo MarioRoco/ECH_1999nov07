@@ -685,7 +685,8 @@ x_FOV_NOrotcomp, y_FOV_NOrotcomp = create_rectangle(x_left=HPlon[0], x_right=HPl
 ### PAPER image: full Sun with contours and SUMER FOV
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(11, 11))
 img = ax.imshow(data_eit, cmap='Greys_r', norm=LogNorm(vmin=vmin_eit_fullsun, vmax=vmax_eit_fullsun), extent=extent_eit_fullsun_HP) # Plot the main solar image 
-cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+#cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+cax = fig.add_axes([0.92, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
 cbar = fig.colorbar(img, ax=ax, cax=cax, pad=0.01)
 cbar.set_label(f'Intensity (DN/s)', fontsize=16)
 ax.set_title(f'SOHO/EIT - {header_eit["WAVELNTH"]} \u212B, {label_date_eit}', fontsize=20)
@@ -729,7 +730,7 @@ plt.show(block=False)
 ### PAPER image: full Sun with contours, SUMER FOV, and slit position
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(11, 11))
 img = ax.imshow(data_eit, cmap='Greys_r', norm=LogNorm(vmin=vmin_eit_fullsun, vmax=vmax_eit_fullsun), extent=extent_eit_fullsun_HP) # Plot the main solar image 
-cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+cax = fig.add_axes([0.92, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
 cbar = fig.colorbar(img, ax=ax, cax=cax, pad=0.01)
 cbar.set_label(f'Intensity (DN/s)', fontsize=16)
 ax.set_title(f'SOHO/EIT - {header_eit["WAVELNTH"]} \u212B, {label_date_eit}', fontsize=20)
@@ -777,7 +778,7 @@ plt.show(block=False)
 ### PAPER image: full Sun with contours and SUMER FOV
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(11, 11))
 img = ax.imshow(data_eit, cmap='Greys_r', norm=LogNorm(vmin=vmin_eit_fullsun, vmax=vmax_eit_fullsun), extent=extent_eit_fullsun_HP) # Plot the main solar image 
-cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+cax = fig.add_axes([0.92, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
 cbar = fig.colorbar(img, ax=ax, cax=cax, pad=0.01)
 cbar.set_label(f'Intensity (DN/s)', fontsize=16)
 ax.set_title(f'SOHO/EIT - {header_eit["WAVELNTH"]} \u212B, {label_date_eit}', fontsize=20)
@@ -823,9 +824,10 @@ plt.show(block=False)
 
 
 ### PAPER image: full Sun with contours, SUMER FOV, and slit position
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(11, 11))
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(11,11))
 img = ax.imshow(data_eit, cmap='Greys_r', norm=LogNorm(vmin=vmin_eit_fullsun, vmax=vmax_eit_fullsun), extent=extent_eit_fullsun_HP) # Plot the main solar image 
-cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+#cax = fig.add_axes([0.88, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
+cax = fig.add_axes([0.92, 0.11, 0.03, 0.77])  # [left, bottom, width, height]
 cbar = fig.colorbar(img, ax=ax, cax=cax, pad=0.01)
 cbar.set_label(f'Intensity (DN/s)', fontsize=16)
 ax.set_title(f'SOHO/EIT - {header_eit["WAVELNTH"]} \u212B, {label_date_eit}', fontsize=20)

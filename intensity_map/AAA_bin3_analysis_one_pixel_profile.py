@@ -3,10 +3,6 @@
 bin_lat = 4
 bin_lon = 1
 
-
-lat_img__indices_binned = 46, 156
-lat_img__indices = bin_lat*lat_img__indices_binned[0], bin_lon*lat_img__indices_binned[1]
-
 wavelength_range_analysis = [1539., 1543.] #Angstroem
 
 BR_distance_centroid = 50. #[km/s] Distance of the center of the range from the centroid of the fitted gaussian
@@ -231,173 +227,186 @@ vmin_vmax__BRmap = [-1., 1.]
 label_size = 18
 
 
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
-ax.imshow(dopplershift_map_binned_HRTSsub_qra_lessmedian, cmap='seismic', vmin=vmin_vmax__dopplermap[0], vmax=vmin_vmax__dopplermap[1], aspect='auto')
-ax.set_title('Dopplershift map, HRTS: QR-A, median subtracted', fontsize=18)
-ax.set_aspect('auto')
-ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
-fig.supylabel('Latitude dimension (pixels)', fontsize=17)
-row, col = lat_img__indices_binned
-rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
-ax.add_patch(rect)
-plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-plt.show(block=False)
+def show_one_pixel_profile(lat_img__indices_binned, type_map, hrts_qr='qra'):
+
+	"""
+	Example of use:
+	In [1]: %run AAA_bin3_analysis_one_pixel_profile.py
+	In [2]: lat_img__binned, type_map=[43,102], 'br'
+	In [3]: show_one_pixel_profile(lat_img__indices_binned=lat_img__binned, type_map=type_map, hrts_qr='qra')
+	"""
+	
+	lat_img__indices = bin_lat*lat_img__indices_binned[0], bin_lon*lat_img__indices_binned[1]
+
+	############################################################
+	############################################################
+	############################################################
+	# 
+
+
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
+	ax.imshow(intensity_map_croplat_binned, cmap='Greys_r', norm=LogNorm(), aspect='auto')
+	ax.set_title('Intensity map binned, HRTS: QR-A', fontsize=18)
+	ax.set_aspect('auto')
+	ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
+	fig.supylabel('Latitude dimension (pixels)', fontsize=17)
+	row, col = lat_img__indices_binned
+	rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
+	ax.add_patch(rect)
+	plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
+	plt.show(block=False)
+
+	"""
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
+	ax.imshow(intensity_map_croplat, cmap='Greys_r', norm=LogNorm(), aspect='auto')
+	ax.set_title('Intensity map, HRTS: QR-A', fontsize=18)
+	ax.set_aspect('auto')
+	ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
+	fig.supylabel('Latitude dimension (pixels)', fontsize=17)
+	row, col = lat_img__indices
+	rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
+	ax.add_patch(rect)
+	plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
+	plt.show(block=False)
+	"""
+
+	if type_map=='doppler' or type_map=='d':
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
+		ax.imshow(dopplershift_map_binned_HRTSsub_qra_lessmedian, cmap='seismic', vmin=vmin_vmax__dopplermap[0], vmax=vmin_vmax__dopplermap[1], aspect='auto')
+		ax.set_title('Dopplershift map, HRTS: QR-A, median subtracted', fontsize=18)
+		ax.set_aspect('auto')
+		ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
+		fig.supylabel('Latitude dimension (pixels)', fontsize=17)
+		row, col = lat_img__indices_binned
+		rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
+		ax.add_patch(rect)
+		plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
+		plt.show(block=False)
+
+
+	if type_map=='br' or type_map=='asymmetry':
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
+		ax.imshow(BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized, cmap='seismic', vmin=vmin_vmax__BRmap[0], vmax=vmin_vmax__BRmap[1], aspect='auto')
+		ax.set_title('BR asymmetry map, HRTS: QR-A', fontsize=18)
+		ax.set_aspect('auto')
+		ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
+		fig.supylabel('Latitude dimension (pixels)', fontsize=17)
+		row, col = lat_img__indices_binned
+		rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
+		ax.add_patch(rect)
+		plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
+		plt.show(block=False)
 
 
 
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
-ax.imshow(BRasymmetry_map_gaussian_binned_HRTSsub_qra_normalized, cmap='seismic', vmin=vmin_vmax__BRmap[0], vmax=vmin_vmax__BRmap[1], aspect='auto')
-ax.set_title('BR asymmetry map, HRTS: QR-A', fontsize=18)
-ax.set_aspect('auto')
-ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
-fig.supylabel('Latitude dimension (pixels)', fontsize=17)
-row, col = lat_img__indices_binned
-rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
-ax.add_patch(rect)
-plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-plt.show(block=False)
+	############################################################
+	# 
 
+	r_binned, c_binned = lat_img__indices_binned
+	r, c = lat_img__indices
 
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
-ax.imshow(intensity_map_croplat_binned, cmap='Greys_r', norm=LogNorm(), aspect='auto')
-ax.set_title('Intensity map binned, HRTS: QR-A', fontsize=18)
-ax.set_aspect('auto')
-ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
-fig.supylabel('Latitude dimension (pixels)', fontsize=17)
-row, col = lat_img__indices_binned
-rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
-ax.add_patch(rect)
-plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-plt.show(block=False)
+	## binned
+	spectral_image_binned = spectral_image_interpolated_croplat_binned_list[c_binned]
+	unc_spectral_image_binned = spectral_image_unc_interpolated_croplat_binned_list[c_binned]
+	x_profile_binned = lam_sumer
+	y_profile_binned = spectral_image_binned[r_binned, :]
+	yerr_profile_binned = unc_spectral_image_binned[r_binned, :]
 
+	## not binned
+	spectral_image = spectral_image_interpolated_croplat_list[c]
+	unc_spectral_image = spectral_image_unc_interpolated_croplat_list[c]
+	x_profile = x_profile_binned = lam_sumer
+	y_profile = spectral_image[r, :]
+	yerr_profile = unc_spectral_image[r, :]
 
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
-ax.imshow(intensity_map_croplat, cmap='Greys_r', norm=LogNorm(), aspect='auto')
-ax.set_title('Intensity map, HRTS: QR-A', fontsize=18)
-ax.set_aspect('auto')
-ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
-fig.supylabel('Latitude dimension (pixels)', fontsize=17)
-row, col = lat_img__indices
-rect = patches.Rectangle((col-0.5, row-0.5), 1, 1, linewidth=1.5, edgecolor=color_pixel, facecolor='none', label=f'row, col: {row}, {col}')
-ax.add_patch(rect)
-plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-plt.show(block=False)
+	## Scaling the HRTS convolved profiles
+	scaling_factor_qra = scaling_factor_map_binned_qra[r_binned,c_binned]
+	scaling_factor_qrb = scaling_factor_map_binned_qrb[r_binned,c_binned]
+	scaling_factor_qrl = scaling_factor_map_binned_qrl[r_binned,c_binned]
+	rad_hrtsa_conv_scaled = scaling_factor_qra * rad_hrtsa_conv
+	rad_hrtsb_conv_scaled = scaling_factor_qrb * rad_hrtsb_conv
+	rad_hrtsl_conv_scaled = scaling_factor_qrl * rad_hrtsl_conv
+	rad_hrtsa_conv_SUMERgrid_scaled = scaling_factor_qra * rad_hrtsa_conv_SUMERgrid
+	rad_hrtsb_conv_SUMERgrid_scaled = scaling_factor_qrb * rad_hrtsb_conv_SUMERgrid
+	rad_hrtsl_conv_SUMERgrid_scaled = scaling_factor_qrl * rad_hrtsl_conv_SUMERgrid
 
-############################################################
-# 
+	## Crop spectra in a shorter range around Ne VIII
+	### SUMER
+	lam_sumer_crop, idx_sumer_crop = crop_range(list_to_crop=lam_sumer, range_values=wavelength_range_analysis)
+	#### Not binned
+	x_profile_crop = x_profile[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
+	y_profile_crop = y_profile[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
+	yerr_profile_crop = yerr_profile[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
+	#### Binned
+	x_profile_binned_crop = x_profile_binned[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
+	y_profile_binned_crop = y_profile_binned[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
+	yerr_profile_binned_crop = yerr_profile_binned[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
+	### HRTS
+	lam_hrts_crop, idx_hrts_crop = crop_range(list_to_crop=lam_hrtsa, range_values=wavelength_range_analysis)
+	rad_hrtsa_conv_scaled_crop = rad_hrtsa_conv_scaled[idx_hrts_crop[0]:idx_hrts_crop[1]+1]
+	rad_hrtsb_conv_scaled_crop = rad_hrtsb_conv_scaled[idx_hrts_crop[0]:idx_hrts_crop[1]+1]
+	rad_hrtsl_conv_scaled_crop = rad_hrtsl_conv_scaled[idx_hrts_crop[0]:idx_hrts_crop[1]+1]
+	### HRTS in SUMER grid
+	lam_hrts_SUMERgrid_crop, idx_hrtsSG_crop = crop_range(list_to_crop=lam_hrts_SUMERgrid, range_values=wavelength_range_analysis)
+	rad_hrtsa_conv_SUMERgrid_scaled_crop = rad_hrtsa_conv_SUMERgrid_scaled[idx_hrtsSG_crop[0]:idx_hrtsSG_crop[1]+1]
+	rad_hrtsb_conv_SUMERgrid_scaled_crop = rad_hrtsb_conv_SUMERgrid_scaled[idx_hrtsSG_crop[0]:idx_hrtsSG_crop[1]+1]
+	rad_hrtsl_conv_SUMERgrid_scaled_crop = rad_hrtsl_conv_SUMERgrid_scaled[idx_hrtsSG_crop[0]:idx_hrtsSG_crop[1]+1]
 
-r_binned, c_binned = lat_img__indices_binned
-r, c = lat_img__indices
-
-## binned
-spectral_image_binned = spectral_image_interpolated_croplat_binned_list[c_binned]
-unc_spectral_image_binned = spectral_image_unc_interpolated_croplat_binned_list[c_binned]
-x_profile_binned = lam_sumer
-y_profile_binned = spectral_image_binned[r_binned, :]
-yerr_profile_binned = unc_spectral_image_binned[r_binned, :]
-
-## not binned
-spectral_image = spectral_image_interpolated_croplat_list[c]
-unc_spectral_image = spectral_image_unc_interpolated_croplat_list[c]
-x_profile = x_profile_binned = lam_sumer
-y_profile = spectral_image[r, :]
-yerr_profile = unc_spectral_image[r, :]
-
-## Scaling the HRTS convolved profiles
-scaling_factor_qra = scaling_factor_map_binned_qra[r_binned,c_binned]
-scaling_factor_qrb = scaling_factor_map_binned_qrb[r_binned,c_binned]
-scaling_factor_qrl = scaling_factor_map_binned_qrl[r_binned,c_binned]
-rad_hrtsa_conv_scaled = scaling_factor_qra * rad_hrtsa_conv
-rad_hrtsb_conv_scaled = scaling_factor_qrb * rad_hrtsb_conv
-rad_hrtsl_conv_scaled = scaling_factor_qrl * rad_hrtsl_conv
-rad_hrtsa_conv_SUMERgrid_scaled = scaling_factor_qra * rad_hrtsa_conv_SUMERgrid
-rad_hrtsb_conv_SUMERgrid_scaled = scaling_factor_qrb * rad_hrtsb_conv_SUMERgrid
-rad_hrtsl_conv_SUMERgrid_scaled = scaling_factor_qrl * rad_hrtsl_conv_SUMERgrid
-
-## Crop spectra in a shorter range around Ne VIII
-### SUMER
-lam_sumer_crop, idx_sumer_crop = crop_range(list_to_crop=lam_sumer, range_values=wavelength_range_analysis)
-#### Not binned
-x_profile_crop = x_profile[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
-y_profile_crop = y_profile[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
-yerr_profile_crop = yerr_profile[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
-#### Binned
-x_profile_binned_crop = x_profile_binned[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
-y_profile_binned_crop = y_profile_binned[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
-yerr_profile_binned_crop = yerr_profile_binned[idx_sumer_crop[0]:idx_sumer_crop[1]+1]
-### HRTS
-lam_hrts_crop, idx_hrts_crop = crop_range(list_to_crop=lam_hrtsa, range_values=wavelength_range_analysis)
-rad_hrtsa_conv_scaled_crop = rad_hrtsa_conv_scaled[idx_hrts_crop[0]:idx_hrts_crop[1]+1]
-rad_hrtsb_conv_scaled_crop = rad_hrtsb_conv_scaled[idx_hrts_crop[0]:idx_hrts_crop[1]+1]
-rad_hrtsl_conv_scaled_crop = rad_hrtsl_conv_scaled[idx_hrts_crop[0]:idx_hrts_crop[1]+1]
-### HRTS in SUMER grid
-lam_hrts_SUMERgrid_crop, idx_hrtsSG_crop = crop_range(list_to_crop=lam_hrts_SUMERgrid, range_values=wavelength_range_analysis)
-rad_hrtsa_conv_SUMERgrid_scaled_crop = rad_hrtsa_conv_SUMERgrid_scaled[idx_hrtsSG_crop[0]:idx_hrtsSG_crop[1]+1]
-rad_hrtsb_conv_SUMERgrid_scaled_crop = rad_hrtsb_conv_SUMERgrid_scaled[idx_hrtsSG_crop[0]:idx_hrtsSG_crop[1]+1]
-rad_hrtsl_conv_SUMERgrid_scaled_crop = rad_hrtsl_conv_SUMERgrid_scaled[idx_hrtsSG_crop[0]:idx_hrtsSG_crop[1]+1]
-
-## Substract HRTS to SUMER
-#### Binned
-y_profile_binned_crop_corrected_qra = y_profile_binned_crop - rad_hrtsa_conv_SUMERgrid_scaled_crop
-y_profile_binned_crop_corrected_qrb = y_profile_binned_crop - rad_hrtsb_conv_SUMERgrid_scaled_crop
-y_profile_binned_crop_corrected_qrl = y_profile_binned_crop - rad_hrtsl_conv_SUMERgrid_scaled_crop
-yerr_profile_binned_crop_corrected_qra = yerr_profile_binned_crop
-yerr_profile_binned_crop_corrected_qrb = yerr_profile_binned_crop
-yerr_profile_binned_crop_corrected_qrl = yerr_profile_binned_crop
+	## Substract HRTS to SUMER
+	#### Binned
+	y_profile_binned_crop_corrected_qra = y_profile_binned_crop - rad_hrtsa_conv_SUMERgrid_scaled_crop
+	y_profile_binned_crop_corrected_qrb = y_profile_binned_crop - rad_hrtsb_conv_SUMERgrid_scaled_crop
+	y_profile_binned_crop_corrected_qrl = y_profile_binned_crop - rad_hrtsl_conv_SUMERgrid_scaled_crop
+	yerr_profile_binned_crop_corrected_qra = yerr_profile_binned_crop
+	yerr_profile_binned_crop_corrected_qrb = yerr_profile_binned_crop
+	yerr_profile_binned_crop_corrected_qrl = yerr_profile_binned_crop
 
 
 
-############################################################
-# 
+	############################################################
+	# 
 
-def lam_to_vkms(lamb): return 299792.4580*(lamb-lam_0)/lam_0 #[km/s]
-def vkms_to_lam(v_kms): return lam_0*((v_kms/299792.4580)+1) #velocity in [km/s]
-
-
-
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
-ax.errorbar(x=x_profile_binned_crop, y=y_profile_binned_crop, yerr=yerr_profile_binned_crop, color='black', linewidth=1, label='SUMER uncorrected')
-ax.errorbar(x=x_profile_binned_crop, y=y_profile_binned_crop_corrected_qra, yerr=yerr_profile_binned_crop_corrected_qra, color='blue', linewidth=1, label='SUMER corrected')
-ax.errorbar(x=lam_hrts_crop, y=rad_hrtsa_conv_scaled_crop, color='green', linewidth=1, label='HRTS convolved and scaled')
-ax.errorbar(x=lam_hrts_SUMERgrid_crop, y=rad_hrtsa_conv_SUMERgrid_scaled_crop, color='green', linewidth=0, marker='.', markersize=5, label='HRTS, SUMER grid')
-ax.set_title(f'Profile of one pixel binned. row, col = ({r_binned}, {c_binned})', fontsize=18)
-ax.set_aspect('auto')
-ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
-fig.supylabel('Latitude dimension (pixels)', fontsize=17)
-ax2 = ax.secondary_xaxis('top', functions=(lam_to_vkms, vkms_to_lam))
-ax2.set_xlabel('Doppler velocity [km/s]', fontsize=17)
-ax.axvline(x=rest_wavelength, color='brown', label=f'Rest wavelength: {vkms_to_lam}'r' $\pm$ 'f'{rest_wavelength}'' \u212B')
-ax.axvspan(rest_wavelength-rest_wavelength_unc, rest_wavelength+rest_wavelength_unc, color='brown', alpha=0.15)
-plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-plt.show(block=False)
+	def lam_to_vkms(lamb): return 299792.4580*(lamb-lam_0)/lam_0 #[km/s]
+	def vkms_to_lam(v_kms): return lam_0*((v_kms/299792.4580)+1) #velocity in [km/s]
 
 
 
-
-# TODO: if you want to subract HRTS for the not binned data, you have to calculate the scaling factor
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
-ax.errorbar(x=x_profile_crop, y=y_profile_crop, yerr=yerr_profile_crop, color='black', linewidth=1, label='SUMER uncorrected') 
-ax.set_title(f'Profile of one pixel (not binned). row, col = ({r}, {c})', fontsize=18)
-ax.set_aspect('auto')
-ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
-fig.supylabel('Latitude dimension (pixels)', fontsize=17)
-ax2 = ax.secondary_xaxis('top', functions=(lam_to_vkms, vkms_to_lam))
-ax2.set_xlabel('Doppler velocity [km/s]', fontsize=17)
-ax.axvline(x=rest_wavelength, label=f'Rest wavelength: {vkms_to_lam}'r' $\pm$ 'f'{rest_wavelength}'' \u212B')
-plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
-plt.show(block=False)
-
-
-############################################################
-# 
-
-
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
+	ax.errorbar(x=x_profile_binned_crop, y=y_profile_binned_crop, yerr=yerr_profile_binned_crop, color='black', linewidth=1, label='SUMER uncorrected')
+	ax.errorbar(x=x_profile_binned_crop, y=y_profile_binned_crop_corrected_qra, yerr=yerr_profile_binned_crop_corrected_qra, color='blue', linewidth=1, label='SUMER corrected')
+	ax.errorbar(x=lam_hrts_crop, y=rad_hrtsa_conv_scaled_crop, color='green', linewidth=1, label='HRTS convolved and scaled')
+	ax.errorbar(x=lam_hrts_SUMERgrid_crop, y=rad_hrtsa_conv_SUMERgrid_scaled_crop, color='green', linewidth=0, marker='.', markersize=5, label='HRTS, SUMER grid')
+	ax.set_title(f'Profile of one pixel binned. row, col = ({r_binned}, {c_binned})', fontsize=18)
+	ax.set_aspect('auto')
+	ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
+	fig.supylabel('Latitude dimension (pixels)', fontsize=17)
+	ax2 = ax.secondary_xaxis('top', functions=(lam_to_vkms, vkms_to_lam))
+	ax2.set_xlabel('Doppler velocity [km/s]', fontsize=17)
+	ax.axvline(x=rest_wavelength, color='brown', label=f'Rest wavelength: {vkms_to_lam}'r' $\pm$ 'f'{rest_wavelength}'' \u212B')
+	ax.axvspan(rest_wavelength-rest_wavelength_unc, rest_wavelength+rest_wavelength_unc, color='brown', alpha=0.15)
+	plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
+	plt.show(block=False)
 
 
 
 
-############################################################
-# 
+	# TODO: if you want to subract HRTS for the not binned data, you have to calculate the scaling factor
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,14))
+	ax.errorbar(x=x_profile_crop, y=y_profile_crop, yerr=yerr_profile_crop, color='black', linewidth=1, label='SUMER uncorrected') 
+	ax.set_title(f'Profile of one pixel (not binned). row, col = ({r}, {c})', fontsize=18)
+	ax.set_aspect('auto')
+	ax.set_xlabel('Longitude dimension (pixels)', fontsize=17)
+	fig.supylabel('Latitude dimension (pixels)', fontsize=17)
+	ax2 = ax.secondary_xaxis('top', functions=(lam_to_vkms, vkms_to_lam))
+	ax2.set_xlabel('Doppler velocity [km/s]', fontsize=17)
+	ax.axvline(x=rest_wavelength, label=f'Rest wavelength: {vkms_to_lam}'r' $\pm$ 'f'{rest_wavelength}'' \u212B')
+	plt.subplots_adjust(left=0.15, right=0.95, bottom=0.05, top=0.95, wspace=0, hspace=0.1)
+	plt.show(block=False)
+
+
+	############################################################
+	# 
+
 
 
 

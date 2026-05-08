@@ -333,6 +333,92 @@ plt.show(block=False)
 
 
 ######################################################
+
+
+lines_id = [[1539.705 , 'Si I'],
+[1539.738 , 'Si I'],
+[1539.849 , 'Fe II'],
+[1539.951 , 'Fe II'],
+[1540.287 , 'Si I'], 
+[1540.369 , 'Fe II'],
+[1540.706 , 'Si I'],
+[1540.707 , 'Si I'],
+[1540.782 , 'Si I'],
+[1540.963 , 'Si I'],
+[1540.985 , 'Si I'],
+[1541.026 , 'Fe II'],
+[1541.033 , 'Fe II'],
+[1541.322 , 'Si I'],
+[1541.415 , 'Si I'],
+[1541.455 , 'Fe II'],
+[1542.186 , 'Si I'],
+[1542.269 , 'Si I'],
+[1542.340 , 'Si I'],
+[1542.432 , 'Si I']]
+
+
+lines_id = [
+#[1540.354 , 'Si I'],
+[1540.544 , 'Si I'],
+[1540.707 , 'Si I'],
+[1540.782 , 'Si I'],
+[1540.963 , 'Si I'],
+[1540.978 , 'Si I'],
+#[1540.985 , 'Si I'],
+[1541.026 , 'Fe II'],
+#[1541.033 , 'Fe II'],
+[1541.064 , 'Si I'],
+#[1541.178 , 'Si I'],
+#[1541.198 , 'Si I'],
+#[1541.322 , 'Si I']
+]
+
+
+
+### PAPER image: spectra sumer and hrts together, and identified lines
+
+x_lims = [max(min(v_hrtsa_cropNeVIII), min(v_sumer_cropNeVIII)),      min(max(v_hrtsa_cropNeVIII), max(v_sumer_cropNeVIII))]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
+## HRTS scaled and convolved
+ax.errorbar(x=v_hrtsa_cropNeVIII, y=rad_hrtsa_conv_scaled_cropNeVIII, linestyle='--', linewidth=line_width, color=color_hrts_qra, label='HRTS QS-A')
+ax.errorbar(x=v_hrtsb_cropNeVIII, y=rad_hrtsb_conv_scaled_cropNeVIII, linestyle='--', linewidth=line_width, color=color_hrts_qrb, label='HRTS QS-B')
+## SUMER uncorrected
+#ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, linestyle='-', marker='.', markersize=10, linewidth=line_width, color=color_sumer_uncorrected, label='SUMER uncorrected')
+ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, linestyle='-', linewidth=line_width, color=color_sumer_uncorrected, label='SUMER uncorrected')
+## SUMER corrected
+ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, linestyle='-', linewidth=line_width, color=color_hrts_qra, label='SUMER corrected, QS-A')
+ax.errorbar(x=v_sumer_cropNeVIII, y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, linestyle='-', linewidth=line_width, color=color_hrts_qrb, label='SUMER corrected, QS-B')
+## 
+ax.axvline(x=0, color='black', linestyle=':', linewidth=1.5, label=rest_wavelength_label_figures)
+ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
+ax.set_title(f'SUMER spectrum of the CH uncorrected and corrected with HRTS', fontsize=title_size)
+ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
+#ax.legend(fontsize=legend_size)
+# legend in desired order:
+handles, labels = ax.get_legend_handles_labels()
+order = [
+    labels.index('SUMER uncorrected'),
+    labels.index('HRTS QS-A'),
+    labels.index('HRTS QS-B'),
+    labels.index('SUMER corrected, QS-A'),
+    labels.index('SUMER corrected, QS-B'),
+    labels.index(rest_wavelength_label_figures),]
+ax.legend([handles[i] for i in order], [labels[i] for i in order], fontsize=legend_size-2)
+ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size) 
+ax.set_xlim(x_lims)
+plt.tight_layout()
+# Add vertical lines and annotations at the upper part of the panel
+_, ymax = ax.get_ylim() # Get the current Y-axis limits
+for wavelength_i, symbol_i in lines_id:
+	v_i = vkms_doppler(lamb=wavelength_i, lamb_0=lam_0)
+	ax.axvline(x=v_i, color='green', linestyle='--')
+	ax.text(v_i+0.2, ymax * 0.55, f'{symbol_i} - {wavelength_i}', rotation=90, verticalalignment='top', fontsize=10, color='green') # Position the text near the top of the plot panel, slightly below the max y-limit
+if save_paper_images == 'yes':
+    fig_name = 'spectra_sumer_and_hrts_together_and_line_identification'
+    plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
+######################################################
 # Fit uncorrected Ne VIII line
 
 x_uncorrected = lam_sumer_cropNeVIII
