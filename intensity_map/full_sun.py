@@ -1,13 +1,13 @@
 #  Inputs
 
 save_paper_images = 'no'
-folder_name = '../outputs/paper_figures/v3' #name of the folder where you save the images
+folder_name = '../outputs/paper_figures' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 
-eit_wavelength = 195 #171, 195, 284, or 304 [Angstrom]
+eit_wavelength = 171 #171, 195, 284, or 304 [Angstrom]
 eit_time = 'late' #'early' or 'late' (early: around 1 or 4 am; late: around 6 or 7 am)
 
 
@@ -17,7 +17,8 @@ eit_time = 'late' #'early' or 'late' (early: around 1 or 4 am; late: around 6 or
 #range_percentage, threshold_value_type, instrument_line = [0., 5.], 'max', 'eit_195'
 #range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
 #range_percentage, threshold_value_type, instrument_line = [0., 30.], 'max', 'eit_195'
-range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
+#range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
+range_percentage, threshold_value_type, instrument_line = [0., 7.], 'max', 'eit_171'
 
 
 
@@ -35,11 +36,10 @@ show_plots_correction = 'yes'
 show_sumer_FOV = 'yes'
 show_contours_fullsun = 'yes'
 vmin_eit_fullsun, vmax_eit_fullsun = 5.5e1, 5e3 
-contour_intensity_eit_fullsun = 135. #110.
-#contour_intensity_eit_fullsun = 'upper_bound'
+#contour_intensity_eit_fullsun = 135. #110.
+contour_intensity_eit_fullsun = 'upper_bound'
 
 legend_size = 13
-
 
 
 ######################################################
@@ -875,5 +875,36 @@ plt.show(block=False)
 
 
 ##############################################################
+# Chromospheric network
+
+bound_SiII = 0.18
+
+
+# Load the intensity map and uncertainties
+intensitymap_loaded_dic_SiII = np.load('../outputs/intensity_map_SiII_interpolated.npz')
+intensity_map_SiII = intensitymap_loaded_dic_SiII['intensity_map'] #2D-array
+intensity_map_unc_SiII = intensitymap_loaded_dic_SiII['intensity_map_unc'] #2D-array
+intensity_map_croplat_SiII = intensitymap_loaded_dic_SiII['intensity_map_croplat'] #2D-array
+intensity_map_unc_croplat_SiII = intensitymap_loaded_dic_SiII['intensity_map_unc_croplat'] #2D-array
+line_center_label_SiII = intensitymap_loaded_dic_SiII['line_center_label'] 
+vmin_sumer_SiII, vmax_sumer_SiII = intensitymap_loaded_dic_SiII['vmin_vmax'] 
+
+
+
 # 
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,5))
+ax.pcolormesh(HPlon_rotcomp, HPlat_croplat, intensity_map_croplat_SiII, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer_SiII, vmax=vmax_sumer_SiII))
+ax.axis('equal') # Ensures equal scaling of axis x and y
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_title('Contours of the CH in EIT overlaid in the Ne VIII intensity map', fontsize=18)
+fig.supylabel('Helioprojective latitude (arcsec)', fontsize=16)
+plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspace=0)
+contour_upper = ax.contour(intensity_map_croplat_SiII[::-1], levels=[bound_SiII], colors='yellow', linewidths=1, extent=extent_eit_sumer_arcsec_contours)
+legend_elements = [mlines.Line2D([],[],color='yellow', label=f'{bound_SiII}')]
+ax.set_aspect('auto')
+plt.show(block=False)
+
+
+
 

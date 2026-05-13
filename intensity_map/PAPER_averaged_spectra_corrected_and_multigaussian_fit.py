@@ -1,7 +1,7 @@
 
 
-save_paper_images = 'yes'
-folder_name = '../outputs/paper_figures/v2' #name of the folder where you save the images
+save_paper_images = 'no'
+folder_name = '../outputs/paper_figures/v3' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
