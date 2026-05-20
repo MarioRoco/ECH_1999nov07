@@ -1,4 +1,5 @@
 
+
 ##############################################################
 # Import packages, variables, functions...
 
@@ -7,7 +8,14 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import datetime as dt
 from astropy.io import fits
-
+import matplotlib.patches as patches
+from scipy.odr import Model, RealData, ODR
+from scipy.interpolate import interp1d
+import matplotlib.lines as mlines
+import sunpy.map
+from astropy.coordinates import SkyCoord
+from sunpy.coordinates import frames
+import astropy.units as u
 
 ##############################################################
 # 
@@ -187,3 +195,7 @@ map2_aligned.plot(axes=ax2)
 ax2.set_title("Aligned")
 
 plt.show()
+
+
+
+

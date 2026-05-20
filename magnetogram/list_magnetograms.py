@@ -85,3 +85,4 @@ ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=1
 fig.supylabel('Helioprojective latitude (arcsec)', fontsize=17)
 plt.show(block=False)
 
+
