@@ -17,7 +17,7 @@ wavelength_range_to_analyze_NeVIII = [1540.2, 1541.4]
 
 
 # save average profile as .npy?
-save_average_profile = 'yes' 
+save_average_profile = 'no' 
 
 
 show_plots_correction = 'no'
@@ -69,11 +69,6 @@ intensity_map_unc_croplat = intensitymap_loaded_dic['intensity_map_unc_croplat']
 line_center_label = intensitymap_loaded_dic['line_center_label'] 
 vmin_sumer, vmax_sumer = intensitymap_loaded_dic['vmin_vmax'] 
 
-######################################################
-# Rest wavelength
-print('rest_wavelength_label =', rest_wavelength_label)
-print('Rest wavelength Ne VIII (2nd order): (lam_0 +- lam_unc_0) =', lam_0, r'$\pm$', lam_unc_0, '\u212B')
-print('Uncertainty of the rest wavelengh in km/s =', v_unc_0, 'km/s')
 
 ######################################################
 
@@ -105,7 +100,7 @@ lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from
 # Substract HRTS
 
 #subtract HRTS QR-A
-fsh_qra = fun_scale_hrts(hrts_qr='a', lamb_0=lamb_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+fsh_qra = fun_scale_hrts(hrts_qr='a', lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
 lam_sumer_cropNeVIII = fsh_qra['lam_sumer_cropNeVIII']
 rad_sumer_cropNeVIII = fsh_qra['rad_sumer_cropNeVIII']
 erad_sumer_cropNeVIII = fsh_qra['erad_sumer_cropNeVIII']
@@ -125,7 +120,7 @@ rad_hrtsa_conv_scaled_cropNeVIII = fsh_qra['rad_hrts_conv_scaled_cropNeVIII']
 erad_hrtsa_conv_scaled_cropNeVIII = fsh_qra['erad_hrts_conv_scaled_cropNeVIII']
 
 #subtract HRTS QR-B
-fsh_qrb = fun_scale_hrts(hrts_qr='b', lamb_0=lamb_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+fsh_qrb = fun_scale_hrts(hrts_qr='b', lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
 rad_sumer_cropNeVIII_corrected_qrb = fsh_qrb['rad_sumer_cropNeVIII_corrected']
 erad_sumer_cropNeVIII_corrected_qrb = fsh_qrb['erad_sumer_cropNeVIII_corrected']
 lam_hrtsb = fsh_qrb['lam_hrts']
@@ -142,7 +137,7 @@ rad_hrtsb_conv_scaled_cropNeVIII = fsh_qrb['rad_hrts_conv_scaled_cropNeVIII']
 erad_hrtsb_conv_scaled_cropNeVIII = fsh_qrb['erad_hrts_conv_scaled_cropNeVIII']
 
 #subtract HRTS QR-L
-fsh_qrl = fun_scale_hrts(hrts_qr='l', lamb_0=lamb_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_conv, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
+fsh_qrl = fun_scale_hrts(hrts_qr='l', lamb_0=lam_0, lam_sumer=lam_sumer_av, rad_sumer=rad_sumer_av, erad_sumer=erad_sumer_av, fwhm_conv=fwhm_to_convolve, wavelength_range_to_average=wavelength_range_to_average, wavelength_range_to_analyze_NeVIII=wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left=wavelength_range_scalefactor_left, wavelength_range_scalefactor_right=wavelength_range_scalefactor_right, show_plot=show_plots_correction)
 rad_sumer_cropNeVIII_corrected_qrl = fsh_qrl['rad_sumer_cropNeVIII_corrected']
 erad_sumer_cropNeVIII_corrected_qrl = fsh_qrl['erad_sumer_cropNeVIII_corrected']
 lam_hrtsl = fsh_qrl['lam_hrts']
@@ -216,8 +211,8 @@ ax.errorbar(x=lam_sumer_av, y=rad_sumer_av, yerr=erad_sumer_av, color='blue', li
 ax.set_title(f'SOHO/SUMER, profile averaged', fontsize=18) 
 ax.set_xlabel('Wavelength (\u212B)', color='black', fontsize=16)
 ax.set_ylabel(f'Av. spectral radiance [W/sr/m^2/Angstroem]', color='black', fontsize=16)
-ax.axvline(lamb_0, color='green', linewidth=1., label=f'Rest wavelength ({lamb_0})'' \u212B')
-ax.axvspan(lamb_0-lamb_unc_0, lamb_0+lamb_unc_0, color='green', alpha=0.2)
+ax.axvline(lam_0, color='green', linewidth=1., label=f'Rest wavelength ({lam_0})'' \u212B')
+ax.axvspan(lam_0-lam_unc_0, lam_0+lam_unc_0, color='green', alpha=0.2)
 ax.legend()
 plt.show(block=False)
 
@@ -228,26 +223,26 @@ ax.errorbar(x=lam_sumer_cropNeVIII, y=rad_sumer_cropNeVIII, yerr=erad_sumer_crop
 ax.set_title(f'SOHO/SUMER, profile averaged', fontsize=18) 
 ax.set_xlabel('Wavelength (\u212B)', color='black', fontsize=16)
 ax.set_ylabel(f'Av. spectral radiance [W/sr/m^2/Angstroem]', color='black', fontsize=16)
-ax.axvline(lamb_0, color='green', linewidth=1., label=f'Rest wavelength ({lamb_0})'' \u212B')
-ax.axvspan(lamb_0-lamb_unc_0, lamb_0+lamb_unc_0, color='green', alpha=0.2)
+ax.axvline(lam_0, color='green', linewidth=1., label=f'Rest wavelength ({lam_0})'' \u212B')
+ax.axvspan(lam_0-lam_unc_0, lam_0+lam_unc_0, color='green', alpha=0.2)
 ax.legend()
 plt.show(block=False)
 
 
 # Plot: Comparison SUMER corrected and uncorrected
 fig, ax = plt.subplots(figsize=(12, 5))
-#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
+#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
 title_ = f'Comparison SUMER {range_percentage} % corrected and uncorrected with HRTS - QR A'
 title_ = r'Comparison SUMER $\leq$ 4 % corrected and uncorrected with HRTS - QR A'
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, color=color_sumer_corrected, linestyle='-', linewidth=2., label='SUMER corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_hrtsa_cropNeVIII, lamb_0=lamb_0), y=rad_hrtsa_conv_scaled_cropNeVIII, yerr=erad_hrtsa_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR A') #Real spectrum (SUMER)
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, color=color_sumer_corrected, linestyle='-', linewidth=2., label='SUMER corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_hrtsa_cropNeVIII, lamb_0=lam_0), y=rad_hrtsa_conv_scaled_cropNeVIII, yerr=erad_hrtsa_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR A') #Real spectrum (SUMER)
 ax.axvline(x=0, color='black', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS QR-A', fontsize=18)
 ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
-ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsa_cropNeVIII), lamb_0=lamb_0), vkms_doppler(lamb=max(lam_hrtsa_cropNeVIII), lamb_0=lamb_0)])
+ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsa_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrtsa_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12, loc='upper left')
 ax.set_yscale('linear')
 plt.show(block=False)
@@ -255,18 +250,18 @@ plt.show(block=False)
 
 # Plot: Comparison SUMER corrected and uncorrected
 fig, ax = plt.subplots(figsize=(12, 5))
-#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
+#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
 title_ = f'Comparison SUMER {range_percentage} % corrected and uncorrected with HRTS - QR B'
 title_ = r'Comparison SUMER $\leq$ 4 % corrected and uncorrected with HRTS - QR B'
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, color=color_sumer_corrected, linestyle='-', linewidth=2., label='SUMER corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_hrtsb_cropNeVIII, lamb_0=lamb_0), y=rad_hrtsb_conv_scaled_cropNeVIII, yerr=erad_hrtsb_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR B') #Real spectrum (SUMER)
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, color=color_sumer_corrected, linestyle='-', linewidth=2., label='SUMER corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_hrtsb_cropNeVIII, lamb_0=lam_0), y=rad_hrtsb_conv_scaled_cropNeVIII, yerr=erad_hrtsb_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR B') #Real spectrum (SUMER)
 ax.axvline(x=0, color='black', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS QR-B', fontsize=18)
 ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
-ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsb_cropNeVIII), lamb_0=lamb_0), vkms_doppler(lamb=max(lam_hrtsb_cropNeVIII), lamb_0=lamb_0)])
+ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsb_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrtsb_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12, loc='upper left')
 ax.set_yscale('linear')
 plt.show(block=False)
@@ -274,18 +269,18 @@ plt.show(block=False)
 
 # Plot: Comparison SUMER corrected and uncorrected
 fig, ax = plt.subplots(figsize=(12, 5))
-#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lamb_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
+#ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
 title_ = f'Comparison SUMER {range_percentage} % corrected and uncorrected with HRTS - QR L'
 title_ = r'Comparison SUMER $\leq$ 4 % corrected and uncorrected with HRTS - QR L'
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lamb_0), y=rad_sumer_cropNeVIII_corrected_qrl, yerr=erad_sumer_cropNeVIII_corrected_qrl, color=color_sumer_corrected, linestyle='-', linewidth=2., label='SUMER corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_hrtsl_cropNeVIII, lamb_0=lamb_0), y=rad_hrtsl_conv_scaled_cropNeVIII, yerr=erad_hrtsl_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR L') #Real spectrum (SUMER)
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qrl, yerr=erad_sumer_cropNeVIII_corrected_qrl, color=color_sumer_corrected, linestyle='-', linewidth=2., label='SUMER corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_hrtsl_cropNeVIII, lamb_0=lam_0), y=rad_hrtsl_conv_scaled_cropNeVIII, yerr=erad_hrtsl_conv_scaled_cropNeVIII, color='black', linestyle='--', linewidth=2., label='HRST - QR L') #Real spectrum (SUMER)
 ax.axvline(x=0, color='black', linestyle=':', linewidth=2., label='Rest wavelength of Ne VIII/2')
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax.set_title(f'Comparison SUMER before and after correction with HRTS QR-L', fontsize=18)
 ax.set_xlabel('Doppler shift (km/s)', fontsize=15)#'Wavelength (nm)'
 ax.set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=15)
-ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsl_cropNeVIII), lamb_0=lamb_0), vkms_doppler(lamb=max(lam_hrtsl_cropNeVIII), lamb_0=lamb_0)])
+ax.set_xlim([vkms_doppler(lamb=min(lam_hrtsl_cropNeVIII), lamb_0=lam_0), vkms_doppler(lamb=max(lam_hrtsl_cropNeVIII), lamb_0=lam_0)])
 ax.legend(fontsize=12, loc='upper left')
 ax.set_yscale('linear')
 plt.show(block=False)
