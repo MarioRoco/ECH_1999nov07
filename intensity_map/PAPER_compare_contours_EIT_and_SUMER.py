@@ -1,27 +1,19 @@
 #  Inputs
 
 save_paper_images = 'no'
-folder_name = '../outputs/paper_figures/v3' #name of the folder where you save the images
+folder_name = '../outputs/paper_figures/v2' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
-
 eit_wavelength = 195 #171, 195, 284, or 304 [Angstrom]
 eit_time = 'late' #'early' or 'late' (early: around 1 or 4 am; late: around 6 or 7 am)
 
-# Threshold value: label (type) and range of percentageRange percentage of the threshold value
-percentage_eit, threshold_value_type_eit = 4., 'max'
+# EIT's threshold value: percentage of the threshold value and label of the threshold value
+percentage_eit, threshold_value_type_eit = 4., 'max' #'max', 'min', 'mean', 'median'
 
-
-#eit_wavelength = 171 #171, 195, 284, or 304 [Angstrom]
-#eit_time = 'late' #'early' or 'late' (early: around 1 or 4 am; late: around 6 or 7 am)
-#percentage_eit, threshold_value_type_eit = 7., 'max'
-
-
-# Threshold value: label (type) and range of percentageRange percentage of the threshold value
-#percentage_sumer, threshold_value_type_sumer = 4., 'max' #'max', 'min', 'mean', 'median'
-percentage_sumer, threshold_value_type_sumer = 6., 'max' #'max', 'min', 'mean', 'median'
+# SUMER's's threshold value: percentage of the threshold value and label of the threshold value
+percentage_sumer, threshold_value_type_sumer = 6.5, 'max' #'max', 'min', 'mean', 'median'
 
 
 
@@ -33,6 +25,9 @@ contour_intensity_eit_fullsun = 135. #110.
 #contour_intensity_eit_fullsun = 'upper_bound'
 
 legend_size = 13
+
+color_contours_eit = 'yellow'
+color_contours_sumer = 'magenta'
 
 
 
@@ -145,6 +140,7 @@ x_px_crop_right = int(np.round(X__HP_to_pixel(x_HP=HPlon_rotcomp[-1], header_eit
 # Crop EIT array
 data_eit_crop = data_eit[y_px_crop_top:y_px_crop_bottom+1, x_px_crop_left:x_px_crop_right+1]
 
+"""
 # Corrected alignment
 dx_px = 0
 dy_px = -6
@@ -152,7 +148,22 @@ data_eit_crop_corrected = data_eit[y_px_crop_top+dy_px : y_px_crop_bottom+dy_px,
 
 # Slit position
 HPlon_slit_rotcomp_corrected = HPlon_rotcomp[closest_index + dx_px]
+"""
 HPlat_slit_croplat_corrected = HPlat_croplat[[0,-1]]
+
+
+# Corrected alignment ('NeVIII', 195, late)
+dx_px_left = -1
+dx_px_right = -1
+dy_px_top = -4
+dy_px_bottom = -7
+vmin_eit, vmax_eit = 5e1, 1e3
+vmin_eit, vmax_eit = 3e1, 5e3
+
+data_eit_crop_corrected = data_eit[y_px_crop_top+dy_px_top : y_px_crop_bottom+dy_px_bottom, x_px_crop_left+dx_px_left : x_px_crop_right+dx_px_right]
+
+# Slit position
+HPlon_slit_rotcomp_corrected = HPlon_rotcomp[closest_index + dx_px_left]
 
 
 
@@ -253,7 +264,7 @@ extent_eit_sumer_arcsec_contours = [HPlon_rotcomp[0], HPlon_rotcomp[-1], HPlat_c
 ######################################################
 
 # Bound EIT
-_, bound_eit = get_bounds(intensitymap_croplat=data_eit_crop_corrected, range_percentage=[0., percentage_eit], threshold_value_type=threshold_value_type_eit)
+_, bound_eit = get_bounds(intensitymap_croplat=data_eit_crop, range_percentage=[0., percentage_eit], threshold_value_type=threshold_value_type_eit)
 print('bound_eit =', bound_eit)
 
 #Bound SUMER
@@ -265,7 +276,7 @@ print('bound_sumer =', bound_sumer)
 ######################################################
 # Show image of the intensity map with the contours and the pixels inside the contours
 
-
+"""
 ### EIT and SUMER maps with contours
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
 ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
@@ -289,10 +300,42 @@ contour_upper = ax[1].contour(intensity_map_croplat[::-1], levels=[bound_sumer],
 ax[0].set_aspect('auto')
 ax[1].set_aspect('auto')
 if save_paper_images == 'yes':
-	    fig_name = 'intensity_maps_SUMER_EIT_and_contours'
-	    plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+    fig_name = 'intensity_maps_SUMER_EIT_and_contours'
+    plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
+"""
 
 
 
 
+### EIT and SUMER maps with contours
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9.8,10.5), sharex=True)
+vmin_eit, vmax_eit = 4e1, 3e3
+#ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
+ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
+#ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
+#ax[1].pcolormesh(HPlon_rotcomp, HPlat_croplat, intensity_map_croplat, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer))
+ax[1].imshow(intensity_map_croplat, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer), extent=extent_eit_sumer_arcsec_image)
+ax[1].axis('equal') # Ensures equal scaling of axis x and y
+ax[1].set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+fig.supylabel('Helioprojective latitude (arcsec)', fontsize=17)
+ax[0].text(1.02, 0.5, f'EIT-{header_eit["WAVELNTH"]}', fontsize=22,transform=ax[0].transAxes, va='center', ha='left', rotation=90)
+ax[1].text(1.02, 0.5, f'SUMER-{line_center_label}', fontsize=22,transform=ax[1].transAxes, va='center', ha='left', rotation=90)
+plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspace=0)
+#ax[0].axvline(x=HPlon_slit_rotcomp_corrected, linestyle='-', linewidth=0.8, color='red', label='Slit position during\n EIT image')
+#ax[1].axvline(x=HPlon_slit_rotcomp_corrected, linestyle='-', linewidth=0.8, color='red')
+contour_sumer = ax[0].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors='orange', linewidths=1, extent=extent_eit_sumer_arcsec_contours)
+contour_sumer = ax[1].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors='orange', linewidths=1, extent=extent_eit_sumer_arcsec_contours)
+contour_lower = ax[0].contour(data_eit_crop_corrected[::-1], levels=[bound_eit], colors=color_contours_eit, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax[0].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors=color_contours_sumer, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+legend_elements = [
+    mlines.Line2D([],[],color=color_contours_eit, label=f'{bound_eit} %'),
+    mlines.Line2D([],[],color=color_contours_sumer, label=f'{bound_sumer} %')]
+contour_lower = ax[1].contour(data_eit_crop_corrected[::-1], levels=[bound_eit], colors=color_contours_eit, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax[1].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors=color_contours_sumer, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+#ax[0].set_xlim([HPlon_rotcomp[0], HPlon_rotcomp[-1]])
+#ax[1].set_xlim([HPlon_rotcomp[0], HPlon_rotcomp[-1]])
+if save_paper_images == 'yes':
+    fig_name = 'intensity_maps_SUMER_EIT_and_contours'
+    plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)

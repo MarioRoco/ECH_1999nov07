@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -28,9 +27,7 @@ from PAPER_fig_params import *
 
 rest_wavelength_label_figures = f'Rest wavelength ({lam_0/2.}'' \u212B)'
 
-show_secondary_plots = 'no'
-
-def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv, wavelength_range_to_average, wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left, wavelength_range_scalefactor_right, show_plot='yes', title_fit_radiances='auto', title_scaled_HRTSspectrum='auto', title_ranges='auto', x_lims_ranges='auto', y_lims_ranges='auto', save_paper_images='no', folder_name='../paper_figures', save_dpi=300): 
+def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv, wavelength_range_to_average, wavelength_range_to_analyze_NeVIII, wavelength_range_scalefactor_left, wavelength_range_scalefactor_right, show_plot='yes', title_fit_radiances='auto', title_scaled_HRTSspectrum='auto', title_ranges='auto', x_lims_ranges='auto', y_lims_ranges='auto', save_paper_images='no', folder_name='../paper_figures', save_dpi=300, show_secondary_plots='no'): 
     
     ######################################################
     # HRTS
@@ -385,5 +382,3 @@ erad_hrts_cropNeVIII = fsh['erad_hrts_cropNeVIII']
 rad_hrts_conv_scaled_cropNeVIII = fsh['rad_hrts_conv_scaled_cropNeVIII']
 erad_hrts_conv_scaled_cropNeVIII = fsh['erad_hrts_conv_scaled_cropNeVIII']
 """
-
-
