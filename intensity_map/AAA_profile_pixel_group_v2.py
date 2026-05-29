@@ -3,6 +3,8 @@
 # polygon vertices are given as (row, col)
 poly_rc = [[66,122], [16,122], [16,176], [66,178]]
 poly_rc = [[294,190], [259,190], [214,231], [298,232]]
+poly_rc = [[285,144], [272,145], [272,148], [282,148]]
+poly_rc = [[272,155], [263,155], [265,159], [271,158]]
 #poly_rc = [[], [], [], [], [], [], [], []]
 
 save_paper_images = 'no'
@@ -293,15 +295,188 @@ extent_eit_sumer_arcsec_contours = [HPlon_rotcomp[0], HPlon_rotcomp[-1], HPlat_c
 lower_bound_eit, upper_bound_eit = get_bounds(intensitymap_croplat=data_eit_crop, range_percentage=range_percentage, threshold_value_type=threshold_value_type)
 print('lower_bound_eit, upper_bound_eit =', lower_bound_eit, ',', upper_bound_eit)
 
+##############################################################
+##############################################################
+##############################################################
+# Dopplermap and BR asymmetry map
+
+# Load the intensity map and uncertainties
+dopplermap_BRmap_loaded_dic = np.load('../outputs/dopplermap_BRmap.npz')
+ddopplershift_map_binned_HRTSsub_lessmedian = dopplermap_BRmap_loaded_dic['ddopplershift_map_binned_HRTSsub_lessmedian']
+BR_asymmetry_map_gaussian_binned_corrected_normalized = dopplermap_BRmap_loaded_dic['BR_map']
+
+
+######################################################
+# Add pixels addresses from the Ne VIII intensity map to the Dopplermap 
+
+Z = intensity_map_croplat # Z is your 2D array
+
+
+### Plot intensity map with contours, coordinates, and pixel scale
+xlon1 = 0.
+xlon2 = Z.shape[1]-1.
+ylon1 = HPlon_rotcomp[0]
+ylon2 = HPlon_rotcomp[-1]
+mlon = (ylon2-ylon1)/(xlon2-xlon1)
+blon = HPlon_rotcomp[0]
+def pixels_to_HPlon(x): return mlon * x + blon #x=np.arange(0, Z.shape[1])
+def HPlon_to_pixels(x): return (x-blon)/mlon #HPlon_rotcomp
+
+
+
+xlat1 = 0
+xlat2 = Z.shape[0]-1
+ylat1 = HPlat_croplat[0]
+ylat2 = HPlat_croplat[-1]
+mlat = (ylat2-ylat1)/(xlat2-xlat1)
+blat = HPlat_croplat[0]
+def pixels_to_HPlat(x): return mlat * x + blat #x=np.arange(0, Z.shape[0])
+def HPlat_to_pixels(x): return (x-blat)/mlat #HPlat_croplat
+
+
+
+"""
+### Dopplermap with contours of EIT and secondary axis with pixel addresses from intensity_map_croplat
+vmin_vmax = [-12., 12.]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
+label_size = 18
+img = ax.imshow(ddopplershift_map_binned_HRTSsub_lessmedian, vmin=vmin_vmax[0], vmax=vmin_vmax[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
+#cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
+#cbar = fig.colorbar(img, cax=cax)
+#cbar.set_label(f'Doppler shift (km/s)', fontsize=16)
+ax.set_title(r'Doppler map, blends corrected', fontsize=20)
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+#plt.subplots_adjust(left=0.1, right=0.90, bottom=0.12, top=0.95, wspace=0, hspace=0)
+contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+legend_elements = [
+    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+ax.set_aspect('auto')
+# Secondary x-axis: arcsec -> pixels
+secax_x = ax.secondary_xaxis(
+    'top',
+    functions=(HPlon_to_pixels, pixels_to_HPlon)
+)
+secax_x.set_xlabel('Pixel x', fontsize=16)
+
+# Secondary y-axis: arcsec -> pixels
+secax_y = ax.secondary_yaxis(
+    'right',
+    functions=(HPlat_to_pixels, pixels_to_HPlat)
+)
+secax_y.set_ylabel('Pixel y', fontsize=16)
+if save_paper_images == 'yes':
+	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+"""
+
+ei = extent_eit_sumer_arcsec_image
+extent_eit_sumer_pxNeVIII_image = [HPlon_to_pixels(x=ei[0]), HPlon_to_pixels(x=ei[1]), pixels_to_HPlat(x=ei[2]), pixels_to_HPlat(x=ei[3])]
+ec = extent_eit_sumer_arcsec_contours
+extent_eit_sumer_pxNeVIII_contours = [HPlon_to_pixels(x=ec[0]), HPlon_to_pixels(x=ec[1]), pixels_to_HPlat(x=ec[2]), pixels_to_HPlat(x=ec[3])]
+
+
+### Dopplermap with contours of EIT and secondary axis with pixel addresses from intensity_map_croplat
+vmin_vmax = [-12., 12.]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
+label_size = 18
+img = ax.imshow(ddopplershift_map_binned_HRTSsub_lessmedian, vmin=vmin_vmax[0], vmax=vmin_vmax[1], cmap='seismic', extent=extent_eit_sumer_pxNeVIII_image)
+#cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
+#cbar = fig.colorbar(img, cax=cax)
+#cbar.set_label(f'Doppler shift (km/s)', fontsize=16)
+ax.set_title(r'Doppler map, blends corrected', fontsize=20)
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+#plt.subplots_adjust(left=0.1, right=0.90, bottom=0.12, top=0.95, wspace=0, hspace=0)
+contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_pxNeVIII_contours)
+contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_pxNeVIII_contours)
+legend_elements = [
+    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+ax.set_aspect('auto')
+# Secondary x-axis: arcsec -> pixels
+secax_x = ax.secondary_xaxis(
+    'top',
+    functions=(pixels_to_HPlon, HPlon_to_pixels)
+)
+
+# Secondary y-axis: arcsec -> pixels
+secax_y = ax.secondary_yaxis(
+    'right',
+    functions=(pixels_to_HPlat, HPlat_to_pixels)
+)
+secax_x.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+secax_y.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+ax.set_xlabel('Pixel x', fontsize=16)
+ax.set_ylabel('Pixel y', fontsize=16)
+if save_paper_images == 'yes':
+	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
+
+
+##############################################################
+##############################################################
+##############################################################
+
 
 ######################################################
 # Create a polygon that enclose the left region of the CH and mark all pixels inside the polygon and the CH
 
-Z = intensity_map_croplat # Z is your 2D array
+
+
+
+
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
+ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
+ax[1].pcolormesh(HPlon_rotcomp, HPlat_croplat, intensity_map_croplat, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer))
+ax[1].axis('equal') # Ensures equal scaling of axis x and y
+#ax[1].set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax[1].set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax[0].set_title('Contours of the CH in EIT overlaid in the Ne VIII intensity map', fontsize=18)
+fig.supylabel('Helioprojective latitude (arcsec)', fontsize=16)
+ax[0].text(1.02, 0.5, f'EIT-{header_eit["WAVELNTH"]}', fontsize=20,transform=ax[0].transAxes, va='center', ha='left', rotation=90)
+ax[1].text(1.02, 0.5, f'SUMER-{line_center_label}', fontsize=20,transform=ax[1].transAxes, va='center', ha='left', rotation=90)
+plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspace=0)
+#ax[0].grid(color='white')
+#ax[1].grid(color='white')
+#ax[0].axvline(x=HPlon_rotcomp[closest_index], linestyle='-', linewidth=0.8, color='red', label='Slit position during\n EIT image')
+#ax[1].axvline(x=HPlon_rotcomp[closest_index], linestyle='-', linewidth=0.8, color='red', label='Slit position during\n EIT image')
+contour_lower = ax[0].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax[0].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='yellow', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+legend_elements = [
+    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
+    mlines.Line2D([],[],color='yellow', label=f'{range_percentage[1]} %')]
+contour_lower = ax[1].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='yellow', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+#ax[0].axvline(x=HPlon_slit_rotcomp_corrected, linewidth=1.5, color='red', label='slit position')
+ax[0].set_aspect('auto')
+ax[1].set_aspect('auto')
+if save_paper_images == 'yes':
+	fig_name = 'contours_EIT__intensity_maps_SUMER_EIT_and_contours'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+
+
+secax_x = ax[1].secondary_xaxis('top', functions=(HPlon_to_pixels, pixels_to_HPlon))
+secax_x.set_xlabel('Pixel x')
+
+secax_y = ax[1].secondary_yaxis('right', functions=(HPlat_to_pixels, pixels_to_HPlat))
+secax_y.set_ylabel('Pixel y')
+
+plt.show(block=False)
+
+
+######################################################
+### Create polygon and plot it
 
 import numpy as np
 from matplotlib.path import Path
 from matplotlib.patches import Polygon
+from skimage.measure import find_contours
 
 
 # polygon vertices are given as (row, col)
@@ -319,10 +494,54 @@ y_row_list_plot = rowscols_croplat[:,0] # convert the list of pairs [row, column
 x_col_list_plot = rowscols_croplat[:,1]
 print('Number of pixels in EIT:', len(rowscols_croplat))
 
+contours_region = find_contours(mask.astype(float), 0.5)
+
+
+
+### Dopplermap with contours of EIT and secondary axis with pixel addresses from intensity_map_croplat
+vmin_vmax = [-12., 12.]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
+label_size = 18
+img = ax.imshow(ddopplershift_map_binned_HRTSsub_lessmedian, vmin=vmin_vmax[0], vmax=vmin_vmax[1], cmap='seismic', extent=extent_eit_sumer_pxNeVIII_image)
+#cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
+#cbar = fig.colorbar(img, cax=cax)
+#cbar.set_label(f'Doppler shift (km/s)', fontsize=16)
+ax.set_title(r'Doppler map, blends corrected', fontsize=20)
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+#plt.subplots_adjust(left=0.1, right=0.90, bottom=0.12, top=0.95, wspace=0, hspace=0)
+contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_pxNeVIII_contours)
+contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_pxNeVIII_contours)
+legend_elements = [
+    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+ax.set_aspect('auto')
+# Secondary x-axis: arcsec -> pixels
+secax_x = ax.secondary_xaxis(
+    'top',
+    functions=(pixels_to_HPlon, HPlon_to_pixels)
+)
+
+# Secondary y-axis: arcsec -> pixels
+secax_y = ax.secondary_yaxis(
+    'right',
+    functions=(pixels_to_HPlat, HPlat_to_pixels)
+)
+secax_x.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+secax_y.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+ax.set_xlabel('Pixel x', fontsize=16)
+ax.set_ylabel('Pixel y', fontsize=16)
+contours = find_contours(mask.astype(float), 0.5)
+for c in contours_region:
+    ax.plot(c[:, 1], c[:, 0], color='cyan', linewidth=2)
+if save_paper_images == 'yes':
+	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
+
+
 
 # EIT and SUMER with the grid (for alignment)
-from skimage.measure import find_contours
-contours_region = find_contours(mask.astype(float), 0.5)
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,4))
 ax.imshow(intensity_map_croplat, norm=LogNorm(), cmap='Greys_r')
 ax.axis('auto') # Ensures equal scaling of axis x and y
@@ -731,115 +950,6 @@ erad_hrtsl_conv_scaled_cropNeVIII = profiles_loaded_dic['erad_hrtsl_conv_scaled_
 ""
 
 
-##############################################################
-##############################################################
-##############################################################
-# Dopplermap and BR asymmetry map
-
-# Load the intensity map and uncertainties
-dopplermap_BRmap_loaded_dic = np.load('../outputs/dopplermap_BRmap.npz')
-ddopplershift_map_binned_HRTSsub_lessmedian = dopplermap_BRmap_loaded_dic['ddopplershift_map_binned_HRTSsub_lessmedian']
-BR_asymmetry_map_gaussian_binned_corrected_normalized = dopplermap_BRmap_loaded_dic['BR_map']
-
-
-
-### Dopplermap without contours
-vmin_vmax = [-12., 12.]
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
-label_size = 18
-img = ax.imshow(ddopplershift_map_binned_HRTSsub_lessmedian, vmin=vmin_vmax[0], vmax=vmin_vmax[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
-cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
-cbar = fig.colorbar(img, cax=cax)
-cbar.set_label(f'Doppler shift (km/s)', fontsize=16)
-ax.set_title(r'Doppler map, blends corrected', fontsize=20)
-#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
-ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
-ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
-ax.set_aspect('auto')
-if save_paper_images == 'yes':
-	fig_name = 'dopplermap_NeVIII'
-	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
-plt.show(block=False)
-
-
-
-### PAPER image: Dopplermap with contours of EIT
-vmin_vmax = [-12., 12.]
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
-label_size = 18
-img = ax.imshow(ddopplershift_map_binned_HRTSsub_lessmedian, vmin=vmin_vmax[0], vmax=vmin_vmax[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
-cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
-cbar = fig.colorbar(img, cax=cax)
-cbar.set_label(f'Doppler shift (km/s)', fontsize=16)
-ax.set_title(r'Doppler map, blends corrected', fontsize=20)
-#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
-ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
-ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
-#plt.subplots_adjust(left=0.1, right=0.90, bottom=0.12, top=0.95, wspace=0, hspace=0)
-contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-legend_elements = [
-    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
-ax.set_aspect('auto')
-if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__dopplermap_NeVIII'
-	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
-plt.show(block=False)
-
-
-
-
-### B-R asymmetry map without contours
-vmin_vmax_BR = [-1.,1.]
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
-img = ax.imshow(BR_asymmetry_map_gaussian_binned_corrected_normalized, vmin=vmin_vmax_BR[0], vmax=vmin_vmax_BR[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
-cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
-cbar = fig.colorbar(img, cax=cax)
-cbar.set_label('Red-blue asymmetry normalized', fontsize=16)
-ax.set_title('R-B normalized, blends corrected', fontsize=20)
-#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
-ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
-ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
-#plt.subplots_adjust(left=0.1, right=0.95, bottom=0.12, top=0.95, wspace=0, hspace=0)
-contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-legend_elements = [
-    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
-ax.set_aspect('auto')
-if save_paper_images == 'yes':
-	fig_name = 'asymmetrymap_NeVIII'
-	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
-plt.show(block=False)
-
-
-
-### PAPER image: B-R asymmetry map with contours of EIT
-vmin_vmax_BR = [-1.,1.]
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
-img = ax.imshow(BR_asymmetry_map_gaussian_binned_corrected_normalized, vmin=vmin_vmax_BR[0], vmax=vmin_vmax_BR[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
-cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
-cbar = fig.colorbar(img, cax=cax)
-cbar.set_label('Red-blue asymmetry normalized', fontsize=16)
-ax.set_title('R-B normalized, blends corrected', fontsize=20)
-#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
-ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
-ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
-#plt.subplots_adjust(left=0.1, right=0.95, bottom=0.12, top=0.95, wspace=0, hspace=0)
-contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-legend_elements = [
-    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
-ax.set_aspect('auto')
-if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__asymmetrymap_NeVIII'
-	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
-plt.show(block=False)
-
-
-
 
 ##############################################################
 ##############################################################
@@ -1067,6 +1177,109 @@ ax.set_aspect('equal', adjustable='box')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
 	fig_name = 'contours_EIT__full_sun_and_SUMER_FOV_bigcontour_and_slit'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
+
+##############################################################
+##############################################################
+##############################################################
+# Dopplermap and BR asymmetry map
+
+
+
+### Dopplermap without contours
+vmin_vmax = [-12., 12.]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
+label_size = 18
+img = ax.imshow(ddopplershift_map_binned_HRTSsub_lessmedian, vmin=vmin_vmax[0], vmax=vmin_vmax[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
+cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
+cbar = fig.colorbar(img, cax=cax)
+cbar.set_label(f'Doppler shift (km/s)', fontsize=16)
+ax.set_title(r'Doppler map, blends corrected', fontsize=20)
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+ax.set_aspect('auto')
+if save_paper_images == 'yes':
+	fig_name = 'dopplermap_NeVIII'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
+
+
+### PAPER image: Dopplermap with contours of EIT
+vmin_vmax = [-12., 12.]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
+label_size = 18
+img = ax.imshow(ddopplershift_map_binned_HRTSsub_lessmedian, vmin=vmin_vmax[0], vmax=vmin_vmax[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
+cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
+cbar = fig.colorbar(img, cax=cax)
+cbar.set_label(f'Doppler shift (km/s)', fontsize=16)
+ax.set_title(r'Doppler map, blends corrected', fontsize=20)
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+#plt.subplots_adjust(left=0.1, right=0.90, bottom=0.12, top=0.95, wspace=0, hspace=0)
+contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+legend_elements = [
+    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+ax.set_aspect('auto')
+if save_paper_images == 'yes':
+	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
+
+
+
+### B-R asymmetry map without contours
+vmin_vmax_BR = [-1.,1.]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
+img = ax.imshow(BR_asymmetry_map_gaussian_binned_corrected_normalized, vmin=vmin_vmax_BR[0], vmax=vmin_vmax_BR[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
+cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
+cbar = fig.colorbar(img, cax=cax)
+cbar.set_label('Red-blue asymmetry normalized', fontsize=16)
+ax.set_title('R-B normalized, blends corrected', fontsize=20)
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+#plt.subplots_adjust(left=0.1, right=0.95, bottom=0.12, top=0.95, wspace=0, hspace=0)
+contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+legend_elements = [
+    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+ax.set_aspect('auto')
+if save_paper_images == 'yes':
+	fig_name = 'asymmetrymap_NeVIII'
+	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.show(block=False)
+
+
+
+### PAPER image: B-R asymmetry map with contours of EIT
+vmin_vmax_BR = [-1.,1.]
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,5))
+img = ax.imshow(BR_asymmetry_map_gaussian_binned_corrected_normalized, vmin=vmin_vmax_BR[0], vmax=vmin_vmax_BR[1], cmap='seismic', extent=extent_eit_sumer_arcsec_image)
+cax = fig.add_axes([0.91, 0.11, 0.02, 0.77])  # [left, bottom, width, height]
+cbar = fig.colorbar(img, cax=cax)
+cbar.set_label('Red-blue asymmetry normalized', fontsize=16)
+ax.set_title('R-B normalized, blends corrected', fontsize=20)
+#ax.set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
+ax.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
+ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
+#plt.subplots_adjust(left=0.1, right=0.95, bottom=0.12, top=0.95, wspace=0, hspace=0)
+contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
+legend_elements = [
+    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+ax.set_aspect('auto')
+if save_paper_images == 'yes':
+	fig_name = 'contours_EIT__asymmetrymap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
