@@ -88,8 +88,10 @@ from utils.NeVIII_rest_wavelength import *
 from PAPER_scale_hrts import *
 from PAPER_fig_params import * 
 
+
 rest_wavelength_label_figures = f'Rest wavelength ({lam_0/2.}'' \u212B)'
 #rest_wavelength_label_figures = 'Rest wavelength: 770.428 \u212B'
+
 
 ############################################################################################################
 ############################################################################################################
@@ -312,6 +314,31 @@ print('Number of pixels in SUMER:', len(rowscols_croplat_sumer_from_eit))
 data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
 # Average spectra of the pixels selected
 lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from_pixels_selected_from_interpolated_data(wavelength_range_=wavelength_range_to_average, data_interpolated_loaded_=data_interpolated_loaded, rows_cols_of_spectroheliogram_croplat=rowscols_croplat_sumer_from_eit)
+
+
+#################################################
+#################################################
+#################################################
+# Variation of parameters
+"""
+# Variation of SUMER instrumental profile
+#variation_instrumental_profile = 0.1
+#fwhm_to_convolve = (variation_instrumental_profile+1.)*fwhm_to_convolve
+
+
+l_hrts_left = 1531.609
+l_hrts_right = 1551.248
+l_sumer_left = 1531.550
+l_sumer_right = 1551.358
+lam_shift = (l_hrts_left - l_sumer_left)
+lam_delta = 1.0 + (l_hrts_right-l_sumer_right)/(l_hrts_right-l_hrts_left)
+lam_sumer_modified = (lam_sumer_av-l_hrts_left+lam_shift) * lam_delta + l_hrts_left
+
+#lam_sumer_av = lam_sumer_modified
+"""
+#################################################
+#################################################
+#################################################
 
 ############################################################################################################
 ############################################################################################################
