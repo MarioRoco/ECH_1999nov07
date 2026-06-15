@@ -452,6 +452,15 @@ for ii, range_percentage_i in enumerate(range_percentage_list):
 	lam_sumer_modified = (lam_sumer_av-l_hrts_left+lam_shift) * lam_delta + l_hrts_left
 
 	lam_sumer_av = lam_sumer_modified
+	
+	"""
+	lam_delta * lam_sumer_av + (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left)
+	y = mx+b
+	x = lam_sumer_av
+	m = lam_delta = 0.9943989001476705
+	b = (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left) = 8.637364478835252
+	"""
+	
 
 	#################################################
 	#################################################

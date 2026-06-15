@@ -1,12 +1,7 @@
 #  Inputs
 
-# polygon vertices are given as (row, col)
-poly_rc = [[27,21], [10,58], [17,82], [37,71], [39,47], [44,28], [35,17]] #left part
-#poly_rc = [[39,64], [37,71], [18,82], [0,110], [3,120], [37,105], [56,76], [56,70]] #right arm
-#poly_rc = [[], [], [], [], [], [], [], []]
-
 save_paper_images = 'no'
-folder_name = '../outputs/paper_figures/left_region_contours/v2' #name of the folder where you save the images
+folder_name = '../outputs/paper_figures/complementary_contours/v2' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
@@ -16,13 +11,12 @@ eit_wavelength = 195 #171, 195, 284, or 304 [Angstrom]
 eit_time = 'late' #'early' or 'late' (early: around 1 or 4 am; late: around 6 or 7 am)
 
 
-# Threshold value: label (type) and range of percentageRange percentage of the threshold value
-#range_percentage, threshold_value_type, instrument_line = [0., 3.42], 'max', 'eit_195'
-#range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'sumer_NeVIII'
-#range_percentage, threshold_value_type, instrument_line = [0., 5.], 'max', 'eit_195'
-#range_percentage, threshold_value_type, instrument_line = [0., 60.], 'mean', 'eit_195'
-#range_percentage, threshold_value_type, instrument_line = [0., 30.], 'max', 'eit_195'
-range_percentage, threshold_value_type, instrument_line = [0., 4.], 'max', 'eit_195'
+# EIT: Threshold value: label (type) and range of percentageRange percentage of the threshold value
+range_percentage_eit, threshold_value_type_eit, instrument_line_eit = [0., 4.], 'max', 'eit_195'
+
+
+# SUMER: Threshold value: label (type) and range of percentageRange percentage of the threshold value
+range_percentage_sumer, threshold_value_type_sumer = [0., 6.5], 'max' #'max', 'min', 'mean', 'median'
 
 
 
@@ -46,7 +40,7 @@ wavelength_range_to_analyze_NeVIII = [1540.2, 1541.4]
 # save average profile as .npy?
 save_average_profile = 'no' 
 
-show_secondary_plots = 'no'
+show_secondary_plots = 'yes'
 show_plots_correction = 'yes'
 
 # Full Sun
@@ -93,8 +87,10 @@ from utils.NeVIII_rest_wavelength import *
 from PAPER_scale_hrts import *
 from PAPER_fig_params import * 
 
+
 rest_wavelength_label_figures = f'Rest wavelength ({lam_0/2.}'' \u212B)'
 #rest_wavelength_label_figures = 'Rest wavelength: 770.428 \u212B'
+
 
 ############################################################################################################
 ############################################################################################################
@@ -206,6 +202,11 @@ HPlat_slit_croplat_corrected = HPlat_croplat[[0,-1]]
 
 
 
+
+
+
+
+
 closest_index = closest_index_EIT_SUMER_dic[filename_eit]
 closest_time_sumer = closest_time_SUMER_to_EIT_dic[filename_eit]
 time_eit = time_EIT_dic[filename_eit]
@@ -286,183 +287,68 @@ extent_eit_sumer_arcsec_contours = [HPlon_rotcomp[0], HPlon_rotcomp[-1], HPlat_c
 
 
 ######################################################
+# EIT
 
 # Define intensity bin
 #lower_bound_eit, upper_bound_eit = get_bounds(intensitymap_croplat=data_eit_crop_corrected, range_percentage=range_percentage, threshold_value_type=threshold_value_type)
 #print('lower_bound_eit, upper_bound_eit =', lower_bound_eit, ',', upper_bound_eit)
-lower_bound_eit, upper_bound_eit = get_bounds(intensitymap_croplat=data_eit_crop, range_percentage=range_percentage, threshold_value_type=threshold_value_type)
+lower_bound_eit, upper_bound_eit = get_bounds(intensitymap_croplat=data_eit_crop, range_percentage=range_percentage_eit, threshold_value_type=threshold_value_type_eit)
 print('lower_bound_eit, upper_bound_eit =', lower_bound_eit, ',', upper_bound_eit)
 
-
-######################################################
-# Create a polygon that enclose the left region of the CH and mark all pixels inside the polygon and the CH
-
-Z = data_eit_crop_corrected # Z is your 2D array
-level_eit = upper_bound_eit
-
-import numpy as np
-from matplotlib.path import Path
-from matplotlib.patches import Polygon
-
-
-# polygon vertices are given as (row, col)
-poly_rc = np.array(poly_rc)
-poly_xy = poly_rc[:, ::-1]   # convert (row, col) -> (x, y) = (col, row)
-
-nrows_polygon, ncols_polygon = Z.shape
-rr_polygon, cc_polygon = np.indices((nrows_polygon, ncols_polygon))
-
-poly_path = Path(poly_rc[:, ::-1]) # If your polygon vertices are (row, col), Path expects (x, y), so pass them as (col, row)
-inside_poly = poly_path.contains_points(np.c_[cc_polygon.ravel(), rr_polygon.ravel()]).reshape(Z.shape) # Build a mask of pixels inside the polygon
-# Build a mask for the contour level
-inside_level = Z <= level_eit   # or Z <= level_eit depending on which side you want
-mask = inside_poly & inside_level # Intersection
-rowscols_croplat_eit = np.argwhere(mask) # (row, col) of all matching pixels
+# rows and columns inside the intensity bin  in EIT ,map
+rowscols_croplat_eit = np.argwhere((data_eit_crop_corrected>=lower_bound_eit) & (data_eit_crop_corrected<=upper_bound_eit))
 y_row_list_eit_plot = rowscols_croplat_eit[:,0] # convert the list of pairs [row, column] into 2 lists of rows and columns (for the scatterplot)
 x_col_list_eit_plot = rowscols_croplat_eit[:,1]
-print('Number of pixels in EIT:', len(rowscols_croplat_eit))
-
-
-
-
-# EIT and SUMER with the grid (for alignment)
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,4))
-ax.imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r')
-ax.axis('equal') # Ensures equal scaling of axis x and y
-ax.grid(color='white')
-contour_eit = ax.contour(data_eit_crop_corrected, levels=[level_eit], colors='red', linewidths=2)
-ax.scatter(x_col_list_eit_plot, y_row_list_eit_plot, marker='.', s=3, color='cyan')
-poly_patch = Polygon(poly_xy, closed=True, fill=False, edgecolor='lime', linewidth=2)
-ax.add_patch(poly_patch)
-plt.show(block=False)
-
-
+print('Number of pixels detected:', len(rowscols_croplat_eit))
 
 # rows and columns from EIT in SUMER
 rowscols_croplat_sumer_from_eit = map_pixels_array1_to_array2(arr1=data_eit_crop_corrected, arr2=intensity_map_croplat, pixel_address_list_1=rowscols_croplat_eit)
 rowscols_croplat_sumer_from_eit = np.array(rowscols_croplat_sumer_from_eit)
-y_row_list_sumer_plot = rowscols_croplat_sumer_from_eit[:,0] # convert the list of pairs [row, column] into 2 lists of rows and columns (for the scatterplot)
-x_col_list_sumer_plot = rowscols_croplat_sumer_from_eit[:,1]
+#y_row_list_sumer_plot = rowscols_croplat_sumer_from_eit[:,0] # convert the list of pairs [row, column] into 2 lists of rows and columns (for the scatterplot)
+#x_col_list_sumer_plot = rowscols_croplat_sumer_from_eit[:,1]
 print('Number of pixels in SUMER:', len(rowscols_croplat_sumer_from_eit))
 
-print('##################################')
-print('N PIXELS IN LEFT REGION:', len(rowscols_croplat_sumer_from_eit), '=', len(rowscols_croplat_sumer_from_eit)*150./3600., 'hrs')
-print('##################################')
+
+######################################################
+# SUMER
+
+# Define intensity bin
+lower_bound_sumer, upper_bound_sumer = get_bounds(intensitymap_croplat=intensity_map_croplat, range_percentage=range_percentage_sumer, threshold_value_type=threshold_value_type_sumer)
+print('lower_bound_sumer, upper_bound_sumer =', lower_bound_sumer, ',', upper_bound_sumer)
+
+
+# rows and columns inside the intensity bin
+rowscols_croplat_sumer = np.argwhere((intensity_map_croplat>=lower_bound_sumer) & (intensity_map_croplat<=upper_bound_sumer))
+#y_row_list_plot = rowscols_croplat_sumer[:,0] # convert the list of pairs [row, column] into 2 lists of rows and columns (for the scatterplot)
+#x_col_list_plot = rowscols_croplat_sumer[:,1]
+print('Number of pixels detected:', len(rowscols_croplat_sumer))
+
+
+######################################################
 
 
 
-# EIT and SUMER with the grid (for alignment)
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,4))
-ax.imshow(intensity_map_croplat, norm=LogNorm(), cmap='Greys_r')
-ax.axis('auto') # Ensures equal scaling of axis x and y
-ax.grid(color='white')
-ax.scatter(x_col_list_sumer_plot, y_row_list_sumer_plot, marker='.', s=3, color='cyan')
-plt.show(block=False)
+arr1 = np.ascontiguousarray(rowscols_croplat_sumer)
+arr2 = np.ascontiguousarray(rowscols_croplat_sumer_from_eit)
 
-
-
-
-
-from skimage.measure import find_contours
-contours_eit_region = find_contours(mask.astype(float), 0.5)
-fig, ax = plt.subplots(figsize=(9, 4))
-ax.imshow(Z, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r')
-ax.axis('equal')
-#ax.grid(color='white', alpha=0.3)
-#ax.add_patch(Polygon(poly_xy, closed=True, fill=False, edgecolor='lime', linewidth=2)) # full polygon outline
-#cs = ax.contour(Z, levels=[level_eit], colors='red', linewidths=1.5) # full contour level
-# selected region border from mask
-for c in contours_eit_region:
-    ax.plot(c[:, 1], c[:, 0], color='cyan', linewidth=1)
-plt.show(block=False)
-
-
-
-
-
-
-
-delta_lon_left = np.abs(HPlon_rotcomp[1] - HPlon_rotcomp[0])
-delta_lon_right = np.abs(HPlon_rotcomp[-2] - HPlon_rotcomp[-1])
-xlon1 = -0.5
-xlon2 = Z.shape[1]-1.+0.5
-ylon1 = HPlon_rotcomp[0] - delta_lon_left/2.
-ylon2 = HPlon_rotcomp[-1] + delta_lon_right/2.
-mlon = (ylon2-ylon1)/(xlon2-xlon1)
-blon = HPlon_rotcomp[0]
-HPlon_eit = mlon * np.arange(0, Z.shape[1]) + blon
-print('left eit: ', ylon1)
-print('left sumer: ', HPlon_rotcomp[0]-np.abs(HPlon_rotcomp[1]-HPlon_rotcomp[0])/2.)
-print('right eit: ', ylon2)
-print('right sumer: ', HPlon_rotcomp[-1]+np.abs(HPlon_rotcomp[-1]-HPlon_rotcomp[-2])/2.)
-
-
-
-
-delta_lat_high = np.abs(HPlat_croplat[1] - HPlat_croplat[0])
-delta_lat_low =  np.abs(HPlat_croplat[-1] - HPlat_croplat[-2])
-xlat1 = -0.5
-xlat2 = Z.shape[0]-1.+0.5
-ylat1 = HPlat_croplat[0] + delta_lat_high/2.
-ylat2 = HPlat_croplat[-1] - delta_lat_low/2.
-mlat = (ylat2-ylat1)/(xlat2-xlat1)
-blat = HPlat_croplat[0]
-HPlat_eit = mlat * np.arange(0, Z.shape[0]) + blat
-print('low eit: ', ylat1)
-print('low sumer: ', HPlat_croplat[0]+np.abs(HPlat_croplat[1]-HPlat_croplat[0])/2.)
-print('high eit: ', ylat2)
-print('high sumer: ', HPlat_croplat[-1]-np.abs(HPlat_croplat[-1]-HPlat_croplat[-2])/2.)
-
-
-
-
-from skimage.measure import find_contours
-from matplotlib.path import Path
-from matplotlib.patches import Polygon
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-
-# polygon vertices in pixel indices
-poly_path = Path(poly_rc[:, ::-1])
-
-nrows, ncols = data_eit_crop_corrected.shape
-rr, cc = np.indices((nrows, ncols))
-inside_poly = poly_path.contains_points(np.c_[cc.ravel(), rr.ravel()]).reshape(data_eit_crop_corrected.shape)
-inside_level = data_eit_crop_corrected <= upper_bound_eit
-mask = inside_poly & inside_level
-
-fig, ax = plt.subplots(figsize=(9, 4))
-HPlon_eit = np.asarray(HPlon_eit)
-HPlat_eit = np.asarray(HPlat_eit)
-extent = [
-    HPlon_eit.min(), HPlon_eit.max(),
-    HPlat_eit.min(), HPlat_eit.max()
-]
-ax.imshow(
-    data_eit_crop_corrected,
-    norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit),
-    cmap='Greys_r',
-    extent=extent,
-    origin='upper',
-    aspect='equal'
+mask_complementary = ~np.isin(
+    arr2.view([('', arr2.dtype)] * arr2.shape[1]),
+    arr1.view([('', arr1.dtype)] * arr1.shape[1])
 )
-# polygon border in coordinate space
-#poly_x = HPlon_eit[poly_rc[:, 1]]  # col -> x
-#poly_y = HPlat_eit[poly_rc[:, 0]]  # row -> y
-#ax.add_patch(Polygon(np.c_[poly_x, poly_y], closed=True,fill=False, edgecolor='lime', linewidth=2))
-# border of selected region
-contours = find_contours(mask.astype(float), 0.5)
-for c in contours:
-    rr_c = c[:, 0]
-    cc_c = c[:, 1]
-    x = np.interp(cc_c, np.arange(len(HPlon_eit)), HPlon_eit)
-    y = np.interp(rr_c, np.arange(len(HPlat_eit)), HPlat_eit)
-    ax.plot(x, y, color='cyan', linewidth=3)
-ax.set_xlabel('Helioprojective longitude (arcsec)')
-ax.set_ylabel('Helioprojective latitude (arcsec)')
-ax.grid(color='white', alpha=0.3)
-plt.show(block=False)
+
+rowscols_croplat_complementary = arr2[mask_complementary.ravel()]
+
+print('##################################')
+print('N PIXELS IN COMPLEMENTARY REGION:', len(rowscols_croplat_complementary), '=', len(rowscols_croplat_complementary)*150./3600., 'hrs')
+print('##################################')
+
+"""
+mask_complementary = ~np.isin(rowscols_croplat_sumer_from_eit.view([('', rowscols_croplat_sumer_from_eit.dtype)] * rowscols_croplat_sumer_from_eit.shape[1]), rowscols_croplat_sumer.view([('', rowscols_croplat_sumer.dtype)] * rowscols_croplat_sumer.shape[1]))
+
+rowscols_croplat_complementary = rowscols_croplat_eit[mask_complementary.ravel()]
+"""
+y_row_list_complementary_plot = rowscols_croplat_complementary[:,0] # convert the list of pairs [row, column] into 2 lists of rows and columns (for the scatterplot)
+x_col_list_complementary_plot = rowscols_croplat_complementary[:,1]
 
 
 
@@ -471,19 +357,19 @@ plt.show(block=False)
 # Import SUMER data interpolated (wavelength calibrated)
 data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
 # Average spectra of the pixels selected
-lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from_pixels_selected_from_interpolated_data(wavelength_range_=wavelength_range_to_average, data_interpolated_loaded_=data_interpolated_loaded, rows_cols_of_spectroheliogram_croplat=rowscols_croplat_sumer_from_eit)
+lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from_pixels_selected_from_interpolated_data(wavelength_range_=wavelength_range_to_average, data_interpolated_loaded_=data_interpolated_loaded, rows_cols_of_spectroheliogram_croplat=rowscols_croplat_complementary)
 
 
 #################################################
 #################################################
 #################################################
 # Variation of parameters
-
+"""
 # Variation of SUMER instrumental profile
 #variation_instrumental_profile = 0.1
 #fwhm_to_convolve = (variation_instrumental_profile+1.)*fwhm_to_convolve
 
-"""
+
 l_hrts_left = 1531.609
 l_hrts_right = 1551.248
 l_sumer_left = 1531.550
@@ -494,43 +380,6 @@ lam_sumer_modified = (lam_sumer_av-l_hrts_left+lam_shift) * lam_delta + l_hrts_l
 
 lam_sumer_av = lam_sumer_modified
 """
-
-"""
-lam_delta * lam_sumer_av + (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left)
-y = mx+b
-x = lam_sumer_av
-m = lam_delta = 0.9943989001476705
-b = (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left) = 8.637364478835252
-"""
-"""
-mm = 0.9943989001476705
-bb = 8.637364478835252 
-lam_sumer_av = mm * lam_sumer_av + bb
-"""
-#################################################
-#################################################
-#################################################
-
-#################################################
-#################################################
-#################################################
-# Variation of parameters
-
-# Variation of SUMER instrumental profile
-#variation_instrumental_profile = 0.1
-#fwhm_to_convolve = (variation_instrumental_profile+1.)*fwhm_to_convolve
-
-
-l_hrts_left = 1531.609
-l_hrts_right = 1551.248
-l_sumer_left = 1531.550
-l_sumer_right = 1551.358
-lam_shift = (l_hrts_left - l_sumer_left)
-lam_delta = 1.0 + (l_hrts_right-l_sumer_right)/(l_hrts_right-l_hrts_left)
-lam_sumer_modified = (lam_sumer_av-l_hrts_left+lam_shift) * lam_delta + l_hrts_left
-
-#lam_sumer_av = lam_sumer_modified
-
 
 """
 lam_delta * lam_sumer_av + (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left)
@@ -658,15 +507,26 @@ if show_secondary_plots == 'yes':
     # EIT subplot (bottom) - contours from EIT data
     contour_lower_eit = ax[1].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_sumer_px_contours)
     contour_upper_eit = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='blue', linewidths=2, extent=extent_sumer_px_contours)
+    
+    color_contours_eit_Imap = 'yellow'
+    color_contours_sumer_Imap = 'magenta'
+    contour_eit0 = ax[0].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors=color_contours_eit_Imap, linewidths=2, extent=extent_eit_px_contours)
+    contour_sumer0 = ax[0].contour(intensity_map_croplat[::-1], levels=[upper_bound_sumer], colors=color_contours_sumer_Imap, linewidths=2, extent=extent_eit_px_contours)
+    legend_elements = [
+    mlines.Line2D([],[],color=color_contours_eit_Imap, label=f'{upper_bound_eit} %'),
+    mlines.Line2D([],[],color=color_contours_sumer_Imap, label=f'{upper_bound_sumer} %')]
+    contour_eit1 = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors=color_contours_eit_Imap, linewidths=2, extent=extent_sumer_px_contours)
+    contour_sumer1 = ax[1].contour(intensity_map_croplat[::-1], levels=[upper_bound_sumer], colors=color_contours_sumer_Imap, linewidths=2, extent=extent_sumer_px_contours)
+
+    
     # Plot scatter AFTER contours with zorder to ensure visibility
-    ax[0].scatter(x_col_list_eit_plot, y_row_list_eit_plot, color='cyan', marker='s', s=1, zorder=10)
-    ax[1].scatter(x_col_list_sumer_plot, y_row_list_sumer_plot, color='cyan', marker='o', s=0.7, zorder=10)
+    ax[1].scatter(x_col_list_complementary_plot, y_row_list_complementary_plot, color='cyan', marker='o', s=0.7, zorder=10)
     plt.show(block=False)
 
 
 
 
-### PAPER image: Contours EIT and left region
+### PAPER image: EIT and SUMER maps with contours
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
 ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
 ax[1].pcolormesh(HPlon_rotcomp, HPlat_croplat, intensity_map_croplat, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer))
@@ -685,65 +545,16 @@ plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspac
 contour_lower = ax[0].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_upper = ax[0].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='yellow', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 legend_elements = [
-    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-    mlines.Line2D([],[],color='yellow', label=f'{range_percentage[1]} %')]
+    mlines.Line2D([],[],color='red', label=f'{lower_bound_eit}'),
+    mlines.Line2D([],[],color='yellow', label=f'{upper_bound_eit}')]
 contour_lower = ax[1].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_upper = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='yellow', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 #ax[0].axvline(x=HPlon_slit_rotcomp_corrected, linewidth=1.5, color='red', label='slit position')
 ax[0].set_aspect('auto')
 ax[1].set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__intensity_maps_SUMER_EIT_and_contours'
+	fig_name = 'contours_complementary__intensity_maps_SUMER_EIT_and_contours'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
-contours = find_contours(mask.astype(float), 0.5)
-for c in contours:
-    rr_c = c[:, 0]
-    cc_c = c[:, 1]
-    x = np.interp(cc_c, np.arange(len(HPlon_eit)), HPlon_eit)
-    y = np.interp(rr_c, np.arange(len(HPlat_eit)), HPlat_eit)
-    ax[0].plot(x, y, color='cyan', linewidth=1.5)
-    ax[1].plot(x, y, color='cyan', linewidth=1.5)
-plt.show(block=False)
-
-
-
-### PAPER image: Contours only left region
-fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
-ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
-ax[1].pcolormesh(HPlon_rotcomp, HPlat_croplat, intensity_map_croplat, cmap='Greys_r', norm=LogNorm(vmin=vmin_sumer, vmax=vmax_sumer))
-ax[1].axis('equal') # Ensures equal scaling of axis x and y
-#ax[1].set_xlabel('Helioprojective longitude (arcsec). Rot. compensated', fontsize=16)
-ax[1].set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
-ax[0].set_title('Contours of the CH in EIT overlaid in the Ne VIII intensity map', fontsize=18)
-fig.supylabel('Helioprojective latitude (arcsec)', fontsize=16)
-ax[0].text(1.02, 0.5, f'EIT-{header_eit["WAVELNTH"]}', fontsize=20,transform=ax[0].transAxes, va='center', ha='left', rotation=90)
-ax[1].text(1.02, 0.5, f'SUMER-{line_center_label}', fontsize=20,transform=ax[1].transAxes, va='center', ha='left', rotation=90)
-plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspace=0)
-#ax[0].grid(color='white')
-#ax[1].grid(color='white')
-#ax[0].axvline(x=HPlon_rotcomp[closest_index], linestyle='-', linewidth=0.8, color='red', label='Slit position during\n EIT image')
-#ax[1].axvline(x=HPlon_rotcomp[closest_index], linestyle='-', linewidth=0.8, color='red', label='Slit position during\n EIT image')
-#contour_lower = ax[0].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-#contour_upper = ax[0].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='yellow', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-#legend_elements = [
-#    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-#    mlines.Line2D([],[],color='yellow', label=f'{range_percentage[1]} %')]
-#contour_lower = ax[1].contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-#contour_upper = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='yellow', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-#ax[0].axvline(x=HPlon_slit_rotcomp_corrected, linewidth=1.5, color='red', label='slit position')
-ax[0].set_aspect('auto')
-ax[1].set_aspect('auto')
-if save_paper_images == 'yes':
-	fig_name = 'contours_left__intensity_maps_SUMER_EIT_and_contours'
-	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
-contours = find_contours(mask.astype(float), 0.5)
-for c in contours:
-    rr_c = c[:, 0]
-    cc_c = c[:, 1]
-    x = np.interp(cc_c, np.arange(len(HPlon_eit)), HPlon_eit)
-    y = np.interp(rr_c, np.arange(len(HPlat_eit)), HPlat_eit)
-    ax[0].plot(x, y, color='cyan', linewidth=1.5)
-    ax[1].plot(x, y, color='cyan', linewidth=1.5)
 plt.show(block=False)
 
 
@@ -786,7 +597,7 @@ if show_secondary_plots == 'yes':
 # Plot: Comparison SUMER uncorrected and corrected (QR-A)
 fig, ax = plt.subplots(figsize=(12, 5))
 #ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
-#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
+#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
 ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected') 
 ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qra, yerr=erad_sumer_cropNeVIII_corrected_qra, color=color_sumer_corrected_qra, linestyle='-', linewidth=2., label='SUMER corrected') 
 ax.errorbar(x=vkms_doppler(lamb=lam_hrtsa_cropNeVIII, lamb_0=lam_0), y=rad_hrtsa_conv_scaled_cropNeVIII, yerr=erad_hrtsa_conv_scaled_cropNeVIII, color=color_sumer_corrected_qra, linestyle='--', linewidth=2., label='HRST - QS A') #Real spectrum (SUMER)
@@ -811,7 +622,7 @@ plt.show(block=False)
 # Plot: Comparison SUMER uncorrected and corrected (QR-B)
 fig, ax = plt.subplots(figsize=(12, 5))
 #ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
-#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest {range_percentage}%, not corrected') 
+#ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER lowest not corrected') 
 ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label=f'SUMER not corrected') 
 ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qrb, yerr=erad_sumer_cropNeVIII_corrected_qrb, color=color_sumer_corrected_qrb, linestyle='-', linewidth=2., label=f'SUMER corrected') 
 ax.errorbar(x=vkms_doppler(lamb=lam_hrtsb_cropNeVIII, lamb_0=lam_0), y=rad_hrtsb_conv_scaled_cropNeVIII, yerr=erad_hrtsb_conv_scaled_cropNeVIII, color=color_sumer_corrected_qrb, linestyle='--', linewidth=2., label='HRST - QS B') #Real spectrum (SUMER)
@@ -836,8 +647,8 @@ plt.show(block=False)
 # Plot: Comparison SUMER uncorrected and corrected (QR-L)
 fig, ax = plt.subplots(figsize=(12, 5))
 #ax.errorbar(x=vkms_doppler(lamb=lam_crop, lamb_0=lam_0), y=rad_crop, yerr=erad_crop, color='black', linewidth=0.6, label='SUMER box') #Real spectrum (SUMER) 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected')#, label=f'SUMER lowest {range_percentage}%, not corrected') 
-ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qrl, yerr=erad_sumer_cropNeVIII_corrected_qrl, color=color_sumer_corrected_qrl, linestyle='-', linewidth=2., label='SUMER corrected')#, label=f'SUMER {range_percentage} of the maximum%, corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII, yerr=erad_sumer_cropNeVIII, color=color_sumer_uncorrected, linestyle='-', linewidth=2., label='SUMER not corrected')#, label=f'SUMER not corrected') 
+ax.errorbar(x=vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0), y=rad_sumer_cropNeVIII_corrected_qrl, yerr=erad_sumer_cropNeVIII_corrected_qrl, color=color_sumer_corrected_qrl, linestyle='-', linewidth=2., label='SUMER corrected')#, label=f'SUMER corrected') 
 ax.errorbar(x=vkms_doppler(lamb=lam_hrtsl_cropNeVIII, lamb_0=lam_0), y=rad_hrtsl_conv_scaled_cropNeVIII, yerr=erad_hrtsl_conv_scaled_cropNeVIII, color=color_sumer_corrected_qrl, linestyle='--', linewidth=2., label='HRST - QS L') #Real spectrum (SUMER)
 ax.axvline(x=0, color='black', linestyle=':', linewidth=2., label=rest_wavelength_label_figures)
 ax.axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
@@ -942,11 +753,11 @@ ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
 contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 legend_elements = [
-    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+    mlines.Line2D([],[],color='red', label=f'{range_percentage_eit[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage_eit[1]} %')]
 ax.set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__dopplermap_NeVIII'
+	fig_name = 'contours_complementary__dopplermap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -968,8 +779,8 @@ ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
 contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 legend_elements = [
-    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+    mlines.Line2D([],[],color='red', label=f'{range_percentage_eit[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage_eit[1]} %')]
 ax.set_aspect('auto')
 if save_paper_images == 'yes':
 	fig_name = 'asymmetrymap_NeVIII'
@@ -993,11 +804,11 @@ ax.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
 contour_lower = ax.contour(data_eit_crop_corrected[::-1], levels=[lower_bound_eit], colors='red', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_upper = ax.contour(data_eit_crop_corrected[::-1], levels=[upper_bound_eit], colors='black', linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 legend_elements = [
-    mlines.Line2D([],[],color='red', label=f'{range_percentage[0]} %'),
-    mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
+    mlines.Line2D([],[],color='red', label=f'{range_percentage_eit[0]} %'),
+    mlines.Line2D([],[],color='black', label=f'{range_percentage_eit[1]} %')]
 ax.set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__asymmetrymap_NeVIII'
+	fig_name = 'contours_complementary__asymmetrymap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1083,7 +894,7 @@ if show_sumer_FOV=='yes':
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__full_sun_and_SUMER_FOV'
+	fig_name = 'contours_complementary__full_sun_and_SUMER_FOV'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1128,7 +939,7 @@ if show_sumer_FOV=='yes':
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__full_sun_and_SUMER_FOV_and_slit'
+	fig_name = 'contours_complementary__full_sun_and_SUMER_FOV_and_slit'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1179,7 +990,7 @@ ax.set_aspect('equal', adjustable='box')
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__full_sun_and_SUMER_FOV_bigcontour'
+	fig_name = 'contours_complementary__full_sun_and_SUMER_FOV_bigcontour'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1229,7 +1040,7 @@ ax.set_aspect('equal', adjustable='box')
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__full_sun_and_SUMER_FOV_bigcontour_and_slit'
+	fig_name = 'contours_complementary__full_sun_and_SUMER_FOV_bigcontour_and_slit'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1239,12 +1050,14 @@ plt.show(block=False)
 ############################################################################################################
 # Profile of SUMER uncorrected and corrected (using the 3 spectra of HRTS)
 
+"""
 range_numbers_to_string = '__'.join(f"{x:.2f}".replace('.', '_').rstrip('0') if f"{x:.2f}"[-1] != '0' else f"{x:.1f}".replace('.', '_') for x in range_percentage) 
 filename_averaged_spectrum = 'average_profile__' + range_numbers_to_string + '__' + threshold_value_type + '_of_'+instrument_line+'.npz'
 
 
 ## Import dictionary
 profiles_loaded_dic = np.load('../outputs/'+filename_averaged_spectrum)
+"""
 
 ## HRTS wavelength and Doppler velicity
 v_hrtsa_cropNeVIII = vkms_doppler(lamb=lam_hrtsa_cropNeVIII, lamb_0=lam_0)
@@ -1262,7 +1075,7 @@ v_sumer_cropNeVIII = vkms_doppler(lamb=lam_sumer_cropNeVIII, lamb_0=lam_0)
 # PAPER plot
 
 x_lims = [max(min(v_hrtsa_cropNeVIII), min(v_sumer_cropNeVIII)),      min(max(v_hrtsa_cropNeVIII), max(v_sumer_cropNeVIII))]
-
+"""
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
 ## HRTS scaled and convolved
 ax.errorbar(x=v_hrtsa_cropNeVIII, y=rad_hrtsa_conv_scaled_cropNeVIII, linestyle='--', linewidth=1.2, color=color_hrts_qra, label='HRTS QS-A')
@@ -1290,7 +1103,7 @@ ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax.set_xlim(x_lims)
 plt.tight_layout()
 plt.show(block=False)
-
+"""
 
 ############################################################################################################
 ############################################################################################################
@@ -1376,7 +1189,7 @@ ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax.set_xlim(x_lims)
 plt.tight_layout()
 if save_paper_images == 'yes':
-    fig_name = 'contours_left__spectra_sumer_and_hrts_together'
+    fig_name = 'contours_complementary__spectra_sumer_and_hrts_together'
     plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1463,7 +1276,7 @@ for wavelength_i, symbol_i in lines_id:
 	ax.axvline(x=v_i, color='green', linestyle='--')
 	ax.text(v_i+0.2, ymax * 0.55, f'{symbol_i} - {wavelength_i}', rotation=90, verticalalignment='top', fontsize=10, color='green') # Position the text near the top of the plot panel, slightly below the max y-limit
 if save_paper_images == 'yes':
-    fig_name = 'contours_left__spectra_sumer_and_hrts_together_and_line_identification'
+    fig_name = 'contours_complementary__spectra_sumer_and_hrts_together_and_line_identification'
     plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1517,7 +1330,7 @@ ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linew
 ax[0].axvline(x=0, color='black', linestyle='--', label=rest_wavelength_label_figures)
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum uncorrected, multigaussian fit', fontsize=title_size)
-#ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
+#ax[0].set_title(f'SUMER corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
 ax[0].set_yscale('linear')
 # legend in desired order:
@@ -1536,7 +1349,7 @@ ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__spectrum_multigaussian_fit_uncorrected'
+	fig_name = 'contours_complementary__spectrum_multigaussian_fit_uncorrected'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1591,7 +1404,7 @@ ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linew
 ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-A, multigaussian fit', fontsize=title_size)
-#ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
+#ax[0].set_title(f'SUMER corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
 ax[0].legend(fontsize=legend_size)
 ax[0].set_yscale('linear')
@@ -1603,7 +1416,7 @@ ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__spectrum_multigaussian_fit_corrected_qra'
+	fig_name = 'contours_complementary__spectrum_multigaussian_fit_corrected_qra'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1658,7 +1471,7 @@ ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linew
 ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-B, multigaussian fit', fontsize=title_size)
-#ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
+#ax[0].set_title(f'SUMER corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
 ax[0].legend(fontsize=legend_size)
 ax[0].set_yscale('linear')
@@ -1670,7 +1483,7 @@ plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspa
 ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__spectrum_multigaussian_fit_corrected_qrb'
+	fig_name = 'contours_complementary__spectrum_multigaussian_fit_corrected_qrb'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1725,7 +1538,7 @@ ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linew
 ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-L, multigaussian fit', fontsize=title_size)
-#ax[0].set_title(f'SUMER {range_percentage}%, corrected', fontsize=title_size)
+#ax[0].set_title(f'SUMER corrected', fontsize=title_size)
 ax[0].set_ylabel(r'Spectral radiance (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', fontsize=axislabel_size)
 ax[0].legend(fontsize=legend_size)
 ax[0].set_yscale('linear')
@@ -1737,7 +1550,7 @@ ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 if save_paper_images == 'yes':
-	fig_name = 'contours_left__spectrum_multigaussian_fit_corrected_qrl'
+	fig_name = 'contours_complementary__spectrum_multigaussian_fit_corrected_qrl'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 

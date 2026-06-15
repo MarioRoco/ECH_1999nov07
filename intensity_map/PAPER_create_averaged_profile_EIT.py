@@ -1,7 +1,7 @@
 #  Inputs
 
 save_paper_images = 'no'
-folder_name = '../outputs/paper_figures/eit_contours/v5' #name of the folder where you save the images
+folder_name = '../outputs/paper_figures/eit_contours/v6' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
@@ -308,6 +308,11 @@ y_row_list_sumer_plot = rowscols_croplat_sumer_from_eit[:,0] # convert the list 
 x_col_list_sumer_plot = rowscols_croplat_sumer_from_eit[:,1]
 print('Number of pixels in SUMER:', len(rowscols_croplat_sumer_from_eit))
 
+
+print('##################################')
+print('N PIXELS IN SUMER FROM EIT:', len(rowscols_croplat_sumer_from_eit), '=', len(rowscols_croplat_sumer_from_eit)*150./3600., 'hrs')
+print('##################################')
+
 ######################################################
 
 # Import SUMER data interpolated (wavelength calibrated)
@@ -334,7 +339,20 @@ lam_shift = (l_hrts_left - l_sumer_left)
 lam_delta = 1.0 + (l_hrts_right-l_sumer_right)/(l_hrts_right-l_hrts_left)
 lam_sumer_modified = (lam_sumer_av-l_hrts_left+lam_shift) * lam_delta + l_hrts_left
 
-#lam_sumer_av = lam_sumer_modified
+lam_sumer_av = lam_sumer_modified
+"""
+
+"""
+lam_delta * lam_sumer_av + (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left)
+y = mx+b
+x = lam_sumer_av
+m = lam_delta = 0.9943989001476705
+b = (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left) = 8.637364478835252
+"""
+"""
+mm = 0.9943989001476705
+bb = 8.637364478835252 
+lam_sumer_av = mm * lam_sumer_av + bb
 """
 #################################################
 #################################################
@@ -1060,7 +1078,7 @@ init_parameters_uncorrected = [bckg_fit_uncorrected, #[background, amplitude1, m
 bckg_fit_corrected_qra = -0.3
 init_parameters_corrected_qra = [bckg_fit_corrected_qra, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
 0.1-bckg_fit_corrected_qra, -60., 20.,
-0.5-bckg_fit_corrected_qra, -30., 20.,
+#0.5-bckg_fit_corrected_qra, -30., 20.,
 3.-bckg_fit_corrected_qra, 0.0, 50.,
 #1.5-bckg_fit_corrected_qra, 25., 30.
 ]
@@ -1069,7 +1087,7 @@ bckg_fit_corrected_qrb = 0.0
 init_parameters_corrected_qrb = [bckg_fit_corrected_qrb, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
 0.04-bckg_fit_corrected_qrb, -78., 30.,
 #0.3-bckg_fit_corrected_qrb, -50., 30.,
-0.5-bckg_fit_corrected_qrb, -30., 40.,
+#0.5-bckg_fit_corrected_qrb, -30., 40.,
 0.8-bckg_fit_corrected_qrb, 0.0, 50.,
 #1.5-bckg_fit_corrected_qrb, 33., 40.
 ]

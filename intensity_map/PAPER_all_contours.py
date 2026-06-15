@@ -5,6 +5,10 @@ folder_name = '../outputs/paper_figures/maps_with_contours/v1' #name of the fold
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
+# polygon vertices are given as (row, col)
+poly_rc, region_id = [[12,104], [12,199], [83,180], [83,127]], 'QSa6' #QS a6
+
+
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
 eit_wavelength = 195 #171, 195, 284, or 304 [Angstrom]
 eit_time = 'late' #'early' or 'late' (early: around 1 or 4 am; late: around 6 or 7 am)
@@ -262,7 +266,8 @@ lon_half_right = abs((HPlon_rotcomp[-1]-HPlon_rotcomp[-2])/2.)
 extent_eit_sumer_arcsec_image = [HPlon_rotcomp[0]-lon_half_left, HPlon_rotcomp[-1]+lon_half_right, HPlat_croplat[-1]-lat_half_bottom, HPlat_croplat[0]+lat_half_top] #arcsec
 extent_eit_sumer_arcsec_contours = [HPlon_rotcomp[0], HPlon_rotcomp[-1], HPlat_croplat[-1], HPlat_croplat[0]] #arcsec
 
-
+######################################################
+######################################################
 ######################################################
 
 # Bound EIT
@@ -273,6 +278,134 @@ print('bound_eit =', bound_eit)
 # Define intensity bin
 _, bound_sumer = get_bounds(intensitymap_croplat=intensity_map_croplat, range_percentage=[0., percentage_sumer], threshold_value_type=threshold_value_type_sumer)
 print('bound_sumer =', bound_sumer)
+
+
+######################################################
+######################################################
+######################################################
+# Add pixels addresses from the Ne VIII intensity map to the Dopplermap 
+
+Z = intensity_map_croplat # Z is your 2D array
+
+
+### Plot intensity map with contours, coordinates, and pixel scale
+xlon1 = 0.
+xlon2 = Z.shape[1]-1.
+ylon1 = HPlon_rotcomp[0]
+ylon2 = HPlon_rotcomp[-1]
+mlon = (ylon2-ylon1)/(xlon2-xlon1)
+blon = HPlon_rotcomp[0]
+def pixels_to_HPlon(x): return mlon * x + blon #x=np.arange(0, Z.shape[1])
+def HPlon_to_pixels(x): return (x-blon)/mlon #HPlon_rotcomp
+
+
+
+xlat1 = 0
+xlat2 = Z.shape[0]-1
+ylat1 = HPlat_croplat[0]
+ylat2 = HPlat_croplat[-1]
+mlat = (ylat2-ylat1)/(xlat2-xlat1)
+blat = HPlat_croplat[0]
+def pixels_to_HPlat(x): return mlat * x + blat #x=np.arange(0, Z.shape[0])
+def HPlat_to_pixels(x): return (x-blat)/mlat #HPlat_croplat
+
+
+######################################################
+### Create polygon and plot it
+
+import numpy as np
+from matplotlib.path import Path
+from matplotlib.patches import Polygon
+from skimage.measure import find_contours
+
+
+# polygon vertices are given as (row, col)
+poly_rc = np.array(poly_rc)
+poly_xy = poly_rc[:, ::-1]   # convert (row, col) -> (x, y) = (col, row)
+
+nrows_polygon, ncols_polygon = Z.shape
+rr_polygon, cc_polygon = np.indices((nrows_polygon, ncols_polygon))
+
+poly_path = Path(poly_rc[:, ::-1]) # If your polygon vertices are (row, col), Path expects (x, y), so pass them as (col, row)
+inside_poly = poly_path.contains_points(np.c_[cc_polygon.ravel(), rr_polygon.ravel()]).reshape(Z.shape) # Build a mask of pixels inside the polygon
+mask = inside_poly
+rowscols_croplat = np.argwhere(mask) # (row, col) of all matching pixels
+y_row_list_plot = rowscols_croplat[:,0] # convert the list of pairs [row, column] into 2 lists of rows and columns (for the scatterplot)
+x_col_list_plot = rowscols_croplat[:,1]
+print('Number of pixels in EIT:', len(rowscols_croplat))
+
+contours_region = find_contours(mask.astype(float), 0.5)
+
+######################################################
+
+ZZ = data_eit_crop_corrected # Z is your 2D array
+
+delta_lon_left = np.abs(HPlon_rotcomp[1] - HPlon_rotcomp[0])
+delta_lon_right = np.abs(HPlon_rotcomp[-2] - HPlon_rotcomp[-1])
+xlon1 = -0.5
+xlon2 = ZZ.shape[1]-1.+0.5
+ylon1 = HPlon_rotcomp[0] - delta_lon_left/2.
+ylon2 = HPlon_rotcomp[-1] + delta_lon_right/2.
+mlon = (ylon2-ylon1)/(xlon2-xlon1)
+blon = HPlon_rotcomp[0]
+HPlon_eit = mlon * np.arange(0, ZZ.shape[1]) + blon
+print('left eit: ', ylon1)
+print('left sumer: ', HPlon_rotcomp[0]-np.abs(HPlon_rotcomp[1]-HPlon_rotcomp[0])/2.)
+print('right eit: ', ylon2)
+print('right sumer: ', HPlon_rotcomp[-1]+np.abs(HPlon_rotcomp[-1]-HPlon_rotcomp[-2])/2.)
+
+
+
+
+delta_lat_high = np.abs(HPlat_croplat[1] - HPlat_croplat[0])
+delta_lat_low =  np.abs(HPlat_croplat[-1] - HPlat_croplat[-2])
+xlat1 = -0.5
+xlat2 = ZZ.shape[0]-1.+0.5
+ylat1 = HPlat_croplat[0] + delta_lat_high/2.
+ylat2 = HPlat_croplat[-1] - delta_lat_low/2.
+mlat = (ylat2-ylat1)/(xlat2-xlat1)
+blat = HPlat_croplat[0]
+HPlat_eit = mlat * np.arange(0, ZZ.shape[0]) + blat
+print('low eit: ', ylat1)
+print('low sumer: ', HPlat_croplat[0]+np.abs(HPlat_croplat[1]-HPlat_croplat[0])/2.)
+print('high eit: ', ylat2)
+print('high sumer: ', HPlat_croplat[-1]-np.abs(HPlat_croplat[-1]-HPlat_croplat[-2])/2.)
+
+
+HPlon_eit = np.asarray(HPlon_eit)
+HPlat_eit = np.asarray(HPlat_eit)
+
+######################################################
+######################################################
+######################################################
+
+# polygon vertices are given as (row, col)
+poly_rc_left_region = [[27,21], [10,58], [17,82], [37,71], [39,47], [44,28], [35,17]] #left part
+poly_rc_left_region = np.array(poly_rc_left_region)
+
+
+######################################################
+# Create a polygon that enclose the left region of the CH and mark all pixels inside the polygon and the CH
+
+from skimage.measure import find_contours
+from matplotlib.path import Path
+from matplotlib.patches import Polygon
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+
+# polygon vertices in pixel indices
+poly_path_left_region = Path(poly_rc_left_region[:, ::-1])
+
+nrows, ncols = data_eit_crop_corrected.shape
+rr, cc = np.indices((nrows, ncols))
+inside_poly_left_region = poly_path_left_region.contains_points(np.c_[cc.ravel(), rr.ravel()]).reshape(data_eit_crop_corrected.shape)
+inside_level = data_eit_crop_corrected <= bound_eit
+mask_left_region = inside_poly_left_region & inside_level
+
+######################################################
+######################################################
+######################################################
 
 
 ######################################################
@@ -337,11 +470,28 @@ contour_eit1 = ax[1].contour(data_eit_crop_corrected[::-1], levels=[bound_eit], 
 contour_sumer1 = ax[1].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors=color_contours_sumer_Imap, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 #ax[0].set_xlim([HPlon_rotcomp[0], HPlon_rotcomp[-1]])
 #ax[1].set_xlim([HPlon_rotcomp[0], HPlon_rotcomp[-1]])
+contours = find_contours(mask.astype(float), 0.5)
+for c in contours:
+    rr_c = c[:, 0]
+    cc_c = c[:, 1]
+    x = np.interp(cc_c, np.arange(len(HPlon_rotcomp)), HPlon_rotcomp)
+    y = np.interp(rr_c, np.arange(len(HPlat_croplat)), HPlat_croplat)
+    ax[0].plot(x, y, color='cyan', linewidth=1.5)
+    ax[1].plot(x, y, color='cyan', linewidth=1.5)
+"""
+contours_left_region = find_contours(mask_left_region.astype(float), 0.5)
+for c in contours_left_region:
+    rr_c = c[:, 0]
+    cc_c = c[:, 1]
+    x = np.interp(cc_c, np.arange(len(HPlon_eit)), HPlon_eit)
+    y = np.interp(rr_c, np.arange(len(HPlat_eit)), HPlat_eit)
+    ax[0].plot(x, y, color='red', linewidth=1.5)
+    ax[1].plot(x, y, color='red', linewidth=1.5)
+"""
 if save_paper_images == 'yes':
     fig_name = 'intensity_maps_SUMER_EIT_and_contours'
     plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
-
 
 
 ##############################################################

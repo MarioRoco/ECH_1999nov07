@@ -42,7 +42,7 @@ wavelength_range_to_analyze_NeVIII = [1540.2, 1541.4]
 save_average_profile = 'no' 
 
 show_secondary_plots = 'no'
-show_plots_correction = 'yes'
+show_plots_correction = 'no'
 
 # Full Sun
 show_sumer_FOV = 'yes'
@@ -361,6 +361,19 @@ lam_sumer_modified = (lam_sumer_av-l_hrts_left+lam_shift) * lam_delta + l_hrts_l
 
 lam_sumer_av = lam_sumer_modified
 
+
+"""
+lam_delta * lam_sumer_av + (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left)
+y = mx+b
+x = lam_sumer_av
+m = lam_delta = 0.9943989001476705
+b = (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left) = 8.637364478835252
+"""
+"""
+mm = 0.9943989001476705
+bb = 8.637364478835252 
+lam_sumer_av = mm * lam_sumer_av + bb
+"""
 #################################################
 #################################################
 #################################################

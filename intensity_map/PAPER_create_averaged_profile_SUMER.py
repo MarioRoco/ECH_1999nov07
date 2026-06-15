@@ -1,5 +1,5 @@
 save_paper_images = 'no'
-folder_name = '../outputs/paper_figures/sumer_contours/v3' #name of the folder where you save the images
+folder_name = '../outputs/paper_figures/sumer_contours/v4' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
@@ -111,16 +111,62 @@ y_row_list_plot = rowscols_croplat[:,0] # convert the list of pairs [row, column
 x_col_list_plot = rowscols_croplat[:,1]
 print('Number of pixels detected:', len(rowscols_croplat))
 
+print('##################################')
+print('N PIXELS IN SUMER:', len(rowscols_croplat), '=', len(rowscols_croplat)*150./3600., 'hrs')
+print('##################################')
+
+
 # Extent in pixels 
 extent_sumer_px_contours = [0., intensity_map_croplat.shape[1]-1, intensity_map_croplat.shape[0]-1, 0.]
 extent_sumer_px_image = [-0.5, intensity_map_croplat.shape[1]-1+0.5, intensity_map_croplat.shape[0]-1+0.5, -0.5]
 
-######################################################
+
+#################################################
+#################################################
+#################################################
 
 # Import SUMER data interpolated (wavelength calibrated)
 data_interpolated_loaded = np.load('../data/data_modified/wcal4__spectral_image_list_intepolated_and_wavelength.npz', allow_pickle=True)
 # Average spectra of the pixels selected
 lam_sumer_av, elam_sumer_av, rad_sumer_av, erad_sumer_av = average_profiles_from_pixels_selected_from_interpolated_data(wavelength_range_=wavelength_range_to_average, data_interpolated_loaded_=data_interpolated_loaded, rows_cols_of_spectroheliogram_croplat=rowscols_croplat)
+
+
+#################################################
+#################################################
+#################################################
+# Variation of parameters
+
+# Variation of SUMER instrumental profile
+#variation_instrumental_profile = 0.1
+#fwhm_to_convolve = (variation_instrumental_profile+1.)*fwhm_to_convolve
+
+"""
+l_hrts_left = 1531.609
+l_hrts_right = 1551.248
+l_sumer_left = 1531.550
+l_sumer_right = 1551.358
+lam_shift = (l_hrts_left - l_sumer_left)
+lam_delta = 1.0 + (l_hrts_right-l_sumer_right)/(l_hrts_right-l_hrts_left)
+lam_sumer_modified = (lam_sumer_av-l_hrts_left+lam_shift) * lam_delta + l_hrts_left
+
+lam_sumer_av = lam_sumer_modified
+"""
+
+"""
+lam_delta * lam_sumer_av + (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left)
+y = mx+b
+x = lam_sumer_av
+m = lam_delta = 0.9943989001476705
+b = (-l_hrts_left*lam_delta + lam_shift*lam_delta + l_hrts_left) = 8.637364478835252
+"""
+"""
+mm = 0.9943989001476705
+bb = 8.637364478835252 
+lam_sumer_av = mm * lam_sumer_av + bb
+"""
+#################################################
+#################################################
+#################################################
 
 ############################################################################################################
 ############################################################################################################
@@ -537,7 +583,7 @@ init_parameters_uncorrected = [bckg_fit_uncorrected, #[background, amplitude1, m
 bckg_fit_corrected_qra = -0.3
 init_parameters_corrected_qra = [bckg_fit_corrected_qra, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
 0.04-bckg_fit_corrected_qra, -67., 20.,
-0.13-bckg_fit_corrected_qra, -31., 20.,
+#0.13-bckg_fit_corrected_qra, -31., 20.,
 0.34-bckg_fit_corrected_qra, 0.0, 50.,
 #1.5-bckg_fit_corrected_qra, 25., 30.
 ]
@@ -546,7 +592,7 @@ bckg_fit_corrected_qrb = 0.0
 init_parameters_corrected_qrb = [bckg_fit_corrected_qrb, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
 0.04-bckg_fit_corrected_qrb, -80., 30.,
 #0.3-bckg_fit_corrected_qrb, -50., 30.,
-0.1-bckg_fit_corrected_qrb, -40., 40.,
+#0.1-bckg_fit_corrected_qrb, -40., 40.,
 0.37-bckg_fit_corrected_qrb, 0.0, 50.,
 #1.5-bckg_fit_corrected_qrb, 33., 40.
 ]

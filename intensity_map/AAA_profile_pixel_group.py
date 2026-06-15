@@ -1,45 +1,45 @@
+
+save_paper_images = 'no'
+folder_name = '../outputs/paper_figures/profiles_from_polygons/v1' #name of the folder where you save the images
+save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
+
 #  Inputs
 
 # polygon vertices are given as (row, col)
 #poly_rc = [[], [], [], []]
 
 ## Quiet Sun regions
-#poly_rc = [[68,104], [28,104], [28,130], [68,130]] #QS a1
-#poly_rc = [[28,130], [68,130], [68,160], [28,160]] #QS a2
-#poly_rc = [[68,160], [28,160], [28,190], [68,190]] #QS a3
-#poly_rc = [[68,104], [28,104], [28,190], [68,190]] #QS a4
-#poly_rc = [[66,122], [16,122], [16,176], [66,178]] #QS a5
-#poly_rc = [[12,104], [12,199], [83,180], [83,127]] #QS a6
-#poly_rc = [[115,3], [140,27], [185,27], [167,3]] #QS b
-#poly_rc = [[302,178], [221,199], [221,231], [302,231]] #QS c1
-#poly_rc = [[221,199], [221,231], [97,231]] #QS c2
-#poly_rc = [[302,178], [97,231], [302,231]] #QS c3
+#poly_rc, region_id = [[68,104], [28,104], [28,130], [68,130]], 'QSa1' #QS a1
+#poly_rc, region_id = [[28,130], [68,130], [68,160], [28,160]], 'QSa2' #QS a2
+#poly_rc, region_id = [[68,160], [28,160], [28,190], [68,190]], 'QSa3' #QS a3
+#poly_rc, region_id = [[68,104], [28,104], [28,190], [68,190]], 'QSa4' #QS a4
+#poly_rc, region_id = [[66,122], [16,122], [16,176], [66,178]], 'QSa5' #QS a5
+poly_rc, region_id = [[12,104], [12,199], [83,180], [83,127]], 'QSa6' #QS a6
+#poly_rc, region_id = [[115,3], [140,27], [185,27], [167,3]], 'QSb' #QS b
+#poly_rc, region_id = [[302,178], [221,199], [221,231], [302,231]], 'QSc1' #QS c1
+#poly_rc, region_id = [[221,199], [221,231], [97,231]], 'QSc2' #QS c2
+#poly_rc, region_id = [[302,178], [97,231], [302,231]], 'QSc3' #QS c3
 
 
 ## From Dopplermap
-#poly_rc = [[285,144], [272,145], [272,148], [282,148]] #blue patch inside CH
-#poly_rc = [[272,155], [263,155], [265,159], [271,158]] #red patch in border of CH
-#poly_rc = [[79,94], [81,97], [91,97], [91,94]] #blue patch in border of CH
-#poly_rc = [[17,15], [18,19], [30,18], [30,14]] #blue patch inside CH
-#poly_rc = [[274,159], [278,165], [292,168], [290,160]] #red patch outside CH
-#poly_rc = [[236,5], [236,10], [250,10], [251,7]] #red patch outside CH
-#poly_rc = [[199,225], [203,228], [205,228], [205,224]] #blue patch outside CH
-#poly_rc = [[183,141], [182,145], [167,145], [167,143]] #red patch in border of CH
-#poly_rc = [[203,143], [202,144], [208,144], [208,142]] #blue patch outside CH
-#poly_rc = [[168,143], [169,146], [180,145], [180,142]] #red patch in border of CH
-poly_rc = [[29,133], [29,136], [37,136], [37,133]]
+#poly_rc, region_id = [[285,144], [272,145], [272,148], [282,148]], 'bluein' #blue patch inside CH
+#poly_rc, region_id = [[272,155], [263,155], [265,159], [271,158]], 'redin' #red patch in border of CH
+#poly_rc, region_id = [[79,94], [81,97], [91,97], [91,94]], 'blueborder' #blue patch in border of CH
+#poly_rc, region_id = [[17,15], [18,19], [30,18], [30,14]], 'bluein' #blue patch inside CH
+#poly_rc, region_id = [[274,159], [278,165], [292,168], [290,160]], 'redout' #red patch outside CH
+#poly_rc, region_id = [[236,5], [236,10], [250,10], [251,7]], 'redout' #red patch outside CH
+#poly_rc, region_id = [[199,225], [203,228], [205,228], [205,224]], 'blueout' #blue patch outside CH
+#poly_rc, region_id = [[183,141], [182,145], [167,145], [167,143]], 'redin' #red patch in border of CH
+#poly_rc, region_id = [[203,143], [202,144], [208,144], [208,142]], 'blueout' #blue patch outside CH
+#poly_rc, region_id = [[168,143], [169,146], [180,145], [180,142]], 'redin' #red patch in border of CH
+#poly_rc, region_id = [[29,133], [29,136], [37,136], [37,133]], 
 
 
 ##From BR asymmetry map
-#poly_rc = [[223,80], [223,81], [227,81], [228,79]]
-#poly_rc = [[232-2,79], [232-2,80], [233-2,80], [233-2,79]]
+#poly_rc, region_id = [[223,80], [223,81], [227,81], [228,79]], 
+#poly_rc, region_id = [[232-2,79], [232-2,80], [233-2,80], [233-2,79]], 
 
 
-
-
-save_paper_images = 'no'
-folder_name = '../outputs/paper_figures/eit_contours/v5' #name of the folder where you save the images
-save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
 line_label = 'NeVIII' #'NeVIII', 'SiII', 'CIV', or 'cold_line'
@@ -400,7 +400,7 @@ secax_y = ax.secondary_yaxis(
 )
 secax_y.set_ylabel('Pixel y', fontsize=16)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	fig_name = 'polygon'+region_id+'dopplermap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 """
@@ -443,9 +443,9 @@ secax_x.set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
 secax_y.set_ylabel('Helioprojective latitude (arcsec)', fontsize=16)
 ax.set_xlabel('Pixel x', fontsize=16)
 ax.set_ylabel('Pixel y', fontsize=16)
-if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__dopplermap_NeVIII'
-	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+#if save_paper_images == 'yes':
+#	fig_name = 'polygon'+region_id+'__dopplermap_NeVIII'
+#	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
 
@@ -488,16 +488,12 @@ contour_upper = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound
 ax[0].set_aspect('auto')
 ax[1].set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__intensity_maps_SUMER_EIT_and_contours'
+	fig_name = 'polygon'+region_id+'__intensity_maps_SUMER_EIT_and_contours'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
-
-
 secax_x = ax[1].secondary_xaxis('top', functions=(HPlon_to_pixels, pixels_to_HPlon))
 secax_x.set_xlabel('Pixel x')
-
 secax_y = ax[1].secondary_yaxis('right', functions=(HPlat_to_pixels, pixels_to_HPlat))
 secax_y.set_ylabel('Pixel y')
-
 plt.show(block=False)
 
 
@@ -565,7 +561,7 @@ contours = find_contours(mask.astype(float), 0.5)
 for c in contours_region:
     ax.plot(c[:, 1], c[:, 0], color='cyan', linewidth=2)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	fig_name = 'polygon'+region_id+'__dopplermap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -608,7 +604,7 @@ contours = find_contours(mask.astype(float), 0.5)
 for c in contours_region:
     ax.plot(c[:, 1], c[:, 0], color='cyan', linewidth=2)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	fig_name = 'polygon'+region_id+'__dopplermap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -823,7 +819,7 @@ contour_upper = ax[1].contour(data_eit_crop_corrected[::-1], levels=[upper_bound
 ax[0].set_aspect('auto')
 ax[1].set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__intensity_maps_SUMER_EIT_and_contours'
+	fig_name = 'polygon'+region_id+'__intensity_maps_SUMER_EIT_and_contours'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 contours = find_contours(mask.astype(float), 0.5)
 for c in contours:
@@ -864,7 +860,7 @@ plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspac
 ax[0].set_aspect('auto')
 ax[1].set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__intensity_maps_SUMER_EIT_and_contours'
+	fig_name = 'polygon'+region_id+'__intensity_maps_SUMER_EIT_and_contours'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 contours = find_contours(mask.astype(float), 0.5)
 for c in contours:
@@ -1104,7 +1100,7 @@ if show_sumer_FOV=='yes':
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__full_sun_and_SUMER_FOV'
+	fig_name = 'polygon'+region_id+'__full_sun_and_SUMER_FOV'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1149,7 +1145,7 @@ if show_sumer_FOV=='yes':
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__full_sun_and_SUMER_FOV_and_slit'
+	fig_name = 'polygon'+region_id+'__full_sun_and_SUMER_FOV_and_slit'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1200,7 +1196,7 @@ ax.set_aspect('equal', adjustable='box')
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__full_sun_and_SUMER_FOV_bigcontour'
+	fig_name = 'polygon'+region_id+'__full_sun_and_SUMER_FOV_bigcontour'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1250,7 +1246,7 @@ ax.set_aspect('equal', adjustable='box')
 #ax.axis('equal')
 ax.legend(fontsize=12)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__full_sun_and_SUMER_FOV_bigcontour_and_slit'
+	fig_name = 'polygon'+region_id+'__full_sun_and_SUMER_FOV_bigcontour_and_slit'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1302,7 +1298,7 @@ legend_elements = [
     mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
 ax.set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__dopplermap_NeVIII'
+	fig_name = 'polygon'+region_id+'__dopplermap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1353,7 +1349,7 @@ legend_elements = [
     mlines.Line2D([],[],color='black', label=f'{range_percentage[1]} %')]
 ax.set_aspect('auto')
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__asymmetrymap_NeVIII'
+	fig_name = 'polygon'+region_id+'__asymmetrymap_NeVIII'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1441,7 +1437,7 @@ init_parameters_uncorrected = [bckg_fit_uncorrected, #[background, amplitude1, m
 bckg_fit_corrected_qra = -0.3
 init_parameters_corrected_qra = [bckg_fit_corrected_qra, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
 0.1-bckg_fit_corrected_qra, -60., 20.,
-0.5-bckg_fit_corrected_qra, -30., 20.,
+#0.5-bckg_fit_corrected_qra, -30., 20.,
 3.-bckg_fit_corrected_qra, 0.0, 50.,
 #1.5-bckg_fit_corrected_qra, 25., 30.
 ]
@@ -1450,7 +1446,7 @@ bckg_fit_corrected_qrb = 0.0
 init_parameters_corrected_qrb = [bckg_fit_corrected_qrb, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
 0.04-bckg_fit_corrected_qrb, -78., 30.,
 #0.3-bckg_fit_corrected_qrb, -50., 30.,
-0.5-bckg_fit_corrected_qrb, -30., 40.,
+#0.5-bckg_fit_corrected_qrb, -30., 40.,
 0.8-bckg_fit_corrected_qrb, 0.0, 50.,
 #1.5-bckg_fit_corrected_qrb, 33., 40.
 ]
@@ -1500,7 +1496,7 @@ ax.set_xlabel('Doppler shift (km/s)', fontsize=axislabel_size)
 ax.set_xlim(x_lims)
 plt.tight_layout()
 if save_paper_images == 'yes':
-    fig_name = 'contours_EIT__spectra_sumer_and_hrts_together'
+    fig_name = 'polygon'+region_id+'__spectra_sumer_and_hrts_together'
     plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1587,7 +1583,7 @@ for wavelength_i, symbol_i in lines_id:
 	ax.axvline(x=v_i, color='green', linestyle='--')
 	ax.text(v_i+0.2, ymax * 0.55, f'{symbol_i} - {wavelength_i}', rotation=90, verticalalignment='top', fontsize=10, color='green') # Position the text near the top of the plot panel, slightly below the max y-limit
 if save_paper_images == 'yes':
-    fig_name = 'contours_EIT__spectra_sumer_and_hrts_together_and_line_identification'
+    fig_name = 'polygon'+region_id+'__spectra_sumer_and_hrts_together_and_line_identification'
     plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1660,7 +1656,7 @@ ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__spectrum_multigaussian_fit_uncorrected'
+	fig_name = 'polygon'+region_id+'__spectrum_multigaussian_fit_uncorrected'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1727,7 +1723,7 @@ ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__spectrum_multigaussian_fit_corrected_qra'
+	fig_name = 'polygon'+region_id+'__spectrum_multigaussian_fit_corrected_qra'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1794,7 +1790,7 @@ plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspa
 ax[0].set_xlim(x_lims_fits)
 ax[1].set_xlim(x_lims_fits)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__spectrum_multigaussian_fit_corrected_qrb'
+	fig_name = 'polygon'+region_id+'__spectrum_multigaussian_fit_corrected_qrb'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
@@ -1861,7 +1857,7 @@ ax[1].set_xlim(x_lims_fits)
 #plt.tight_layout()
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 if save_paper_images == 'yes':
-	fig_name = 'contours_EIT__spectrum_multigaussian_fit_corrected_qrl'
+	fig_name = 'polygon'+region_id+'__spectrum_multigaussian_fit_corrected_qrl'
 	plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
 
