@@ -1,7 +1,7 @@
 #  Inputs
 
 save_paper_images = 'yes'
-folder_name = '../outputs/paper_figures/eit_contours/v6' #name of the folder where you save the images
+folder_name = '../outputs/paper_figures/eit_contours/v8' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
 
@@ -1473,7 +1473,7 @@ x_uncorrected = lam_sumer_cropNeVIII
 y_uncorrected = rad_sumer_cropNeVIII
 y_unc_uncorrected = erad_sumer_cropNeVIII
 
-
+"""
 # Perform the fit
 popt, pcov = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_uncorrected, lamb_0=lam_0), y_uncorrected, p0=init_parameters_uncorrected, sigma=y_unc_uncorrected, absolute_sigma=True) #popt are the optimized parameters. pcov is the covariance matrix of the parameters. 
 perr = np.sqrt(np.diag(pcov)) #You can extract the standard deviation (1-sigma uncertainty) of the fitted parameters
@@ -1549,10 +1549,14 @@ if save_paper_images == 'yes':
 	fig_name = 'contours_EIT__spectrum_multigaussian_fit_uncorrected'
 	plt.savefig(folder_name+'/'+fig_name+'.pdf', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
 plt.show(block=False)
-
+"""
        
 ######################################################
-# Single Fit corrected Ne VIII line, QS-A
+# Single fit, QS-A
+
+x_corrected_qra = lam_sumer_cropNeVIII
+y_corrected_qra = rad_sumer_cropNeVIII_corrected_qra
+y_unc_corrected_qra = erad_sumer_cropNeVIII_corrected_qra
 
 bckg_fit1_corrected_qra = -0.3
 init_parameters1_corrected_qra = [bckg_fit1_corrected_qra, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
@@ -1581,7 +1585,7 @@ y_unc_residuals_qra = np.sqrt(y_unc_corrected_qra**2 + y_unc_fit_length_correcte
 
 ### PAPER image: multigaussian fit to the corrected profile (QR-A)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0) ,y=y_corrected_qra, yerr=y_unc_corrected_qra, color=color_hrts_qra, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-A')
+ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0) ,y=y_corrected_qra, yerr=y_unc_corrected_qra, color=color_hrts_qra, marker='o', linewidth=0, elinewidth=1., label='SUMER data')
 ax[0].plot(x_fit_corrected_qra, y_fit_corrected_qra, color=color_hrts_qra, linestyle='-', label='Fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qra_singlegauss, lamb_0=lam_0), y_fit_corrected_qra_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 bckg_fit = popt_qra[0]
@@ -1601,7 +1605,7 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qra_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qra_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qra_singlegauss, y_fit_corrected_qra_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII - 770.428 \u212B')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 #ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-A, multigaussian fit', fontsize=title_size)
 ax[0].set_title(f'CH-1 corrected with QS-A', fontsize=title_size)
@@ -1632,12 +1636,7 @@ if save_paper_images == 'yes':
 plt.show(block=False)    
            
 ######################################################
-# Fit corrected Ne VIII line, QS-A
-
-x_corrected_qra = lam_sumer_cropNeVIII
-y_corrected_qra = rad_sumer_cropNeVIII_corrected_qra
-y_unc_corrected_qra = erad_sumer_cropNeVIII_corrected_qra
-
+# Double fit, QS-A
 
 # Perform the fit
 popt_qra, pcov_qra = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0), y_corrected_qra, p0=init_parameters_corrected_qra, sigma=y_unc_corrected_qra, absolute_sigma=True) #popt_qra are the optimized parameters. pcov_qra is the covariance matrix of the parameters. 
@@ -1646,7 +1645,7 @@ perr_qra = np.sqrt(np.diag(pcov_qra)) #You can extract the standard deviation (1
 
 # fitted curve
 x_fit_corrected_qra = np.linspace(min(vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0)), max(vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0)), 300)
-y_fit_corrected_qra = multigaussian_function_for_curvefit(vkms_doppler(lamb=x_fit_corrected_qra, lamb_0=lam_0), *popt_qra)
+y_fit_corrected_qra = multigaussian_function_for_curvefit(x_fit_corrected_qra, *popt_qra)
 y_fit_SUMERgrid_corrected_qra = multigaussian_function_for_curvefit(vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0), *popt_qra)
 
 
@@ -1663,8 +1662,8 @@ y_unc_residuals_qra = np.sqrt(y_unc_corrected_qra**2 + y_unc_fit_length_correcte
 
 ### PAPER image: multigaussian fit to the corrected profile (QR-A)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0) ,y=y_corrected_qra, yerr=y_unc_corrected_qra, color=color_hrts_qra, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-A')
-ax[0].plot(x_fit_corrected_qra, y_fit_corrected_qra, color=color_hrts_qra, linestyle='-', label='Fit', zorder=1) 
+ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qra, lamb_0=lam_0) ,y=y_corrected_qra, yerr=y_unc_corrected_qra, color=color_hrts_qra, marker='o', linewidth=0, elinewidth=1., label='SUMER data')
+ax[0].plot(x_fit_corrected_qra, y_fit_corrected_qra, color=color_hrts_qra, linestyle='-', label='Double Gaussian fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qra_singlegauss, lamb_0=lam_0), y_fit_corrected_qra_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 bckg_fit = popt_qra[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
@@ -1683,7 +1682,7 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qra_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qra_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qra_singlegauss, y_fit_corrected_qra_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII - 770.428 \u212B')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 #ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-A, multigaussian fit', fontsize=title_size)
 ax[0].set_title(f'CH-1 corrected with QS-A', fontsize=title_size)
@@ -1710,8 +1709,8 @@ ax[0].text(
 plt.subplots_adjust(left=0.08, right=0.93, bottom=0.08, top=0.9, wspace=0., hspace=0.0)
 # Reduced chi-square text on the left
 ax[0].text(0.02, 0.98,  # x, y in axes coordinates (0–1); top-left corner
-    r'Double: $\chi^2_{\rm red} = ' + f'{chi2red_qra_double:.1f}' + r'$' + '\n'
-    r'Single: $\chi^2_{\rm red} = ' + f'{chi2red_qra_single:.1f}' + r'$', transform=ax[0].transAxes, ha='left', va='top', fontsize=chi2red_fontsize, fontweight='normal', color='black')
+    r'Double Gaussian fit: $\chi^2_{\rm red} = ' + f'{chi2red_qra_double:.1f}' + r'$' + '\n'
+    r'Single Gaussian fit: $\chi^2_{\rm red} = ' + f'{chi2red_qra_single:.1f}' + r'$', transform=ax[0].transAxes, ha='left', va='top', fontsize=chi2red_fontsize, fontweight='normal', color='black')
 if save_paper_images == 'yes':
 	fig_name = 'contours_EIT__spectrum_multigaussian_fit_corrected_qra'
 	plt.savefig(folder_name+'/'+fig_name+'.pdf', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
@@ -1721,18 +1720,16 @@ plt.show(block=False)
 
 
 ######################################################
-# Single fit corrected Ne VIII line, QS-B
-
-bckg_fit1_corrected_qrb = -0.3
-init_parameters1_corrected_qrb = [bckg_fit1_corrected_qrb, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
-3.-bckg_fit1_corrected_qrb, 0.0, 50.
-]
-
+# Single fit, QS-B
 
 x_corrected_qrb = lam_sumer_cropNeVIII
 y_corrected_qrb = rad_sumer_cropNeVIII_corrected_qrb
 y_unc_corrected_qrb = erad_sumer_cropNeVIII_corrected_qrb
 
+bckg_fit1_corrected_qrb = -0.3
+init_parameters1_corrected_qrb = [bckg_fit1_corrected_qrb, #[background, amplitude1, mean1, FWHM1, amplitude2, mean2, FWHM2,...]
+3.-bckg_fit1_corrected_qrb, 0.0, 50.
+]
 
 # Perform the fit
 popt_qrb, pcov_qrb = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0), y_corrected_qrb, p0=init_parameters1_corrected_qrb, sigma=y_unc_corrected_qrb, absolute_sigma=True) #popt_qrb are the optimized parameters. pcov_qrb is the covariance matrix of the parameters. 
@@ -1756,7 +1753,7 @@ y_unc_residuals_qrb = np.sqrt(y_unc_corrected_qrb**2 + y_unc_fit_length_correcte
 
 ### PAPER image: multigaussian fit to the corrected profile (QR-B)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0) ,y=y_corrected_qrb, yerr=y_unc_corrected_qrb, color=color_hrts_qrb, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-B')
+ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0) ,y=y_corrected_qrb, yerr=y_unc_corrected_qrb, color=color_hrts_qrb, marker='o', linewidth=0, elinewidth=1., label='SUMER data')
 ax[0].plot(x_fit_corrected_qrb, y_fit_corrected_qrb, color=color_hrts_qrb, linestyle='-', label='Fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qrb_singlegauss, lamb_0=lam_0), y_fit_corrected_qrb_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 bckg_fit = popt_qrb[0]
@@ -1776,7 +1773,7 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qrb_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qrb_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qrb_singlegauss, y_fit_corrected_qrb_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII - 770.428 \u212B')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 #ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-B, multigaussian fit', fontsize=title_size)
 ax[0].set_title(f'CH-1 corrected with QS-B', fontsize=title_size)
@@ -1809,12 +1806,7 @@ plt.show(block=False)
 
 
 ######################################################
-# Double fit corrected Ne VIII line, QS-B
-
-x_corrected_qrb = lam_sumer_cropNeVIII
-y_corrected_qrb = rad_sumer_cropNeVIII_corrected_qrb
-y_unc_corrected_qrb = erad_sumer_cropNeVIII_corrected_qrb
-
+# Double fit, QS-B
 
 # Perform the fit
 popt_qrb, pcov_qrb = curve_fit(multigaussian_function_for_curvefit, vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0), y_corrected_qrb, p0=init_parameters_corrected_qrb, sigma=y_unc_corrected_qrb, absolute_sigma=True) #popt_qrb are the optimized parameters. pcov_qrb is the covariance matrix of the parameters. 
@@ -1838,8 +1830,8 @@ y_unc_residuals_qrb = np.sqrt(y_unc_corrected_qrb**2 + y_unc_fit_length_correcte
 
 ### PAPER image: multigaussian fit to the corrected profile (QR-B)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0) ,y=y_corrected_qrb, yerr=y_unc_corrected_qrb, color=color_hrts_qrb, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-B')
-ax[0].plot(x_fit_corrected_qrb, y_fit_corrected_qrb, color=color_hrts_qrb, linestyle='-', label='Fit', zorder=1) 
+ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrb, lamb_0=lam_0) ,y=y_corrected_qrb, yerr=y_unc_corrected_qrb, color=color_hrts_qrb, marker='o', linewidth=0, elinewidth=1., label='SUMER data')
+ax[0].plot(x_fit_corrected_qrb, y_fit_corrected_qrb, color=color_hrts_qrb, linestyle='-', label='Double Gaussian fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qrb_singlegauss, lamb_0=lam_0), y_fit_corrected_qrb_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 bckg_fit = popt_qrb[0]
 color_singlegauss_list = ['purple', 'brown', 'darkblue', 'darkred']
@@ -1858,7 +1850,7 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qrb_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qrb_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qrb_singlegauss, y_fit_corrected_qrb_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII - 770.428 \u212B')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 #ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-B, multigaussian fit', fontsize=title_size)
 ax[0].set_title(f'CH-1 corrected with QS-B', fontsize=title_size)
@@ -1885,8 +1877,8 @@ ax[0].text(
     fontweight='bold', color='gold')#, color=color_contours_eit_Imap)#color=(0.83, 0.70, 0.00)
     # Reduced chi-square text on the left
 ax[0].text(0.02, 0.98,  # x, y in axes coordinates (0–1); top-left corner
-    r'Double: $\chi^2_{\rm red} = ' + f'{chi2red_qra_double:.1f}' + r'$' + '\n'
-    r'Single: $\chi^2_{\rm red} = ' + f'{chi2red_qra_single:.1f}' + r'$', transform=ax[0].transAxes, ha='left', va='top', fontsize=chi2red_fontsize, fontweight='normal', color='black')
+    r'Double Gaussian fit: $\chi^2_{\rm red} = ' + f'{chi2red_qrb_double:.1f}' + r'$' + '\n'
+    r'Single Gaussian fit: $\chi^2_{\rm red} = ' + f'{chi2red_qrb_single:.1f}' + r'$', transform=ax[0].transAxes, ha='left', va='top', fontsize=chi2red_fontsize, fontweight='normal', color='black')
 if save_paper_images == 'yes':
 	fig_name = 'contours_EIT__spectrum_multigaussian_fit_corrected_qrb'
 	plt.savefig(folder_name+'/'+fig_name+'.pdf', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
@@ -1894,7 +1886,7 @@ plt.show(block=False)
 
 
 
-
+"""
 ######################################################
 # Fit corrected Ne VIII line, QS-L
 
@@ -1922,7 +1914,7 @@ y_unc_residuals_qrl = np.sqrt(y_unc_corrected_qrl**2 + y_unc_fit_length_correcte
 
 ### PAPER image: multigaussian fit to the corrected profile (QR-L)
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=fig_size, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
-ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrl, lamb_0=lam_0) ,y=y_corrected_qrl, yerr=y_unc_corrected_qrl, color=color_hrts_qrl, marker='o', linewidth=0, elinewidth=1., label='SUMER corrected QS-L')
+ax[0].errorbar(x=vkms_doppler(lamb=x_corrected_qrl, lamb_0=lam_0) ,y=y_corrected_qrl, yerr=y_unc_corrected_qrl, color=color_hrts_qrl, marker='o', linewidth=0, elinewidth=1., label='SUMER data')
 ax[0].plot(x_fit_corrected_qrl, y_fit_corrected_qrl, color=color_hrts_qrl, linestyle='-', label='Fit', zorder=1) 
 #ax[0].plot(vkms_doppler(lamb=x_fit_corrected_qrl_singlegauss, lamb_0=lam_0), y_fit_corrected_qrl_singlegauss, color='magenta', linestyle='-', label='Individual gaussian', zorder=1)
 bckg_fit = popt_qrl[0]
@@ -1942,7 +1934,7 @@ for n_gauss in range(N_gaussians):
     y_fit_corrected_qrl_singlegauss = gaussian_function_with_background(x=x_fit_corrected_qrl_singlegauss, bckg=bckg_fit, amplitude=amplitude_fit, mean=mean_fit, fwhm=fwhm_fit)
     ax[0].plot(x_fit_corrected_qrl_singlegauss, y_fit_corrected_qrl_singlegauss, color=components_color, linestyle=components_linestyle, linewidth=components_linewidth)#, label='Individual gaussians')
 ax[0].plot([], [], color=components_color, linestyle=components_linestyle, linewidth=components_linewidth, label='Individual gaussians')
-ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII/2')
+ax[0].axvline(x=0, color='black', linestyle='--', label='Ne VIII - 770.428 \u212B')
 ax[0].axvspan(-v_unc_0, v_unc_0, color='grey', alpha=0.15)
 #ax[0].set_title(f'SUMER spectrum corrected with HRTS QS-L, multigaussian fit', fontsize=title_size)
 ax[0].set_title(f'CH-1 corrected with QS-L', fontsize=title_size)
@@ -1979,7 +1971,7 @@ plt.show(block=False)
 #xb_uncorrected, yb_uncorrected = find_bisector(x_data=x_uncorrected[3:-7], y_data=y_uncorrected[3:-7], y_unc_data=y_unc_uncorrected[3:-7], y_target_list='auto', N_bisector_dots=50, kind_interp='linear', show_figure='yes')
 
 #xb_corrected, yb_corrected = find_bisector(x_data=x_corrected, y_data=y_corrected, y_unc_data=y_unc_corrected, y_target_list='auto', N_bisector_dots=50, kind_interp='linear', show_figure='yes')
-
+"""
 #############################################
 
 print('chi2red_qra_single: ', chi2red_qra_single)

@@ -1,3 +1,6 @@
+
+include_intercept = 'no' #Include the intercept in the linear fitt ('yes' or keep it as zero ('no')?
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -186,6 +189,9 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
 
     def linear_func(x_, m_):
         return m_ * x_   # zero intercept
+    
+    if include_intercept=='yes':
+        def linear_func(x_, m_, b_): return m_ * x_ + b_   # zero intercept
 
     y_hrts = rad_hrts_conv_SUMERgrid_cropscale
     yerr_hrts = erad_hrts_conv_SUMERgrid_cropscale
@@ -195,6 +201,10 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
 
     scaling_factor_ = popt_sf[0]
     scaling_factor_err = np.sqrt(pcov_sf[0, 0])
+    
+    if include_intercept=='yes':
+        intercept_ = popt_sf[1]
+        intercept_err = np.sqrt(pcov_sf[1, 1])
 
     # Compute reduced chi^2
     y_model = linear_func(y_hrts, *popt_sf) # Model prediction 
@@ -209,7 +219,8 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
 
     # Generate fitted line for plotting
     xfit_sf = np.linspace(min(y_hrts), max(y_hrts), 1000)
-    yfit_sf = scaling_factor_ * xfit_sf #or linear_func(x_=xfit_sf, m_=scaling_factor_), they're the same
+    if include_intercept=='yes': yfit_sf = scaling_factor_ * xfit_sf + intercept_
+    else: yfit_sf = scaling_factor_ * xfit_sf 
     
     
 
@@ -217,7 +228,9 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
     if show_plot=='yes':
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
         ax.errorbar(x=y_hrts, y=y_sumer, yerr=yerr_sumer, color=color_hrts, linewidth=0, elinewidth=1., marker='.', markersize=5, label='Data')
-        ax.plot(xfit_sf, yfit_sf, color='brown', label=f'Linear fit. Slope (scaling factor): {np.round(scaling_factor_,4)}')
+        if include_intercept=='yes': label_ = f'Linear fit. Slope, intercept = {np.round(scaling_factor_,4)}, {np.round(intercept_,4)}'
+        else: label_ = f'Linear fit. Slope (scaling factor): {np.round(scaling_factor_,4)}'
+        ax.plot(xfit_sf, yfit_sf, color='brown', label=label_)
         if title_fit_radiances=='auto': title_fit_radiances = f'Spectral radiances of SUMER vs HRTS ({qr_label}), and fitting'
         ax.set_title(title_fit_radiances, fontsize=18) 
         ax.set_xlabel(r'Spectral radiance HRTS (W m$^{-2}$ sr$^{-1}$ ''\u212B'r'$^{-1}$)', color=color_hrts, fontsize=16)
@@ -246,15 +259,32 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
         T1 = a_*b_err
         T2 = b_*a_err
         return np.sqrt(T1**2 + T2**2)
+        
+    def error_propagation_linear(a_, a_err, m_, m_err, b_err):
+        """
+        Error propagartion of y_ = a_*m_ + b_
+        """
+        T1 = a_*m_err
+        T2 = m_*a_err
+        T3 = b_err
+        return np.sqrt(T1**2 + T2**2+ T3**2)
 
 
     # Scale HRTS and crop in range of analysis
     ## Radiance
-    rad_hrts_conv_scaled = scaling_factor_ * rad_hrts_conv
-    rad_hrts_conv_scaled_SUMERgrid = scaling_factor_ * rad_hrts_conv_SUMERgrid
+    if include_intercept=='yes': 
+        rad_hrts_conv_scaled = scaling_factor_ * rad_hrts_conv + intercept_
+        rad_hrts_conv_scaled_SUMERgrid = scaling_factor_ * rad_hrts_conv_SUMERgrid + intercept_
+    else:
+        rad_hrts_conv_scaled = scaling_factor_ * rad_hrts_conv
+        rad_hrts_conv_scaled_SUMERgrid = scaling_factor_ * rad_hrts_conv_SUMERgrid
     ## Uncertainties
-    erad_hrts_conv_scaled = error_propagation_product(a_=scaling_factor_, a_err=scaling_factor_err, b_=rad_hrts_conv, b_err=erad_hrts_conv)
-    erad_hrts_conv_scaled_SUMERgrid = error_propagation_product(a_=scaling_factor_, a_err=scaling_factor_err, b_=rad_hrts_conv_SUMERgrid, b_err=erad_hrts_conv_SUMERgrid)
+    if include_intercept=='yes': 
+        erad_hrts_conv_scaled = error_propagation_linear(a_=rad_hrts_conv, a_err=erad_hrts_conv, m_=scaling_factor_, m_err=scaling_factor_err, b_err=intercept_)
+        erad_hrts_conv_scaled_SUMERgrid = error_propagation_linear(a_=rad_hrts_conv_SUMERgrid, a_err=erad_hrts_conv_SUMERgrid, m_=scaling_factor_, m_err=scaling_factor_err, b_err=intercept_)
+    else:
+        erad_hrts_conv_scaled = error_propagation_product(a_=scaling_factor_, a_err=scaling_factor_err, b_=rad_hrts_conv, b_err=erad_hrts_conv)
+        erad_hrts_conv_scaled_SUMERgrid = error_propagation_product(a_=scaling_factor_, a_err=scaling_factor_err, b_=rad_hrts_conv_SUMERgrid, b_err=erad_hrts_conv_SUMERgrid)
 
     ######################################################
     # 4) Crop in the range of analysis

@@ -16,3 +16,6 @@ color_sumer_corrected_qrl = color_hrts_qrl_scaled
 color_contours_eit_Imap = 'yellow'
 color_contours_sumer_Imap = 'magenta'
 
+
+chi2red_fontsize = 14
+
