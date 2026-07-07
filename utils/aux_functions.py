@@ -271,6 +271,20 @@ def gaussian_function_v2(x, amplitude, mean, FWHM_):
     stddev_ = FWHM_ / (2*np.sqrt(2*np.log(2)))
     return amplitude * np.exp(-((x-mean)**2)/(2*stddev_**2))
     
+def gaussian_area(peak_, fwhm_):
+    H = peak_
+    W = fwhm_
+    C_ = np.sqrt( np.pi / (4*np.log(2)) )
+    return H * W * C_ 
+    
+def unc_gaussian_area(peak_, fwhm_, peak_unc_, fwhm_unc_):
+    H = peak_
+    W = fwhm_
+    dH = peak_unc_
+    dW = fwhm_unc_
+    C_ = np.sqrt( np.pi / (4*np.log(2)) )
+    return C_ * np.sqrt( (W*dH)**2 + (H*dW)**2 )
+    
 def multi_gaussian_function(x, amplitude_list, mean_list, stddev_list):
     gaussian_total = np.zeros(len(x))
     for i in range(len(x)):
@@ -840,11 +854,23 @@ def reduced_chi_squared(y_fit_, y_data_, y_unc_data_, n_parameters):
     Calculation of reduced Chi square of a fit. 
     It uses only y-errors.
     """
+
     chi_square = np.sum(((y_data_ - y_fit_) / y_unc_data_)**2)  # Using only y-errors
     dof = len(y_data_) - n_parameters # Degrees of freedom
     reduced_chi_squared_ = chi_square / dof
-    
     return [reduced_chi_squared_, chi_square]
+    
+def chi2red_function(y_fit_, y_data_, y_unc_data_, popt_):
+    
+    """
+    Calculation of reduced Chi square of a fit. 
+    It uses only y-errors.
+    """
+    chi_square = np.sum(((y_data_ - y_fit_) / y_unc_data_)**2)  # Using only y-errors
+    dof = len(y_data_) - len(popt_) # Degrees of freedom
+    reduced_chi_squared_ = chi_square / dof
+    return [reduced_chi_squared_, chi_square]
+    
 
 def averaged_intensity_along_slit(I_ij, f_j, t_exp): 
     """
