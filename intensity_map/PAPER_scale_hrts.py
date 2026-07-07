@@ -210,8 +210,8 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
     # Generate fitted line for plotting
     xfit_sf = np.linspace(min(y_hrts), max(y_hrts), 1000)
     yfit_sf = scaling_factor_ * xfit_sf #or linear_func(x_=xfit_sf, m_=scaling_factor_), they're the same
-
-
+    
+    
 
     # PAPER image: radiances of SUMER and HRTS
     if show_plot=='yes':
@@ -354,7 +354,7 @@ def fun_scale_hrts(hrts_qr, lamb_0, lam_sumer, rad_sumer, erad_sumer, fwhm_conv,
         plt.show(block=False)
         
     #return [lam_sumer_cropNeVIII, rad_sumer_cropNeVIII, erad_sumer_cropNeVIII, rad_sumer_cropNeVIII_corrected, erad_sumer_cropNeVIII_corrected]
-    return {'lam_sumer_cropNeVIII': lam_sumer_cropNeVIII, 'rad_sumer_cropNeVIII': rad_sumer_cropNeVIII, 'erad_sumer_cropNeVIII': erad_sumer_cropNeVIII, 'rad_sumer_cropNeVIII_corrected': rad_sumer_cropNeVIII_corrected, 'erad_sumer_cropNeVIII_corrected': erad_sumer_cropNeVIII_corrected, 'lam_hrts': lam_hrts, 'rad_hrts': rad_hrts, 'erad_hrts': erad_hrts, 'rad_hrts_conv': rad_hrts_conv, 'erad_hrts_conv': erad_hrts_conv, 'rad_hrts_conv_scaled': rad_hrts_conv_scaled, 'erad_hrts_conv_scaled': erad_hrts_conv_scaled, 'lam_hrts_cropNeVIII': lam_hrts_cropNeVIII, 'rad_hrts_cropNeVIII': rad_hrts_cropNeVIII, 'erad_hrts_cropNeVIII': erad_hrts_cropNeVIII, 'rad_hrts_conv_scaled_cropNeVIII': rad_hrts_conv_scaled_cropNeVIII, 'erad_hrts_conv_scaled_cropNeVIII': erad_hrts_conv_scaled_cropNeVIII}
+    return {'lam_sumer_cropNeVIII': lam_sumer_cropNeVIII, 'rad_sumer_cropNeVIII': rad_sumer_cropNeVIII, 'erad_sumer_cropNeVIII': erad_sumer_cropNeVIII, 'rad_sumer_cropNeVIII_corrected': rad_sumer_cropNeVIII_corrected, 'erad_sumer_cropNeVIII_corrected': erad_sumer_cropNeVIII_corrected, 'lam_hrts': lam_hrts, 'rad_hrts': rad_hrts, 'erad_hrts': erad_hrts, 'rad_hrts_conv': rad_hrts_conv, 'erad_hrts_conv': erad_hrts_conv, 'rad_hrts_conv_scaled': rad_hrts_conv_scaled, 'erad_hrts_conv_scaled': erad_hrts_conv_scaled, 'lam_hrts_cropNeVIII': lam_hrts_cropNeVIII, 'rad_hrts_cropNeVIII': rad_hrts_cropNeVIII, 'erad_hrts_cropNeVIII': erad_hrts_cropNeVIII, 'rad_hrts_conv_scaled_cropNeVIII': rad_hrts_conv_scaled_cropNeVIII, 'erad_hrts_conv_scaled_cropNeVIII': erad_hrts_conv_scaled_cropNeVIII, 'scaling_factor': scaling_factor_, 'scaling_factor_unc': scaling_factor_err, 'chi2_red_sf': chi2_red_sf}
 
 
 #rad_hrts_conv_SUMERgrid, erad_hrts_conv_SUMERgrid

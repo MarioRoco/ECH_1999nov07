@@ -13,4 +13,6 @@ color_sumer_corrected_qra = color_hrts_qra_scaled
 color_sumer_corrected_qrb = color_hrts_qrb_scaled
 color_sumer_corrected_qrl = color_hrts_qrl_scaled
 
+color_contours_eit_Imap = 'yellow'
+color_contours_sumer_Imap = 'magenta'
 

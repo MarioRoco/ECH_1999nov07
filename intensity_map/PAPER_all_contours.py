@@ -4,6 +4,8 @@ save_paper_images = 'no'
 folder_name = '../outputs/paper_figures/maps_with_contours/v1' #name of the folder where you save the images
 save_dpi = 100 #resolution: number of pixels per inch. ChatGPT gave me 300 by default. 
 
+show_legend = 'no'
+
 
 # polygon vertices are given as (row, col)
 poly_rc, region_id = [[12,104], [12,199], [83,180], [83,127]], 'QSa6' #QS a6
@@ -20,18 +22,8 @@ percentage_eit, threshold_value_type_eit = 4., 'max' #'max', 'min', 'mean', 'med
 percentage_sumer, threshold_value_type_sumer = 6.5, 'max' #'max', 'min', 'mean', 'median'
 
 
-
-# Full Sun
-show_sumer_FOV = 'yes'
-show_contours_fullsun = 'yes'
-vmin_eit_fullsun, vmax_eit_fullsun = 5.5e1, 5e3 
-contour_intensity_eit_fullsun = 135. #110.
-#contour_intensity_eit_fullsun = 'upper_bound'
-
 legend_size = 13
 
-color_contours_eit_Imap = 'yellow'
-color_contours_sumer_Imap = 'magenta'
 
 color_contours_eit_dopplermap, linestyle_eit_dopplermap = 'springgreen', '-'
 color_contours_sumer_dopplermap, linestyle_sumer_dopplermap = 'black', '-' #'springgreen', 'green', 'lime', 'olive', 'forestgreen', 'seagreen', 'springgreen', 'darkgreen', 'lightgreen', 'mediumseagreen', 'palegreen', 'yellowgreen', 'chartreuse', 'lawngreen'; 'teal', 'black', 'gold', 'yellow', 'orange', 'coral', 'cyan', 'darkgreen'
@@ -444,7 +436,7 @@ plt.show(block=False)
 
 
 ### EIT and SUMER maps with contours
-fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9.8,10.5), sharex=True)
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9.8,9.55), sharex=True)
 vmin_eit, vmax_eit = 4e1, 3e3
 #ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
 ax[0].imshow(data_eit_crop_corrected, norm=LogNorm(vmin=vmin_eit, vmax=vmax_eit), cmap='Greys_r', extent=extent_eit_sumer_arcsec_image)
@@ -456,16 +448,15 @@ ax[1].set_xlabel('Helioprojective longitude (arcsec)', fontsize=16)
 fig.supylabel('Helioprojective latitude (arcsec)', fontsize=17)
 ax[0].text(1.02, 0.5, f'EIT-{header_eit["WAVELNTH"]}', fontsize=22,transform=ax[0].transAxes, va='center', ha='left', rotation=90)
 ax[1].text(1.02, 0.5, f'SUMER-{line_center_label}', fontsize=22,transform=ax[1].transAxes, va='center', ha='left', rotation=90)
-plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspace=0)
 #ax[0].axvline(x=HPlon_slit_rotcomp_corrected, linestyle='-', linewidth=0.8, color='red', label='Slit position during\n EIT image')
 #ax[1].axvline(x=HPlon_slit_rotcomp_corrected, linestyle='-', linewidth=0.8, color='red')
 #contour_sumer = ax[0].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors='orange', linewidths=1, extent=extent_eit_sumer_arcsec_contours)
 #contour_sumer = ax[1].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors='orange', linewidths=1, extent=extent_eit_sumer_arcsec_contours)
 contour_eit0 = ax[0].contour(data_eit_crop_corrected[::-1], levels=[bound_eit], colors=color_contours_eit_Imap, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_sumer0 = ax[0].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors=color_contours_sumer_Imap, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
-legend_elements = [
-    mlines.Line2D([],[],color=color_contours_eit_Imap, label=f'{bound_eit} %'),
-    mlines.Line2D([],[],color=color_contours_sumer_Imap, label=f'{bound_sumer} %')]
+#legend_elements = [
+#    mlines.Line2D([],[],color=color_contours_eit_Imap, label=f'{bound_eit} %'),
+#    mlines.Line2D([],[],color=color_contours_sumer_Imap, label=f'{bound_sumer} %')]
 contour_eit1 = ax[1].contour(data_eit_crop_corrected[::-1], levels=[bound_eit], colors=color_contours_eit_Imap, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 contour_sumer1 = ax[1].contour(intensity_map_croplat[::-1], levels=[bound_sumer], colors=color_contours_sumer_Imap, linewidths=2, extent=extent_eit_sumer_arcsec_contours)
 #ax[0].set_xlim([HPlon_rotcomp[0], HPlon_rotcomp[-1]])
@@ -491,6 +482,12 @@ for c in contours_left_region:
 if save_paper_images == 'yes':
     fig_name = 'intensity_maps_SUMER_EIT_and_contours'
     plt.savefig(folder_name+'/'+fig_name+'.png', dpi=save_dpi, bbox_inches='tight')  # Save as PNG (high-res)
+plt.subplots_adjust(left=0.1, right=0.95, bottom=0.08, top=0.95, wspace=0, hspace=0)
+if show_legend=='yes':
+    ax[0].plot([],[], linewidth=2, color=color_contours_eit_Imap, label='CH-1')
+    ax[0].plot([],[], linewidth=2, color=color_contours_sumer_Imap, label='CH-2')
+    ax[0].plot([],[], linewidth=2, color='cyan', label='QS-1')
+    ax[0].legend(loc='lower right', fontsize=14)
 plt.show(block=False)
 
 
